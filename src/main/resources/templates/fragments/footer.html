@@ -1,0 +1,111 @@
+<footer th:fragment="mainFooter" class="site-footer" role="contentinfo" aria-label="Site footer">
+    <div class="container footer-container">
+
+        <!-- Centered Privacy / Terms / Contact -->
+        <nav class="footer-nav" aria-label="Footer links">
+            <a href="/privacy">Privacy</a>
+            <a href="/terms">Terms</a>
+            <a href="/contact">Contact</a>
+        </nav>
+
+        <!-- Social icons moved BELOW -->
+        <nav class="footer-social" aria-label="Social media">
+            <ul class="social-icons" role="list">
+                <li>
+                    <a href="https://twitter.com/yourhandle" aria-label="Twitter" target="_blank" rel="noopener noreferrer">
+                        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill="currentColor" d="M22 5.9c-.6.3-1.2.5-1.8.6.6-.4 1-1 1.2-1.8-.6.4-1.4.8-2.2 1-1.3-1.3-3.5-1.3-4.8 0-1 1-1.3 2.5-.9 3.8-3.1-.2-5.9-1.7-7.7-4C4 7.3 4.6 9 6.1 9.9c-.5 0-1-.2-1.4-.4v.1c0 1.6 1.2 3 2.8 3.3-.4.1-.8.1-1.2 0 .3 1 1.2 1.8 2.3 1.8C6.9 16 5.9 16.4 5 16.4c-.3 0-.6 0-.9-.1 1 1 2.3 1.6 3.6 1.6 4.3 0 6.6-3.7 6.6-6.9v-.3c.5-.3 1-.7 1.4-1.2-.4.2-.9.3-1.3.4z">
+                        </svg>
+                        <span class="sr-only">Twitter</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+    </div>
+
+    <style>
+        :root {
+            --footer-bg: var(--primary-color);
+            --footer-text: #cccccc;
+            --footer-accent: var(--main-color);
+            --footer-muted: #777;
+        }
+
+        .site-footer {
+            padding: 1.5rem 0;
+            background: var(--footer-bg);
+            color: var(--footer-text);
+            border-top: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.95rem;
+        }
+
+        .footer-container {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        /* Centered Links */
+        .footer-nav {
+            margin-bottom: 1rem;
+        }
+
+        .footer-nav a {
+            margin: 0 0.75rem;
+            color: var(--footer-text);
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .footer-nav a:hover {
+            color: var(--footer-accent);
+            text-shadow: 0 0 6px var(--footer-accent);
+        }
+
+        /* Social */
+        .footer-social {
+            margin-top: 0.5rem;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .social-icons a {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            color: var(--footer-text);
+            transition: 0.2s;
+        }
+
+        .social-icons a:hover {
+            background: rgba(130,43,217,0.15);
+            color: var(--footer-accent);
+            transform: translateY(-2px);
+        }
+
+        .social-icons svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(1px,1px,1px,1px);
+        }
+    </style>
+</footer>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head id="master-head">
+    <title>Home | MauDonate</title>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="/assets/manifest.json">
+    <meta name="theme-color" content="#822BD9">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="icon"  href="/assets/img/logo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/main.css">
+
+    <style>
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+            width: 100%;
+            background: var(--primary-color);
+        }
+
+        .page-wrap {
+            inset: 0;
+            overflow: hidden;
+        }
+        .page-carousel {
+            display: flex;
+            height: 100%;
+            transition: transform .28s ease;
+        }
+        .page {
+            min-width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+
+        .request-card {
+            margin: 8px;
+            border-radius: 10px;
+            background-color: var(--primary-color-lighter);
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Main Header -->
+<header th:replace="/fragments/header :: mainHeader" id="master-header"></header>
+
+<main class="page-wrap" id="pageWrap">
+    <div class="page-carousel" id="pageCarousel">
+
+        <!-- PAGE 1 -->
+        <section class="page">
+            <div class="container h-100 align-items-center">
+                <div class="row justify-content-center">
+                    <div class="col-md-8 col-lg-6 text-center text-white">
+
+                        <img src="/assets/img/logo_transparent.png" height="250" class="mb-4" alt="BeatCam Logo">
+
+                        <p class="lead mb-4">
+                            Your kindness. In any way.
+                        </p>
+
+                        <button class="btn btn-lg btn-success px-5 mb-3" onclick="goToPage(1)" id="donateNow">
+                            Donate Now
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 2 -->
+        <section class="page">
+            <p style="justify-content: center; align-items: center; text-align: center; padding: 30px;" th:if="${requests.isEmpty()}">No one has reached out yet.</p>
+            <div th:each="req : ${requests}" class="request-card card mb-3">
+                <div class="card-body">
+                    <div class="text-muted d-flex align-items-center">
+                        <h5 th:text="${req.getUser().getFirstName() + ' ' + req.getUser().getLastName()}"></h5>
+                        <h5 class="ms-auto" th:text="${'Goal: Rs ' + req.GoalAmount}"></h5>
+                    </div>
+                    <p th:text="${req.Story}"></p>
+                    <p ></p>
+                    <div class="text-muted d-flex align-items-center">
+                        <small th:text="${'Created at ' + req.CreatedAt}"></small>
+                        <a th:href="'/donate/' + ${req.ID}" class="ms-auto btn btn-primary">Donate</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 3 -->
+        <section class="page">
+            <p style="justify-content: center; align-items: center; text-align: center; padding: 30px;">Coming soon.</p>
+        </section>
+
+        <!-- PAGE 4 -->
+        <section class="page">
+            <p style="justify-content: center; align-items: center; text-align: center; padding: 30px;">Coming soon.</p>
+        </section>
+
+    </div>
+</main>
+
+<!-- Scripts -->
+<script src="/assets/js/app.js"></script>
+<script>
+    const pageWrap = document.getElementById('pageWrap');
+    const pageCarousel = document.getElementById('pageCarousel');
+    const pages = pageCarousel.querySelectorAll('.page');
+    let pageIndex = 0;
+
+    let startX = 0, isDown = false, isDragging = false;
+
+
+    pageWrap.addEventListener('pointerdown', e => {
+        startX = e.clientX;
+        isDown = true;
+        isDragging = false;
+    });
+
+    pageWrap.addEventListener('pointermove', e => {
+        if (!isDown) return;
+        const dx = e.clientX - startX;
+        if (Math.abs(dx) > 10 && !isDragging) {
+            isDragging = true;
+            pageWrap.setPointerCapture(e.pointerId);
+        }
+        if (!isDragging) return;
+        pageCarousel.style.transition = 'none';
+        pageCarousel.style.transform = `translateX(calc(-${pageIndex * 100}% + ${dx}px))`;
+    });
+
+    pageWrap.addEventListener('pointerup', e => {
+        if (!isDown) return;
+        isDown = false;
+
+        if (isDragging) pageWrap.releasePointerCapture(e.pointerId);
+        pageCarousel.style.transition = '';
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        if (Math.abs(dx) > 80) {
+            if (dx < 0 && pageIndex < pages.length - 1) pageIndex++;
+            if (dx > 0 && pageIndex > 0) pageIndex--;
+        }
+        pageCarousel.style.transform = `translateX(-${pageIndex * 100}%)`;
+    });
+
+    function goToPage(i) {
+        closeSidebar();
+        pageIndex = i;
+        pageCarousel.style.transform = `translateX(-${i * 100}%)`;
+    }
+</script>
+
+
+<script src="/assets/pwa-init.js"></script>
+
+
+
+<div th:replace="/fragments/bottom-nav :: mainBottomNav" id="bottomNav"></div>
+
+</body>
+</html>

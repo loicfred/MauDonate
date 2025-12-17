@@ -1,0 +1,87 @@
+//CAMERA PERMISSION
+async function requestCameraPermission() {
+    try {
+        await navigator.mediaDevices.getUserMedia({ video: true });
+        console.log("📷 Camera permission granted");
+        return true;
+    } catch (err) {
+        console.warn("Camera permission denied:", err);
+        return false;
+    }
+}
+
+// MICROPHONE PERMISSION
+async function requestMicrophonePermission() {
+    try {
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        console.log("🎤 Microphone permission granted");
+        return true;
+    } catch (err) {
+        console.warn("Microphone permission denied:", err);
+        return false;
+    }
+}
+
+//MOTION / ACCELEROMETER PERMISSION (iOS only)
+async function requestMotionPermission() {
+    if (typeof DeviceMotionEvent === "undefined") {
+        console.log("Motion sensor not supported.");
+        return false;
+    }
+
+    // iOS requires explicit permission
+    if (typeof DeviceMotionEvent.requestPermission === "function") {
+        try {
+            const response = await DeviceMotionEvent.requestPermission();
+            if (response === "granted") {
+                console.log("📱 Motion permission granted");
+                return true;
+            } else {
+                console.warn("Motion permission denied by user.");
+                return false;
+            }
+        } catch (err) {
+            console.error("Motion permission error:", err);
+            return false;
+        }
+    }
+
+    // Android/web usually auto-granted
+    console.log("📱 Motion permission auto-granted (non-iOS)");
+    return true;
+}
+
+
+//FULL PERMISSION CHECK (Camera + Mic + Motion)
+async function requestAllPermissions() {
+    let cam = await requestCameraPermission();
+    let mic = await requestMicrophonePermission();
+    let motion = await requestMotionPermission();
+
+    return cam && mic && motion;
+}
+
+//Optional — Show custom UI message
+function showPermissionPopup(message) {
+    const div = document.createElement("div");
+    div.className = "permission-popup";
+    div.innerHTML = message;
+
+    Object.assign(div.style, {
+        position: "fixed",
+        top: "15px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        padding: "14px 20px",
+        background: "var(--main-color)",
+        color: "white",
+        borderRadius: "10px",
+        zIndex: "9999",
+        boxShadow: "0 0 10px rgba(130,43,217,0.6)",
+        fontFamily: "Arial",
+        fontSize: "14px"
+    });
+
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 4000);
+}

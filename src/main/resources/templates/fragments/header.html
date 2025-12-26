@@ -1,20 +1,42 @@
 <nav th:fragment="mainHeader" class="navbar navbar-dark" style="padding: 3px">
     <div class="container d-flex align-items-center" style="justify-content: space-between;">
         <button class="hamburger-btn me-3" id="hamburgerBtn" aria-label="Open menu">☰</button>
-        <a class="navbar-brand me-auto" href="/">
-            <img style="border-radius: 50%" src="/assets/img/logo.png" height="40" alt="BeatCam">
+        <a class="navbar-brand me-auto" href="/home">
+            <img style="border-radius: 50%" src="/img/logo.png" draggable="false" height="40" alt="BeatCam">
         </a>
 
         <div class="sidebar" id="sidebar">
             <h5 class="mb-3">Menu</h5>
-            <a onclick="goToPage(0)">Home</a>
-            <a onclick="goToPage(1)">Donate</a>
-            <a onclick="goToPage(2)">Campaigns</a>
-            <a onclick="goToPage(3)">About</a>
+            <button onclick="goToHome()">Home</button>
+            <button onclick="goToDonate()">Donate</button>
+            <button onclick="goToCampaign()">Campaigns</button>
+            <button onclick="goToAbout()">About</button>
             <hr>
             <a th:if="${principal == null}" href="/accounts/login">Log in</a>
             <a th:if="${principal != null}" href="/settings">Settings</a>
-            <a th:if="${principal != null}" href="/logout">Log out</a>
+            <form th:if="${principal != null}" action="/logout" method="post">
+                <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+                <button type="submit">Logout</button>
+            </form>
+            <script>
+                const url = window.location.href;
+                function goToHome() {
+                    if (url.includes("home")) goToPage(0);
+                    else window.location.href = "/?page=0";
+                }
+                function goToDonate() {
+                    if (url.includes("home")) goToPage(1);
+                    else window.location.href = "/?page=1";
+                }
+                function goToCampaign() {
+                    if (url.includes("home")) goToPage(2);
+                    else window.location.href = "/?page=2";
+                }
+                function goToAbout() {
+                    if (url.includes("home")) goToPage(3);
+                    else window.location.href = "/?page=3";
+                }
+            </script>
         </div>
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 

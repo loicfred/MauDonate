@@ -1,22 +1,11 @@
-// BeatCam Service Worker
-
-const CACHE_NAME = "beatcam-v1";
+const CACHE_NAME = "maudonate-v1";
 
 const ASSETS_TO_CACHE = [
-    "index.html",
-    "capture.html",
-    "studio.html",
-    "library.html",
-    "settings.html",
-    "about.html",
-
-    "manifest.json",
-    "offline.html",
-    "service-worker.js",
-    "pwa-init.js",
-
+    "/manifest.json",
     "/css/main.css",
-    "/assets/js/app.js"
+    "/assets/js/app.js",
+    "/img/logo.png",
+    "/img/logo_transparent.png"
 ];
 
 // Install event
@@ -25,22 +14,22 @@ self.addEventListener("install", (event) => {
         caches.open(CACHE_NAME).then((cache) => {
             console.log("Caching assets...");
             return cache.addAll(ASSETS_TO_CACHE);
-        })
+        }).catch(err => console.log("Error caching assets:", err))
     );
     self.skipWaiting();
 });
 
 // Fetch event
 self.addEventListener("fetch", (event) => {
+    const req = event.request;
+    if (req.mode === "navigate") {
+        event.respondWith(
+            fetch(req).catch(() => caches.match("/offline.html"))
+        );
+        return;
+    }
     event.respondWith(
-        caches.match(event.request).then((cacheRes) => {
-            return (
-                cacheRes ||
-                fetch(event.request).catch(() => {
-                    return caches.match("offline.html");
-                })
-            );
-        })
+        caches.match(req).then(res => res || fetch(req))
     );
 });
 

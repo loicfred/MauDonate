@@ -5,8 +5,10 @@ import mau.donate.objects.Email_Verification;
 import mau.donate.objects.User;
 import mau.donate.service.EmailService;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,28 +28,6 @@ public class AuthController {
         this.emailService = emailService;
     }
 
-    @GetMapping("/accounts/signup")
-    public String signupForm(Model model) {
-        model.addAttribute("isAnonymous", SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken);
-        model.addAttribute("user", new User());
-        return "accounts/signup";
-    }
-    @GetMapping("/accounts/verify")
-    public String verifyAccount(@RequestParam("token") String token, Model model) {
-        model.addAttribute("isAnonymous", SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken);
-        Email_Verification vToken = Email_Verification.getByToken(token);
-        if (vToken == null) {
-            model.addAttribute("message", "Verification code has expired.");
-            model.addAttribute("success", false);
-        } else {
-            vToken.getUser().setEnabled(true);
-            vToken.getUser().Update();
-            vToken.Delete();
-            model.addAttribute("message", "Your account has been verified! You can now log in.");
-            model.addAttribute("success", true);
-        }
-        return "accounts/verification";
-    }
     @GetMapping("/accounts/login")
     public String login(Model model) {
         model.addAttribute("isAnonymous", SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken);
@@ -55,14 +35,41 @@ public class AuthController {
     }
 
 
+
+    @GetMapping("/accounts/signup")
+    public String signupForm(Model model) {
+        model.addAttribute("isAnonymous", SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken);
+        model.addAttribute("user", new User());
+        return "accounts/signup";
+    }
     @PostMapping("/post/accounts/register")
     public String register(User user) {
-        User.ClearFailedLogins(user.Username, user.Email);
+        if (!user.isPasswordValid()) return "redirect:/accounts/signup?badpassword";
+        User.ClearFailedLogins(user.Email);
         user.Password = passwordEncoder.encode(user.Password);
         user.Write();
         String token = UUID.randomUUID().toString();
         new Email_Verification(user, token, "REGISTRATION");
         emailService.sendVerificationEmail(user.Email, token);
         return "redirect:/accounts/login?verify";
+    }
+    @GetMapping("/accounts/email/verify")
+    public String verifyAccount(@RequestParam("token") String token, Model model) {
+        model.addAttribute("isAnonymous", SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken);
+        Email_Verification vToken = Email_Verification.getByToken(token);
+        if (vToken == null) {
+            model.addAttribute("message", "Verification code has expired.");
+            model.addAttribute("success", false);
+            return "accounts/verification";
+        } else {
+            vToken.getUser().setEnabled(true);
+            vToken.getUser().setVerified(true);
+            vToken.getUser().UpdateOnly("Verified", "Enabled");
+            vToken.Delete();
+            model.addAttribute("message", "Your account has been verified! You can now log in.");
+            model.addAttribute("success", true);
+            model.addAttribute("loginparam", "verified");
+            return "accounts/verification";
+        }
     }
 }

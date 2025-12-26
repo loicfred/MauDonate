@@ -11,7 +11,7 @@
       <div class="card shadow p-4">
         <h3 class="mb-3" th:text="${success} ? 'Success!' : 'Oops!'"></h3>
         <p th:text="${message}"></p>
-        <a th:if="${success}" href="/accounts/login?verified" class="btn btn-danger mt-3">Go to Login</a>
+          <a th:if="${success}" th:href="'/accounts/login?' + ${loginparam}" class="btn btn-danger mt-3">Go to Login</a>
         <a th:if="${!success}" href="/accounts/signup" class="btn btn-secondary mt-3">Try Again</a>
       </div>
     </div>

@@ -14,9 +14,23 @@ public class EmailService {
 
     public void sendVerificationEmail(String to, String token) {
         String subject = "Verify your MauDonate account";
-        String verificationUrl = "http://localhost:8080/accounts/verify?token=" + token;
+        String verificationUrl = "http://localhost:8080/accounts/email/verify?token=" + token;
 
-        String message = "Welcome! Please click the link to verify your MauDonate account:\n" + verificationUrl;
+        String message = "Welcome! Please click the link below to verify your MauDonate account:\n" + verificationUrl;
+
+        SimpleMailMessage email = new SimpleMailMessage();
+        email.setTo(to);
+        email.setSubject(subject);
+        email.setText(message);
+        mailSender.send(email);
+        System.out.println("Email sent to " + to + " with subject: " + subject + "\n" + message);
+    }
+
+    public void sendDeleteConfirmationEmail(String to, String token) {
+        String subject = "Confirm deletion of MauDonate account";
+        String verificationUrl = "http://localhost:8080/accounts/delete/verify?token=" + token;
+
+        String message = "Welcome! Please click the link below to confirm the deletion of your MauDonate account:\n" + verificationUrl;
 
         SimpleMailMessage email = new SimpleMailMessage();
         email.setTo(to);

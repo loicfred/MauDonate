@@ -1,8 +1,9 @@
 package mau.donate.objects;
 
 import mau.donate.service.DatabaseObject;
-import org.springframework.context.annotation.Profile;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.security.Principal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,21 +11,23 @@ import java.time.LocalDateTime;
 import static my.utilities.util.Utilities.CutString;
 
 public class User extends DatabaseObject<User> {
-    public transient Profile P;
 
     public long ID;
-    public String Username;
     public String Email;
     public String Password;
     public String FirstName;
     public String LastName;
-    public String Role;
+    public String AccountProvider = null;
+    public String Role = "USER";
     public String Address;
     public String Gender;
     public String Phone;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     public LocalDate DateOfBirth;
     public boolean isAnonymous = false;
     public boolean Enabled = false;
+    public boolean Verified = false;
     public LocalDateTime CreatedAt = LocalDateTime.now();
     public LocalDateTime UpdatedAt = LocalDateTime.now();
 
@@ -32,9 +35,8 @@ public class User extends DatabaseObject<User> {
         this.ID = Instant.now().toEpochMilli();
     }
 
-    public User(String username, String email, String password, String firstName, String lastName, String role, String address, String gender, String phone, LocalDate dateOfBirth, boolean isAnonymous) {
+    public User(String email, String password, String firstName, String lastName, String role, String address, String gender, String phone, LocalDate dateOfBirth, boolean isAnonymous) {
         ID = Instant.now().toEpochMilli();
-        Username = CutString(username, 64);
         Email = CutString(email, 64);
         Password = password;
         FirstName = CutString(firstName, 64);
@@ -51,34 +53,22 @@ public class User extends DatabaseObject<User> {
         return DatabaseObject.getById(User.class, id).orElse(null);
     }
 
-    public static User getByUsername(String username) {
-        return DatabaseObject.getWhere(User.class, "Username = ?", username).orElse(null);
-    }
-
     public static User getByEmail(String email) {
         return DatabaseObject.getWhere(User.class, "Email = ?", email).orElse(null);
     }
 
-    public static User getByLogin(String username, String password) {
-        return DatabaseObject.getWhere(User.class, "(Username = ? OR Email = ?) AND Password = ?", username, username, password).orElse(null);
+    public static User getByAuthentication(Principal principal) {
+        if (principal == null) return null;
+        return DatabaseObject.getWhere(User.class, "Email = ?", principal.getName()).orElse(null);
     }
 
-    public static void ClearFailedLogins(String username, String email) {
-        User U = DatabaseObject.getWhere(User.class, "Username = ? OR Enabled = ?", username, false).orElse(null);
+    public static void ClearFailedLogins(String email) {
+        User U = DatabaseObject.getWhere(User.class, "Email = ? OR (Enabled = ? AND Verified = ?)", email, false, false).orElse(null);
         if (U != null) U.Delete();
-        U = DatabaseObject.getWhere(User.class, "Email = ? OR Enabled = ?", email, false).orElse(null);
-        if (U != null) U.Delete();
     }
 
-    public static int ClearAllFailedLogins() {
-        return DatabaseObject.doUpdate("DELETE user WHERE Enabled = ?", false);
-    }
-
-    public long getId() {
+    public long getID() {
         return ID;
-    }
-    public String getUsername() {
-        return Username;
     }
     public String getEmail() {
         return Email;
@@ -113,12 +103,18 @@ public class User extends DatabaseObject<User> {
     public String getFirstName() {
         return FirstName;
     }
+    public String getAccountProvider() {
+        return AccountProvider;
+    }
     public boolean isEnabled() {
         return Enabled;
     }
+    public boolean isVerified() {
+        return Verified;
+    }
 
-    public void setUsername(String username) {
-        Username = CutString(username, 64);
+    public void setID(long id) {
+        ID = id;
     }
     public void setPassword(String password) {
         Password = password;
@@ -128,6 +124,9 @@ public class User extends DatabaseObject<User> {
     }
     public void setEnabled(boolean enabled) {
         Enabled = enabled;
+    }
+    public void setVerified(boolean verified) {
+        Verified = verified;
     }
     public void setCreatedAt(LocalDateTime createdAt) {
         CreatedAt = createdAt;
@@ -156,5 +155,24 @@ public class User extends DatabaseObject<User> {
     public void setFirstName(String firstName) {
         FirstName = CutString(firstName, 64);
     }
+    public void setAccountProvider(String accountProvider) {
+        AccountProvider = accountProvider;
+    }
 
+
+    public boolean isPasswordValid() {
+        if (Password.length() < 8) return false;
+        boolean hasSymbol = false;
+        boolean hasUpper = false;
+        boolean hasLower = false;
+        boolean hasNumber = false;
+
+        for (char c : Password.toCharArray()) {
+            if (Character.isUpperCase(c)) hasUpper = true;
+            else if (Character.isLowerCase(c)) hasLower = true;
+            else if (Character.isDigit(c)) hasNumber = true;
+            else if (!Character.isLetterOrDigit(c)) hasSymbol = true;
+        }
+        return hasSymbol && hasUpper && hasLower && hasNumber;
+    }
 }

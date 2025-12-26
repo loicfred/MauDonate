@@ -1,14 +1,9 @@
 package mau.donate.controller;
 
 import mau.donate.objects.*;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -19,29 +14,39 @@ import java.util.List;
 public class AppController {
 
     //@Cacheable(key = "1", value = "index")
-    @RequestMapping("/")
+    @RequestMapping("/home")
     public String index(Model model, Principal loggedUser) {
-        addEssential(model, loggedUser);
+        User U = User.getByAuthentication(loggedUser);
+        if (loggedUser != null && U == null) return "redirect:/logout";
+        addEssential(model, loggedUser, U);
         model.addAttribute("requests", Donation_Request.getAllWhere(Donation_Request.class, "isApproved AND NOT isCompleted"));
         model.addAttribute("campaigns", Campaign.getAll(Campaign.class));
         return "index";
     }
 
-    @RequestMapping("/home")
-    public String home(Model model, Principal loggedUser) {
-        return index(model, loggedUser);
-    }
     @RequestMapping("/donate")
     public String donation(Model model, Principal loggedUser) {
-        addEssential(model, loggedUser);
+        User U = User.getByAuthentication(loggedUser);
+        addEssential(model, loggedUser, U);
         return "donate";
     }
 
-    private void addEssential(Model model, Principal loggedUser) {
+
+
+    @GetMapping("/offline")
+    public String offline() {
+        return "offline";
+    }
+
+
+
+
+
+
+    public static void addEssential(Model model, Principal loggedUser, User U) {
         model.addAttribute("principal", loggedUser);
         if (loggedUser != null) {
-            User U = User.getByUsername(loggedUser.getName());
-            List<Notification> notifs = Notification.ofUser(U.getId(), 7);
+            List<Notification> notifs = Notification.ofUser(U.getID(), 7);
             model.addAttribute("notifications", notifs);
             model.addAttribute("isRead", notifs.stream().allMatch(Notification::isRead));
         } else {

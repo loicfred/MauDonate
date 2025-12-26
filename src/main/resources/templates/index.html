@@ -5,15 +5,15 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="manifest" href="/assets/manifest.json">
+    <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#822BD9">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="icon"  href="/assets/img/logo.png">
+    <link rel="icon"  href="/img/logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/css/main.css">
 
     <style>
         body {
@@ -46,7 +46,7 @@
         }
 
 
-        .request-card {
+        .request-card, .modal-content {
             margin: 8px;
             border-radius: 10px;
             background-color: var(--primary-color-lighter);
@@ -68,7 +68,7 @@
                 <div class="row justify-content-center">
                     <div class="col-md-8 col-lg-6 text-center text-white">
 
-                        <img src="/assets/img/logo_transparent.png" height="250" class="mb-4" alt="BeatCam Logo">
+                        <img src="/img/logo_transparent.png" height="250" class="mb-4" draggable="false" alt="BeatCam Logo">
 
                         <p class="lead mb-4">
                             Your kindness. In any way.
@@ -93,10 +93,12 @@
                         <h5 class="ms-auto" th:text="${'Goal: Rs ' + req.GoalAmount}"></h5>
                     </div>
                     <p th:text="${req.Story}"></p>
-                    <p ></p>
                     <div class="text-muted d-flex align-items-center">
                         <small th:text="${'Created at ' + req.CreatedAt}"></small>
-                        <a th:href="'/donate/' + ${req.ID}" class="ms-auto btn btn-primary">Donate</a>
+                        <button class="ms-auto btn btn-primary" onclick="showDonatePopup(this)"
+                                th:data-banks="${req.BankName}"
+                                th:data-account="${req.AccountNumber}">Donate
+                        </button>
                     </div>
                 </div>
             </div>
@@ -113,10 +115,56 @@
         </section>
 
     </div>
+
+
+
+
+    <div class="modal fade" id="donateModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Donate via Bank Transfer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Bank:</strong> <span id="bankName"></span></p>
+                    <p><strong>Account ID:</strong></p>
+                    <div class="input-group">
+                        <input type="text" id="accountNumber" class="form-control" readonly>
+                        <button class="btn btn-secondary" onclick="copyAccountNumber()">
+                            Copy
+                        </button>
+                    </div>
+                    <p class="text-success mt-2 mb-0 d-none" style="text-align: center;" id="copySuccess">
+                        Account ID copied ✔
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showDonatePopup(button) {
+            const bank = button.getAttribute("data-banks");
+            const account = button.getAttribute("data-account");
+            document.getElementById("bankName").innerText = bank;
+            document.getElementById("accountNumber").value = account;
+            document.getElementById("copySuccess").classList.add("d-none");
+            const modal = new bootstrap.Modal(document.getElementById("donateModal"));
+            modal.show();
+        }
+        function copyAccountNumber() {
+            const input = document.getElementById("accountNumber");
+            input.select();
+            input.setSelectionRange(0, 99999); // mobile support
+            navigator.clipboard.writeText(input.value);
+            document.getElementById("copySuccess").classList.remove("d-none");
+        }
+    </script>
 </main>
 
 <!-- Scripts -->
-<script src="/assets/js/app.js"></script>
+<script src="/js/app.js"></script>
 <script>
     const pageWrap = document.getElementById('pageWrap');
     const pageCarousel = document.getElementById('pageCarousel');
@@ -127,6 +175,7 @@
 
 
     pageWrap.addEventListener('pointerdown', e => {
+        if (e.target.closest('button')) return;
         startX = e.clientX;
         isDown = true;
         isDragging = false;
@@ -147,8 +196,8 @@
     pageWrap.addEventListener('pointerup', e => {
         if (!isDown) return;
         isDown = false;
-
         if (isDragging) pageWrap.releasePointerCapture(e.pointerId);
+
         pageCarousel.style.transition = '';
         if (!isDragging) return;
         const dx = e.clientX - startX;
@@ -160,14 +209,16 @@
     });
 
     function goToPage(i) {
+        if (i == null) return;
         closeSidebar();
         pageIndex = i;
         pageCarousel.style.transform = `translateX(-${i * 100}%)`;
     }
+    goToPage(new URLSearchParams(window.location.search).get('page'))
 </script>
 
 
-<script src="/assets/pwa-init.js"></script>
+<script src="/pwa-init.js"></script>
 
 
 

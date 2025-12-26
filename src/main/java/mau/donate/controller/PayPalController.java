@@ -64,10 +64,10 @@ public class PayPalController {
         String amountUsd = order.purchaseUnits().getFirst().payments().captures().getFirst().amount().value();
         String typeUsd = order.purchaseUnits().getFirst().payments().captures().getFirst().amount().currencyCode();
 
-        User U = User.getByUsername(loggedUser.getName());
+        User U = User.getByEmail(loggedUser.getName());
 
-        Fundraising fundraising = new Fundraising(U.getId(), Double.parseDouble(amountUsd), payload.get("title").toString(), payload.get("comment").toString());
-        Notification notif = new Notification(U.getId(), "Successfully donated to fundraising!", "Transaction " + amountUsd + " " + typeUsd + " successfully done to fundraising.");
+        Fundraising fundraising = new Fundraising(U.getID(), Double.parseDouble(amountUsd), payload.get("title").toString(), payload.get("comment").toString());
+        Notification notif = new Notification(U.getID(), "Successfully donated to fundraising!", "Transaction " + amountUsd + " " + typeUsd + " successfully done to fundraising.");
 
         return Map.of("status", order.status(), "id", order.id(), "amountUsd", amountUsd, "currencyUsd", typeUsd, "notification", notif);
     }

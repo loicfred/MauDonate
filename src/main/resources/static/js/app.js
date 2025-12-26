@@ -23,7 +23,7 @@ console.log("app.js loaded successfully");
 // Register Service Worker
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker
-        .register('/assets/service-worker.js')
+        .register('/service-worker.js')
         .then(() => console.log("Service Worker registered"))
         .catch(err => console.log("SW registration failed:", err));
 }

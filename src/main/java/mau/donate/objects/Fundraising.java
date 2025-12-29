@@ -12,16 +12,16 @@ public class Fundraising extends DatabaseObject<Fundraising> {
     public long DonorID;
     public double USD;
     public String Title;
-    public String Comment;
+    public String Message;
     public LocalDateTime CreatedAt;
     
     public Fundraising() {}
-    public Fundraising(long donorID, double usd, String title, String comment) {
+    public Fundraising(long donorID, double usd, String title, String message) {
         ID = Instant.now().toEpochMilli();
         DonorID = donorID;
         USD = usd;
         Title = StopString(title, 128);
-        Comment = StopString(comment, 512);
+        Message = StopString(message, 512);
         CreatedAt = LocalDateTime.now();
         Write();
     }

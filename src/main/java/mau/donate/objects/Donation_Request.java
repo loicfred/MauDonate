@@ -5,12 +5,15 @@ import mau.donate.service.DatabaseObject;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
+import static my.utilities.util.Utilities.StopString;
+
 public class Donation_Request extends DatabaseObject<Donation_Request> {
     public transient User U;
 
     public long ID;
     public long UserID;
-    public String Story;
+    public String Title;
+    public String Message;
     public String AccountNumber;
     public String BankName;
     public double CurrentAmount;
@@ -18,18 +21,19 @@ public class Donation_Request extends DatabaseObject<Donation_Request> {
     public int Upvotes;
     public LocalDateTime CreatedAt;
     public LocalDateTime UpdatedAt;
-    public boolean isApproved;
-    public boolean isCompleted;
+    public boolean Approved;
+    public boolean Completed;
 
     public Donation_Request() {}
-    public Donation_Request(long userId, String story, String accountNumber, String bankName, double goalAmount) {
+    public Donation_Request(long userId, String title, String message, String accountNumber, String bankName, double goalAmount) {
         ID = Instant.now().toEpochMilli();
         UserID = userId;
-        Story = story;
+        Title = StopString(title, 128);
+        Message = StopString(message, 512);
         AccountNumber = accountNumber;
         BankName = bankName;
-        isApproved = false;
-        isCompleted = false;
+        Approved = false;
+        Completed = false;
         CurrentAmount = 0;
         GoalAmount = goalAmount;
         Upvotes = 0;

@@ -13,6 +13,7 @@
             <button onclick="goToAbout()">About</button>
             <hr>
             <a th:if="${principal == null}" href="/accounts/login">Log in</a>
+            <a th:if="${principal != null}" href="/request">Make a donation request</a>
             <a th:if="${principal != null}" href="/settings">Settings</a>
             <form th:if="${principal != null}" action="/logout" method="post">
                 <input type="hidden" name="_csrf" th:value="${_csrf.token}">
@@ -37,6 +38,7 @@
                     else window.location.href = "/?page=3";
                 }
             </script>
+            <a class="mt-auto" th:if="${principal != null && user.Role.equals('ADMIN')}" href="/admin">Go to Admin</a>
         </div>
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
@@ -60,7 +62,7 @@
                         <h1 class="m-0">🔔</h1>
                         <div class="d-flex align-items-center" style="flex-direction: column;">
                             <h6 class="mb-0 me-auto" th:text="${notif.Title.length > 40 ? notif.Title.substring(0, 40) + '...' : notif.Title}"></h6>
-                            <p class="mb-0" th:text="${notif.Content.length > 80 ? notif.Content.substring(0, 80) + '...' : notif.Content}"></p>
+                            <p class="mb-0" th:text="${notif.Message.length > 80 ? notif.Message.substring(0, 80) + '...' : notif.Message}"></p>
                             <small class="ms-auto" th:text="${notif.CreatedAt}"></small>
                         </div>
                     </div>

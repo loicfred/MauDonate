@@ -25,7 +25,7 @@ public class User extends DatabaseObject<User> {
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     public LocalDate DateOfBirth;
-    public boolean isAnonymous = false;
+    public boolean Anonymous = false;
     public boolean Enabled = false;
     public boolean Verified = false;
     public LocalDateTime CreatedAt = LocalDateTime.now();
@@ -80,7 +80,7 @@ public class User extends DatabaseObject<User> {
         return CreatedAt;
     }
     public boolean isAnonymous() {
-        return isAnonymous;
+        return Anonymous;
     }
     public LocalDate getDateOfBirth() {
         return DateOfBirth;
@@ -132,7 +132,7 @@ public class User extends DatabaseObject<User> {
         CreatedAt = createdAt;
     }
     public void setAnonymous(boolean anonymous) {
-        isAnonymous = anonymous;
+        Anonymous = anonymous;
     }
     public void setDateOfBirth(LocalDate dateOfBirth) {
         DateOfBirth = dateOfBirth;

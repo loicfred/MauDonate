@@ -39,6 +39,7 @@
             transition: transform .28s ease;
         }
         .page {
+            padding: 15px 20px;
             min-width: 100%;
             height: 100%;
             overflow-y: auto;
@@ -46,10 +47,9 @@
         }
 
 
-        .request-card, .modal-content {
-            margin: 8px;
-            border-radius: 10px;
-            background-color: var(--primary-color-lighter);
+        .settings-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
         }
     </style>
 </head>
@@ -64,41 +64,28 @@
 
         <!-- PAGE 1 -->
         <section class="page">
-            <div class="container h-100 align-items-center">
-                <div class="row justify-content-center">
-                    <div class="col-md-8 col-lg-6 text-center text-white">
 
-                        <img src="/img/logo_transparent.png" height="250" class="mb-4" draggable="false" alt="BeatCam Logo">
-
-                        <p class="lead mb-4">
-                            Your kindness. In any way.
-                        </p>
-
-                        <button class="btn btn-lg btn-success px-5 mb-3" onclick="goToPage(1)" id="donateNow">
-                            Donate Now
-                        </button>
-
-                    </div>
-                </div>
-            </div>
         </section>
 
         <!-- PAGE 2 -->
         <section class="page">
-            <p style="justify-content: center; align-items: center; text-align: center; padding: 30px;" th:if="${requests.isEmpty()}">No one has reached out yet.</p>
-            <div th:each="req : ${requests}" class="request-card card mb-3">
+            <p style="justify-content: center; align-items: center; text-align: center; padding: 30px;" th:if="${unapproved_reqs.isEmpty()}">No one has reached out yet.</p>
+            <div th:each="req : ${unapproved_reqs}" class="request-card card mb-3">
                 <div class="card-body">
                     <div class="text-muted d-flex align-items-center">
                         <h5 th:text="${req.getUser().getFirstName() + ' ' + req.getUser().getLastName()}"></h5>
                         <h5 class="ms-auto" th:text="${'Goal: Rs ' + req.GoalAmount}"></h5>
                     </div>
-                    <p th:text="${req.Story}"></p>
+                    <h6 th:text="${req.Title}"></h6>
+                    <p th:text="${req.Message}"></p>
                     <div class="text-muted d-flex align-items-center">
                         <small th:text="${'Created at ' + req.CreatedAt}"></small>
-                        <button class="ms-auto btn btn-primary" onclick="showDonatePopup(this)"
-                                th:data-banks="${req.BankName}"
-                                th:data-account="${req.AccountNumber}">Donate
-                        </button>
+                        <form th:action="${'/admin/donation/' + req.ID + '/accept'}" method="post" class="d-inline">
+                            <button type="submit" class="ms-auto btn btn-success">Accept</button>
+                        </form>
+                        <form th:action="${'/admin/donation/' + req.ID + '/deny'}" method="post" class="d-inline">
+                            <button type="submit" class="ms-auto btn btn-danger">Deny</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -106,61 +93,103 @@
 
         <!-- PAGE 3 -->
         <section class="page">
-            <p style="justify-content: center; align-items: center; text-align: center; padding: 30px;">Coming soon.</p>
-        </section>
+            <h2 class="settings-header">Database Accessor</h2>
 
-        <!-- PAGE 4 -->
-        <section class="page">
-            <p style="justify-content: center; align-items: center; text-align: center; padding: 30px;">Coming soon.</p>
+            <form id="databaseForm">
+                <div class="mb-3">
+                    <label for="table" class="form-label">Table</label>
+                    <select id="table" onchange="addSelect()" class="form-select">
+                        <option value="" disabled selected>- Public -</option>
+                        <option value="User">User Accounts</option>
+                        <option value="Donation_Request">Donation request</option>
+                        <option value="Donation">Donations</option>
+                        <option value="Fundraising">Fundraising</option>
+                        <option value="Association">Association</option>
+                        <option value="Campaign">Campaigns</option>
+                        <option value="" disabled selected>- Private -</option>
+                        <option value="Staff">Staffs</option>
+                        <option value="Vehicle">Vehicles</option>
+                        <option value="Warehouse">Warehouses</option>
+                        <option value="Trip">Trips</option>
+                        <option value="" disabled selected>- Other -</option>
+                        <option value="Email_Verification">Email verifications</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="ID" class="form-label">ID</label>
+                    <select id="IDs" class="form-control mb-2 d-none"></select>
+                    <input type="text" id="ID" maxlength="16" class="form-control">
+                </div>
+
+                <div class="mb-3">
+                    <h5 class="form-label">Database information:</h5>
+                    <p class="mb-0" th:text="${'Table count: ' + dbstat.totalTables}"></p>
+                    <p class="mb-0" th:text="${'Total rows: ' + dbstat.totalRows}"></p>
+                </div>
+                <div class="mb-3 d-none tablestat" th:id="'IDTable_' + ${table.key}" th:each="table : ${dbstat.tableRowCounts.entrySet()}">
+                    <h5 class="form-label">Table information:</h5>
+                    <p class="mb-0" th:text="${'Name: ' + table.key}"></p>
+                    <p class="mb-0" th:text="${'Rows count: ' + table.value}"></p>
+                </div>
+
+                <div id="error" class="alert alert-danger d-none">Please select and input values.</div>
+
+                <button type="submit" class="btn btn-primary w-100">Go to entry</button>
+
+                <script>
+                    const error = document.getElementById('error');
+                    const table = document.getElementById('table');
+                    const id = document.getElementById('ID');
+                    const ids = document.getElementById('IDs');
+
+                    function addSelect() {
+                        fetch('/admin/list/' + table.value)
+                            .then(res => res.json())
+                            .then(data => {
+                                document.querySelectorAll(".tablestat").forEach(el => el.classList.add("d-none"));
+                                document.getElementById("IDTable_" + table.value.toLowerCase()).classList.remove('d-none');
+                                ids.classList.remove('d-none');
+                                ids.innerHTML = '<option value="" disabled selected>- Select an item -</option>';
+                                data.forEach(item => {
+                                    if (table.value === 'Donation_Request' || table.value === 'Fundraising' || table.value === 'Campaign' || table.value === 'Notification') {
+                                        ids.innerHTML += `<option value="${item.ID}">${item.ID} - ${item.Title}</option>`;
+                                    }
+                                    else if (table.value === 'Warehouse' || table.value === 'Vehicle' || table.value === 'Association') {
+                                        ids.innerHTML += `<option value="${item.ID}">${item.ID} - ${item.Name}</option>`;
+                                    }
+                                    else if (table.value === 'User' || table.value === 'Staff') {
+                                        ids.innerHTML += `<option value="${item.ID}">${item.ID} - ${item.FirstName} - ${item.LastName}</option>`;
+                                    }
+                                    else if (table.value === 'User' || table.value === 'Staff') {
+                                        ids.innerHTML += `<option value="${item.ID}">${item.ID} - ${item.FirstName} - ${item.LastName}</option>`;
+                                    } else {
+                                        ids.classList.add('d-none');
+                                    }
+                                })
+                        });
+                    }
+
+                    document.getElementById('databaseForm').addEventListener('submit', function (e) {
+                        e.preventDefault();
+                        if (table.value && (id.value || ids.value)) {
+                            error.classList.add('d-none');
+                            window.location.href = '/admin/edit/' + table.value + '/' + (id.value ? id.value : ids.value);
+                        } else {
+                            error.classList.remove('d-none');
+                        }
+                    });
+
+                    id.addEventListener("input", () => {
+                        ids.disabled = !!id.value;
+                    });
+                </script>
+            </form>
         </section>
 
     </div>
 
 
-
-
-    <div class="modal fade" id="donateModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Donate via Bank Transfer</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p><strong>Bank:</strong> <span id="bankName"></span></p>
-                    <p><strong>Account ID:</strong></p>
-                    <div class="input-group">
-                        <input type="text" id="accountNumber" class="form-control" readonly>
-                        <button class="btn btn-secondary" onclick="copyAccountNumber()">
-                            Copy
-                        </button>
-                    </div>
-                    <p class="text-success mt-2 mb-0 d-none" style="text-align: center;" id="copySuccess">
-                        Account ID copied ✔
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function showDonatePopup(button) {
-            const bank = button.getAttribute("data-banks");
-            const account = button.getAttribute("data-account");
-            document.getElementById("bankName").innerText = bank;
-            document.getElementById("accountNumber").value = account;
-            document.getElementById("copySuccess").classList.add("d-none");
-            const modal = new bootstrap.Modal(document.getElementById("donateModal"));
-            modal.show();
-        }
-        function copyAccountNumber() {
-            const input = document.getElementById("accountNumber");
-            input.select();
-            input.setSelectionRange(0, 99999); // mobile support
-            navigator.clipboard.writeText(input.value);
-            document.getElementById("copySuccess").classList.remove("d-none");
-        }
-    </script>
 </main>
 
 <!-- Scripts -->
@@ -171,7 +200,7 @@
 
 
 
-<div th:replace="/fragments/bottom-nav :: mainBottomNav" id="bottomNav"></div>
+<div th:replace="/fragments/bottom-nav-admin :: adminBottomNav" id="bottomNav"></div>
 
 </body>
 </html>

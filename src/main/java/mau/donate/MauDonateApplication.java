@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Map;
 
-//@EnableCaching
+@EnableCaching
 @SpringBootApplication
 public class MauDonateApplication {
 

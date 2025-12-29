@@ -11,8 +11,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static my.utilities.json.JSONItem.GSON;
@@ -478,6 +482,32 @@ public abstract class DatabaseObject<T> {
             this.newSQL = newSql.toString();
             this.newParams = newParams.toArray();
         }
+    }
+
+
+    public static DatabaseStats getDatabaseStats() {
+        DatabaseStats stats = new DatabaseStats();
+        jdbcTemplate.execute((Connection con) -> {
+            DatabaseMetaData metaData = con.getMetaData();
+            try (ResultSet tables = metaData.getTables(con.getCatalog(), null, "%", new String[]{"TABLE"})) {
+                int tableCount = 0;
+                while (tables.next()) {
+                    String tableName = tables.getString("TABLE_NAME");
+                    Long rowCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM " + tableName, Long.class);
+                    stats.tableRowCounts.put(tableName, rowCount);
+                    stats.totalRows += rowCount;
+                    tableCount++;
+                }
+                stats.totalTables = tableCount;
+            }
+            return null;
+        });
+        return stats;
+    }
+    public static class DatabaseStats {
+        public int totalTables = 0;
+        public long totalRows = 0;
+        public Map<String, Long> tableRowCounts = new HashMap<>();
     }
 
     @Inherited

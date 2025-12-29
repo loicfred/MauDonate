@@ -27,8 +27,8 @@ public class Donation extends DatabaseObject<Donation> {
         DonorID = donorID;
         ReceiverID = receiverID;
         Rupees = rupees;
-        Message = CutString(message, 512);
-        Status = status;
+        Message = StopString(message, 512);
+        Status = CutString(status, 64);
         this.isAnonymous = isAnonymous;
         CreatedAt = LocalDateTime.now();
         Write();

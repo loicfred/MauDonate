@@ -39,4 +39,30 @@ public class EmailService {
         mailSender.send(email);
         System.out.println("Email sent to " + to + " with subject: " + subject + "\n" + message);
     }
+
+    public void acceptRequest(String to, String name) {
+        String subject = "Approval of Donation Request";
+
+        String message = "Greetings dear " + name + ". It is with great pleasure that we inform you that your donation request has been approved. May you find the help you need.";
+
+        SimpleMailMessage email = new SimpleMailMessage();
+        email.setTo(to);
+        email.setSubject(subject);
+        email.setText(message);
+        mailSender.send(email);
+        System.out.println("Email sent to " + to + " with subject: " + subject + "\n" + message);
+    }
+
+    public void denyRequest(String to, String name) {
+        String subject = "Rejection of Donation Request";
+
+        String message = "Greetings dear " + name + ". It is with great sadness that we inform you that your donation request has been denied.";
+
+        SimpleMailMessage email = new SimpleMailMessage();
+        email.setTo(to);
+        email.setSubject(subject);
+        email.setText(message);
+        mailSender.send(email);
+        System.out.println("Email sent to " + to + " with subject: " + subject + "\n" + message);
+    }
 }

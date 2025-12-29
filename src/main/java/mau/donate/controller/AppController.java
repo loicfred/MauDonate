@@ -1,6 +1,7 @@
 package mau.donate.controller;
 
 import mau.donate.objects.*;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -13,15 +14,21 @@ import java.util.List;
 @Controller
 public class AppController {
 
-    //@Cacheable(key = "1", value = "index")
+    @Cacheable(key = "1", value = "index")
     @RequestMapping("/home")
-    public String index(Model model, Principal loggedUser) {
+    public String home(Model model, Principal loggedUser) {
         User U = User.getByAuthentication(loggedUser);
         if (loggedUser != null && U == null) return "redirect:/logout";
         addEssential(model, loggedUser, U);
-        model.addAttribute("requests", Donation_Request.getAllWhere(Donation_Request.class, "isApproved AND NOT isCompleted"));
+        model.addAttribute("requests", Donation_Request.getAllWhere(Donation_Request.class, "Approved AND NOT Completed"));
         model.addAttribute("campaigns", Campaign.getAll(Campaign.class));
         return "index";
+    }
+
+    @Cacheable(key = "1", value = "index")
+    @RequestMapping("/")
+    public String index(Model model, Principal loggedUser) {
+        return home(model, loggedUser);
     }
 
     @RequestMapping("/donate")
@@ -31,9 +38,14 @@ public class AppController {
         return "donate";
     }
 
+    @RequestMapping("/request")
+    public String request(Model model, Principal loggedUser) {
+        User U = User.getByAuthentication(loggedUser);
+        addEssential(model, loggedUser, U);
+        return "request";
+    }
 
-
-    @GetMapping("/offline")
+    @RequestMapping("/offline")
     public String offline() {
         return "offline";
     }
@@ -46,6 +58,7 @@ public class AppController {
     public static void addEssential(Model model, Principal loggedUser, User U) {
         model.addAttribute("principal", loggedUser);
         if (loggedUser != null) {
+            model.addAttribute("user", U);
             List<Notification> notifs = Notification.ofUser(U.getID(), 7);
             model.addAttribute("notifications", notifs);
             model.addAttribute("isRead", notifs.stream().allMatch(Notification::isRead));

@@ -2,6 +2,7 @@ package mau.donate.objects;
 
 import mau.donate.service.DatabaseObject;
 import org.springframework.context.annotation.Profile;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ public class Staff extends DatabaseObject<User> {
     public String Department;
     public double Salary;
     public String Status;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     public LocalDate DateOfBirth;
     public String Gender;
     public String Address;

@@ -16,36 +16,6 @@
     <link rel="stylesheet" href="/css/main.css">
 
     <style>
-        body {
-            min-height: 100vh;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-        }
-
-        main {
-            flex: 1;
-            width: 100%;
-            background: var(--primary-color);
-        }
-
-        .page-wrap {
-            inset: 0;
-            overflow: hidden;
-        }
-        .page-carousel {
-            display: flex;
-            height: 100%;
-            transition: transform .28s ease;
-        }
-        .page {
-            min-width: 100%;
-            height: 100%;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-
         .request-card, .modal-content {
             margin: 8px;
             border-radius: 10px;
@@ -92,7 +62,7 @@
                         <h5 th:text="${req.getUser().getFirstName() + ' ' + req.getUser().getLastName()}"></h5>
                         <h5 class="ms-auto" th:text="${'Goal: Rs ' + req.GoalAmount}"></h5>
                     </div>
-                    <h6 th:text="${req.Title}"></h6>
+                    <h6 class="mb-0 fw-bold" th:text="${req.Title}"></h6>
                     <p th:text="${req.Message}"></p>
                     <div class="text-muted d-flex align-items-center">
                         <small th:text="${'Created at ' + req.CreatedAt}"></small>

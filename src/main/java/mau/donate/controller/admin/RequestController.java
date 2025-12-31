@@ -1,16 +1,12 @@
-package mau.donate.controller;
+package mau.donate.controller.admin;
 
-import mau.donate.objects.Campaign;
 import mau.donate.objects.Donation_Request;
 import mau.donate.objects.User;
 import mau.donate.service.EmailService;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 
@@ -37,8 +33,8 @@ public class RequestController {
     }
 
 
-    @PostMapping("/admin/donation/{id}/accept")
-    public String acceptDonationRequest(Model model, Principal loggedUser, @PathVariable Long id) {
+    @PostMapping("/admin/request/validate/{id}/accept")
+    public String acceptDonationReqRequest(Model model, Principal loggedUser, @PathVariable Long id, @RequestParam String message, RedirectAttributes redirectAttributes) {
         User U = User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
@@ -48,12 +44,13 @@ public class RequestController {
         req.UpdateOnly("Approved");
 
         User sender = req.getUser();
-        emailService.acceptRequest(sender.getEmail(), sender.getFirstName() + " " + sender.getLastName());
+        emailService.acceptRequest(sender.getEmail(), sender.getFirstName() + " " + sender.getLastName(), message);
 
+        redirectAttributes.addFlashAttribute("successReq", "Successfully accepted the request from " + sender.getFirstName() + ".");
         return "redirect:/admin?page=1";
     }
-    @PostMapping("/admin/donation/{id}/deny")
-    public String denyDonationRequest(Model model, Principal loggedUser, @PathVariable Long id) {
+    @PostMapping("/admin/request/validate/{id}/deny")
+    public String denyDonationReqRequest(Model model, Principal loggedUser, @PathVariable Long id, @RequestParam String message, RedirectAttributes redirectAttributes) {
         User U = User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
@@ -63,8 +60,9 @@ public class RequestController {
         req.UpdateOnly("Approved");
 
         User sender = req.getUser();
-        emailService.denyRequest(sender.getEmail(), sender.getFirstName() + " " + sender.getLastName());
+        emailService.denyRequest(sender.getEmail(), sender.getFirstName() + " " + sender.getLastName(), message);
 
+        redirectAttributes.addFlashAttribute("successReq", "Successfully denied the request from " + sender.getFirstName() + ".");
         return "redirect:/admin?page=1";
     }
 }

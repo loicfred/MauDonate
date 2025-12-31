@@ -11,6 +11,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -70,6 +71,20 @@ public abstract class DatabaseObject<T> {
                             f.set(item, D.toLocalDate());
                         } else if (value instanceof java.sql.Timestamp D) {
                             f.set(item, D.toLocalDateTime());
+                        } else if (value instanceof BigDecimal D) {
+                            if (f.getType() == float.class) {
+                                f.set(item, D.floatValue());
+                            } else if (f.getType() == long.class) {
+                                f.set(item, D.longValue());
+                            } else if (f.getType() == int.class) {
+                                f.set(item, D.intValue());
+                            } else if (f.getType() == short.class) {
+                                f.set(item, D.shortValue());
+                            } else if (f.getType() == byte.class) {
+                                f.set(item, D.byteValue());
+                            } else if (f.getType() == double.class) {
+                                f.set(item, D.doubleValue());
+                            }
                         } else {
                             f.set(item, value);
                         }

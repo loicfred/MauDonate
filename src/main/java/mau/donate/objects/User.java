@@ -23,6 +23,8 @@ public class User extends DatabaseObject<User> {
     public String Gender;
     public String Phone;
 
+    public byte[] Image;
+
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     public LocalDate DateOfBirth;
     public boolean Anonymous = false;
@@ -112,6 +114,9 @@ public class User extends DatabaseObject<User> {
     public boolean isVerified() {
         return Verified;
     }
+    public byte[] getImage() {
+        return Image;
+    }
 
     public void setID(long id) {
         ID = id;
@@ -158,7 +163,9 @@ public class User extends DatabaseObject<User> {
     public void setAccountProvider(String accountProvider) {
         AccountProvider = accountProvider;
     }
-
+    public void setImage(byte[] image) {
+        Image = image;
+    }
 
     public boolean isPasswordValid() {
         if (Password.length() < 8) return false;

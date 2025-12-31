@@ -1,5 +1,6 @@
 package mau.donate.objects;
 
+import mau.donate.objects.enums.Status;
 import mau.donate.service.DatabaseObject;
 
 import java.time.Instant;
@@ -18,7 +19,7 @@ public class Donation_Request extends DatabaseObject<Donation_Request> {
     public String BankName;
     public double CurrentAmount;
     public double GoalAmount;
-    public int Upvotes;
+    public String Status;
     public LocalDateTime CreatedAt;
     public LocalDateTime UpdatedAt;
     public boolean Approved;
@@ -36,7 +37,7 @@ public class Donation_Request extends DatabaseObject<Donation_Request> {
         Completed = false;
         CurrentAmount = 0;
         GoalAmount = goalAmount;
-        Upvotes = 0;
+        Status = mau.donate.objects.enums.Status.PENDING.toString();
         CreatedAt = LocalDateTime.now();
         UpdatedAt = LocalDateTime.now();
         Write();

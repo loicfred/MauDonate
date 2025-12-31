@@ -1,12 +1,11 @@
 package mau.donate.controller.admin;
 
-import mau.donate.objects.Campaign;
 import mau.donate.objects.Donation_Request;
 import mau.donate.objects.User;
+import mau.donate.objects.Warehouse;
+import mau.donate.objects.derived.D_Warehouse;
 import mau.donate.service.CacheService;
 import mau.donate.service.DatabaseObject;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +33,8 @@ public class AdminController {
         addEssential(model, loggedUser, U);
 
         model.addAttribute("dbstat", cacheService.getDatabaseStats());
-        model.addAttribute("unapproved_reqs", Donation_Request.getAllWhere(Donation_Request.class, "NOT Approved"));
+        model.addAttribute("warehouses", D_Warehouse.getAll(D_Warehouse.class));
+        model.addAttribute("unapproved_reqs", Donation_Request.getAllWhere(Donation_Request.class, "NOT Approved AND NOT Completed"));
 
         return "admin";
     }

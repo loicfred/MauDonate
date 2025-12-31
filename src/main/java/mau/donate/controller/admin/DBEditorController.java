@@ -25,6 +25,12 @@ public class DBEditorController {
 
     public static final String DBObjectPackage = "mau.donate.objects.";
 
+
+    @RequestMapping("/admin/edit/{item}")
+    public String adminEdit(Model model, Principal loggedUser, @PathVariable String item) {
+        return adminEdit(model, loggedUser, item, null);
+    }
+
     @RequestMapping("/admin/edit/{item}/{id}")
     public String adminEdit(Model model, Principal loggedUser, @PathVariable String item, @PathVariable Long id) {
         User U = User.getByAuthentication(loggedUser);
@@ -32,9 +38,9 @@ public class DBEditorController {
         addEssential(model, loggedUser, U);
         try {
             item = item.substring(0,1).toUpperCase() + item.substring(1);
-            Class<?> objClass = Class.forName(DBObjectPackage + item);
-            Object entity = DatabaseObject.getById(objClass, id).orElseThrow();
             List<FieldMeta> fields = new ArrayList<>();
+            Class<?> objClass = Class.forName(DBObjectPackage + item);
+            Object entity = id != null ? DatabaseObject.getById(objClass, id).orElseThrow() : null;
             for (Field field : objClass.getDeclaredFields()) {
                 field.setAccessible(true);
                 if (Modifier.isStatic(field.getModifiers())) continue;
@@ -45,13 +51,13 @@ public class DBEditorController {
                 FieldMeta meta = new FieldMeta();
                 meta.name = field.getName();
                 meta.type = field.getType().getSimpleName();
-                meta.value = field.get(entity);
+                if (entity != null) meta.value = field.get(entity);
                 fields.add(meta);
             }
             UniversalForm form = new UniversalForm();
             form.fields = fields;
-
             model.addAttribute("form", form);
+
             model.addAttribute("item", item);
             model.addAttribute("id", id);
         } catch (Exception ignored) {}
@@ -135,8 +141,8 @@ public class DBEditorController {
     public static class FieldMeta {
         public String name;
         public String type;
-        public Object value;
-        public Boolean booleanValue;
+        public Object value = null;
+        public Boolean booleanValue = null;
 
         public String getName() {
             return name;

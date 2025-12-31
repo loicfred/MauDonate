@@ -14,7 +14,6 @@ import java.util.List;
 @Controller
 public class AppController {
 
-    @Cacheable(key = "1", value = "index")
     @RequestMapping("/home")
     public String home(Model model, Principal loggedUser) {
         User U = User.getByAuthentication(loggedUser);
@@ -25,7 +24,6 @@ public class AppController {
         return "index";
     }
 
-    @Cacheable(key = "1", value = "index")
     @RequestMapping("/")
     public String index(Model model, Principal loggedUser) {
         return home(model, loggedUser);

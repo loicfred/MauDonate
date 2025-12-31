@@ -40,10 +40,10 @@ public class EmailService {
         System.out.println("Email sent to " + to + " with subject: " + subject + "\n" + message);
     }
 
-    public void acceptRequest(String to, String name) {
+    public void acceptRequest(String to, String name, String msg) {
         String subject = "Approval of Donation Request";
 
-        String message = "Greetings dear " + name + ". It is with great pleasure that we inform you that your donation request has been approved. May you find the help you need.";
+        String message = "Greetings dear " + name + ". It is with great pleasure that we inform you that your donation request has been approved.\n" + msg + "\nMay you find the help you need.";
 
         SimpleMailMessage email = new SimpleMailMessage();
         email.setTo(to);
@@ -53,10 +53,10 @@ public class EmailService {
         System.out.println("Email sent to " + to + " with subject: " + subject + "\n" + message);
     }
 
-    public void denyRequest(String to, String name) {
+    public void denyRequest(String to, String name, String msg) {
         String subject = "Rejection of Donation Request";
 
-        String message = "Greetings dear " + name + ". It is with great sadness that we inform you that your donation request has been denied.";
+        String message = "Greetings dear " + name + ". It is with great sadness that we inform you that your donation request has been denied.\n" + msg + "\nSee you next time.";
 
         SimpleMailMessage email = new SimpleMailMessage();
         email.setTo(to);

@@ -16,20 +16,7 @@
     <link rel="stylesheet" href="/css/main.css">
 
     <style>
-        body {
-            min-height: 100vh;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-        }
 
-        main {
-            flex: 1;
-            width: 100%;
-            background: var(--primary-color);
-        }
-
-        /* Bottom curved panel */
         .donate-panel {
             position: fixed;
             height: 76vh;
@@ -53,6 +40,14 @@
             }
         }
 
+        .container {
+            overflow-y: scroll;
+            height: 100%;
+        }
+        .container::-webkit-scrollbar {
+            display: none;
+        }
+
         .amount-input {
             margin: 0 auto;
         }
@@ -67,9 +62,10 @@
 </head>
 <body>
 
+<header th:replace="/fragments/header :: mainHeader" id="master-header"></header>
+
 <main>
     <!-- Main Header -->
-    <header th:replace="/fragments/header :: mainHeader" id="master-header"></header>
 
     <h1>Support Our Work</h1>
     <p class="text-center opacity-75">

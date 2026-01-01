@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head id="master-head">
-    <title>Settings | MauDonate</title>
+    <title>Request | MauDonate</title>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -41,47 +41,37 @@
 
 <main>
     <div class="settings-card">
-        <h2 class="settings-header">User Settings</h2>
+        <h2 class="settings-header">Make a request</h2>
 
-        <div th:if="${requestFailed}" class="alert alert-danger" th:text="${requestFailed}"></div>
+        <div th:if="${failed}" class="alert alert-danger" th:text="${failed}"></div>
 
         <form th:action="@{/donation/request}" th:object="${request}" method="post" class="d-flex flex-column">
             <div class="mb-3">
                 <label for="title" class="form-label">Title</label>
-                <input type="text" id="title" maxlength="128" class="form-control" th:field="*{Title}">
+                <input type="text" id="title" maxlength="128" required class="form-control" th:field="*{Title}">
             </div>
 
             <div class="mb-3">
                 <label for="message" class="form-label">Tell us everything about your case</label>
-                <textarea rows="5" id="message" maxlength="512" class="form-control" th:field="*{Message}"></textarea>
+                <textarea rows="5" id="message" maxlength="512" required class="form-control" th:field="*{Message}"></textarea>
             </div>
 
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
                     <label for="GoalAmount" class="form-label">How much money do you need? (Rs)</label>
-                    <input type="number" id="GoalAmount" maxlength="64" class="form-control" th:field="*{GoalAmount}">
+                    <input type="number" id="GoalAmount" required class="form-control" th:field="*{GoalAmount}">
                 </div>
                 <div class="col-md-6">
                     <label for="AccountNumber" class="form-label">Account Number</label>
-                    <input type="text" id="AccountNumber" maxlength="64" class="form-control" th:field="*{AccountNumber}">
+                    <input type="text" id="AccountNumber" required maxlength="64" class="form-control" th:field="*{AccountNumber}">
                 </div>
             </div>
 
             <div class="mb-3">
                 <label for="BankName" class="form-label">BankName</label>
-                <select id="BankName" class="form-select" th:field="*{BankName}">
+                <select id="BankName" class="form-select" required th:field="*{BankName}">
                     <option value="" disabled selected>Select Bank</option>
-                    <option value="MCB">MCB</option>
-                    <option value="SBM">SBM</option>
-                    <option value="MauBank">MauBank</option>
-                    <option value="Absa Bank">Absa Bank</option>
-                    <option value="HSBC Bank">HSBC Bank</option>
-                    <option value="Standard Chartered">Standard Chartered</option>
-                    <option value="Bank One">Bank One</option>
-                    <option value="AfrAsia Bank">AfrAsia Bank</option>
-                    <option value="Silver Bank">Silver Bank</option>
-                    <option value="ABC Banking">ABC Banking</option>
-                    <option value="Other">Other</option>
+                    <option th:each="b : ${T(mau.donate.objects.enums.Bank).values()}" th:value="${b.toString()}" th:text="${b.getName()}" th:selected="${b.toString() == request.BankName}"></option>
                 </select>
             </div>
             <button type="submit" class="btn btn-primary flex-grow-1">Submit</button>

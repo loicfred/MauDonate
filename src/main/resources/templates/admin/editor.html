@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head id="master-head">
-    <title>Settings | MauDonate</title>
+    <title>Database Editor | MauDonate</title>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -84,7 +84,7 @@
                 <input th:if="${entry.type.equals('byte[]')}" type="file" th:id="${entry.name}" class="form-check-input" th:field="*{fields[__${stat.index}__].value}">
 
             </div>
-            <button type="submit" class="btn btn-primary flex-grow-1">Save Entry</button>
+            <button type="submit" class="btn btn-success flex-grow-1">Save Entry</button>
         </form>
         <form th:action="@{/admin/delete/{item}/{id}(item=${item}, id=${id})}" class="d-flex flex-column mt-4" method="post" onsubmit="return confirm('Are you sure you want to delete this entry?');">
             <button type="submit" class="btn btn-danger flex-grow-1">Delete Entry</button>

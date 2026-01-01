@@ -2,7 +2,6 @@ package mau.donate.controller.admin;
 
 import mau.donate.objects.User;
 import mau.donate.service.DatabaseObject;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -25,13 +24,14 @@ public class DBEditorController {
     public static final String DBObjectPackage = "mau.donate.objects.";
 
 
-    @RequestMapping("/admin/edit/{item}")
+    @GetMapping("/admin/edit/{item}")
     public String adminEdit(Model model, Principal loggedUser, @PathVariable String item) {
         return adminEdit(model, loggedUser, item, null);
     }
 
-    @RequestMapping("/admin/edit/{item}/{id}")
+    @GetMapping("/admin/edit/{item}/{id}")
     public String adminEdit(Model model, Principal loggedUser, @PathVariable String item, @PathVariable Long id) {
+        if (loggedUser == null) return "redirect:/accounts/login";
         User U = User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
@@ -62,11 +62,12 @@ public class DBEditorController {
         } catch (Exception ignored) {
             return "redirect:/admin?page=3&errorDb";
         }
-        return "editor";
+        return "admin/editor";
     }
 
     @PostMapping("/admin/update/{item}/{id}")
     public String editItem(Model model, Principal loggedUser, RedirectAttributes redirectAttributes, @PathVariable String item, @PathVariable Long id, @ModelAttribute UniversalForm form) {
+        if (loggedUser == null) return "redirect:/accounts/login";
         User U = User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);

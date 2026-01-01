@@ -11,6 +11,7 @@
             <div class="card shadow p-4">
                 <h3 class="mb-3">Create an Account</h3>
                 <div th:if="${param.badpassword}" class="alert alert-danger">Password should be of minimum 8 of length and contain at least 1 digit, symbol, uppercase & lowercase character.</div>
+                <div th:if="${param.badage}" class="alert alert-danger">You should be at least 18 years old to register.</div>
                 <form th:action="@{/post/accounts/register}" th:object="${user}" method="post">
                     <div class="mb-3">
                         <input type="email" th:field="*{Email}" maxlength="64" class="form-control" placeholder="Email" required>

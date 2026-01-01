@@ -33,7 +33,7 @@ public class SettingsController {
     @GetMapping("/settings")
     public String settings(Model model, Principal loggedUser) {
         if (loggedUser == null) return "redirect:/accounts/login";
-        User U = User.getByEmail(loggedUser.getName());
+        User U = User.getByAuthentication(loggedUser);
         addEssential(model, loggedUser, U);
         model.addAttribute("user", U);
         return "settings";
@@ -41,8 +41,8 @@ public class SettingsController {
     @PostMapping("/settings")
     public String updateSettings(@ModelAttribute User newDetails, Model model, Principal loggedUser, RedirectAttributes redirectAttributes) {
         if (loggedUser == null) return "redirect:/accounts/login";
+        User oldYou = User.getByAuthentication(loggedUser);
         try {
-            User oldYou = User.getByEmail(loggedUser.getName());
             if (!oldYou.Email.equals(newDetails.Email) && User.getByEmail(newDetails.Email) != null) {
                 redirectAttributes.addFlashAttribute("error", "Email already exists.");
                 return "redirect:/settings";
@@ -82,36 +82,14 @@ public class SettingsController {
 
     @PostMapping("/delete-account")
     public String deleteAccount(Principal loggedUser, RedirectAttributes redirectAttributes) {
-        if (loggedUser != null) {
-            User user = User.getByEmail(loggedUser.getName());
-            if (user != null) {
+        if (loggedUser == null) return "redirect:/accounts/login";
+        User U = User.getByAuthentication(loggedUser);
 
-                String token = UUID.randomUUID().toString();
-                new Email_Verification(user, token, "DELETE ACCOUNT");
-                emailService.sendDeleteConfirmationEmail(user.Email, token);
+        String token = UUID.randomUUID().toString();
+        new Email_Verification(U, token, "DELETE ACCOUNT");
+        emailService.sendDeleteConfirmationEmail(U.Email, token);
 
-                redirectAttributes.addFlashAttribute("success", "Account deletion verification email sent.");
-                return "redirect:/settings";
-            }
-        }
+        redirectAttributes.addFlashAttribute("success", "Account deletion verification email sent.");
         return "redirect:/settings";
-    }
-    @GetMapping("/accounts/delete/verify")
-    public String verifyAccount(@RequestParam("token") String token, Model model) {
-        model.addAttribute("isAnonymous", SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken);
-        Email_Verification vToken = Email_Verification.getByToken(token);
-        if (vToken == null) {
-            model.addAttribute("message", "Verification code has expired.");
-            model.addAttribute("success", false);
-            return "/accounts/verification";
-        } else {
-            vToken.getUser().Delete();
-            vToken.Delete();
-            SecurityContextHolder.clearContext();
-            model.addAttribute("message", "Your account has deleted successfully!");
-            model.addAttribute("success", true);
-            model.addAttribute("loginparam", "deleted");
-            return "/accounts/verification";
-        }
     }
 }

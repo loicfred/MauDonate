@@ -25,22 +25,6 @@ public class Donation_Request extends DatabaseObject<Donation_Request> {
     public boolean Completed;
 
     public Donation_Request() {}
-    public Donation_Request(long userId, String title, String message, String accountNumber, String bankName, double goalAmount) {
-        ID = Instant.now().toEpochMilli();
-        UserID = userId;
-        Title = StopString(title, 128);
-        Message = StopString(message, 512);
-        AccountNumber = accountNumber;
-        BankName = bankName;
-        Approved = false;
-        Completed = false;
-        CurrentAmount = 0;
-        GoalAmount = goalAmount;
-        Status = DonationStatus.PENDING.toString();
-        CreatedAt = LocalDateTime.now();
-        UpdatedAt = LocalDateTime.now();
-        Write();
-    }
 
     public double getGoalAmount() {
         return GoalAmount;

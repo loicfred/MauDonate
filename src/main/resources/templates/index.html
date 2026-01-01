@@ -48,7 +48,11 @@
                             Donate Now
                         </button>
 
-                        <div th:if="${requestSuccess}" class="alert alert-success" th:text="${requestSuccess}"></div>
+                        <a class="btn btn-lg btn-success px-5 mb-3" href="/fundraise" id="fundraiseNow">
+                            Fundraise Now
+                        </a>
+
+                        <div th:if="${successDon}" class="alert alert-success" th:text="${successDon}"></div>
                     </div>
                 </div>
             </div>
@@ -68,6 +72,7 @@
                     <div class="text-muted d-flex align-items-center">
                         <small th:text="${'Created at ' + req.CreatedAt}"></small>
                         <button class="ms-auto btn btn-primary" onclick="showDonatePopup(this)"
+                                th:data-id="${req.ID}"
                                 th:data-banks="${req.BankName}"
                                 th:data-account="${req.AccountNumber}">Donate
                         </button>
@@ -99,8 +104,10 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p><strong>Bank:</strong> <span id="bankName"></span></p>
-                    <p><strong>Account ID:</strong></p>
+                    <div class="d-flex align-items-center">
+                        <p><strong>Account ID:</strong></p>
+                        <p class="ms-auto"><strong>Bank:</strong> <span id="bankName"></span></p>
+                    </div>
                     <div class="input-group">
                         <input type="text" id="accountNumber" class="form-control" readonly>
                         <button class="btn btn-secondary" onclick="copyAccountNumber()">
@@ -111,6 +118,14 @@
                         Account ID copied ✔
                     </p>
                 </div>
+                <div class="modal-footer">
+                    <div class="d-flex align-items-center">
+                        <p><strong>Donate unused items (if required):</strong></p>
+                        <a class="btn btn-primary ms-auto" id="donateItems">
+                            Donate Items
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -119,9 +134,11 @@
         function showDonatePopup(button) {
             const bank = button.getAttribute("data-banks");
             const account = button.getAttribute("data-account");
+            const id = button.getAttribute("data-id");
             document.getElementById("bankName").innerText = bank;
             document.getElementById("accountNumber").value = account;
             document.getElementById("copySuccess").classList.add("d-none");
+            document.getElementById("donateItems").href = "/donate/" + id;
             const modal = new bootstrap.Modal(document.getElementById("donateModal"));
             modal.show();
         }

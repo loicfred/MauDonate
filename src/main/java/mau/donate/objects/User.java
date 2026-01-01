@@ -7,6 +7,7 @@ import java.security.Principal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 
 import static my.utilities.util.Utilities.CutString;
 
@@ -174,5 +175,9 @@ public class User extends DatabaseObject<User> {
             else if (!Character.isLetterOrDigit(c)) hasSymbol = true;
         }
         return hasSymbol && hasUpper && hasLower && hasNumber;
+    }
+    public int getAge() {
+        if (DateOfBirth == null) return 0;
+        return Period.between(DateOfBirth, LocalDate.now()).getYears();
     }
 }

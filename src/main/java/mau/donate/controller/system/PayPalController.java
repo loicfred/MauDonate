@@ -45,7 +45,6 @@ public class PayPalController {
         OrdersCreateRequest request = new OrdersCreateRequest();
         request.requestBody(orderRequest);
 
-        System.err.println(amountUsd.toString());
         Order order = payPalClient.execute(request).result();
         return Map.of("id", order.id()
                 //, "amountMur", amountMur.toString()

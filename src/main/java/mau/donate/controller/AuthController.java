@@ -45,6 +45,7 @@ public class AuthController {
     @PostMapping("/post/accounts/register")
     public String register(User user) {
         if (!user.isPasswordValid()) return "redirect:/accounts/signup?badpassword";
+        if (user.getAge() < 18) return "redirect:/accounts/signup?badage";
         User.ClearFailedLogins(user.Email);
         user.Password = passwordEncoder.encode(user.Password);
         user.Write();
@@ -60,7 +61,6 @@ public class AuthController {
         if (vToken == null) {
             model.addAttribute("message", "Verification code has expired.");
             model.addAttribute("success", false);
-            return "accounts/verification";
         } else {
             vToken.getUser().setEnabled(true);
             vToken.getUser().setVerified(true);
@@ -69,7 +69,26 @@ public class AuthController {
             model.addAttribute("message", "Your account has been verified! You can now log in.");
             model.addAttribute("success", true);
             model.addAttribute("loginparam", "verified");
-            return "accounts/verification";
+        }
+        return "accounts/verification";
+    }
+
+    @GetMapping("/accounts/delete/verify")
+    public String deleteAccount(@RequestParam("token") String token, Model model) {
+        model.addAttribute("isAnonymous", SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken);
+        Email_Verification vToken = Email_Verification.getByToken(token);
+        if (vToken == null) {
+            model.addAttribute("message", "Verification code has expired.");
+            model.addAttribute("success", false);
+            return "/accounts/verification";
+        } else {
+            vToken.getUser().Delete();
+            vToken.Delete();
+            SecurityContextHolder.clearContext();
+            model.addAttribute("message", "Your account has deleted successfully!");
+            model.addAttribute("success", true);
+            model.addAttribute("loginparam", "deleted");
+            return "/accounts/verification";
         }
     }
 }

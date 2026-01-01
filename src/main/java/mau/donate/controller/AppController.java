@@ -1,7 +1,6 @@
 package mau.donate.controller;
 
 import mau.donate.objects.*;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +13,7 @@ import java.util.List;
 @Controller
 public class AppController {
 
-    @RequestMapping("/home")
+    @GetMapping("/home")
     public String home(Model model, Principal loggedUser) {
         User U = User.getByAuthentication(loggedUser);
         if (loggedUser != null && U == null) return "redirect:/logout";
@@ -24,26 +23,28 @@ public class AppController {
         return "index";
     }
 
-    @RequestMapping("/")
+    @GetMapping("/")
     public String index(Model model, Principal loggedUser) {
         return home(model, loggedUser);
     }
 
-    @RequestMapping("/donate")
+    @GetMapping("/fundraise")
     public String donation(Model model, Principal loggedUser) {
+        if (loggedUser == null) return "redirect:/accounts/login";
         User U = User.getByAuthentication(loggedUser);
         addEssential(model, loggedUser, U);
-        return "donate";
+        return "fundraise";
     }
 
-    @RequestMapping("/request")
+    @GetMapping("/request")
     public String request(Model model, Principal loggedUser) {
+        if (loggedUser == null) return "redirect:/accounts/login";
         User U = User.getByAuthentication(loggedUser);
         addEssential(model, loggedUser, U);
         return "request";
     }
 
-    @RequestMapping("/offline")
+    @GetMapping("/offline")
     public String offline() {
         return "offline";
     }

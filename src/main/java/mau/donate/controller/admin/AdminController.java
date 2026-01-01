@@ -4,7 +4,6 @@ import mau.donate.objects.Donation_Request;
 import mau.donate.objects.User;
 import mau.donate.objects.derived.D_Donation_Item;
 import mau.donate.objects.derived.D_Warehouse;
-import mau.donate.objects.enums.DonationStatus;
 import mau.donate.objects.enums.StorageStatus;
 import mau.donate.service.CacheService;
 import mau.donate.service.DatabaseObject;
@@ -29,8 +28,9 @@ public class AdminController {
         this.cacheService = cacheService;
     }
 
-    @RequestMapping("/admin")
+    @GetMapping("/admin")
     public String admin(Model model, Principal loggedUser) {
+        if (loggedUser == null) return "redirect:/accounts/login";
         User U = User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
@@ -43,12 +43,13 @@ public class AdminController {
         model.addAttribute("tstats", DatabaseObject.doQuery("call maudonate.TotalStat();").orElseGet(() -> new DatabaseObject.Row(Map.of())));
         LocalDate LD = LocalDate.now();
         model.addAttribute("mstats", DatabaseObject.doQuery("call maudonate.MonthlyStat(?,?);", LD.getYear(), LD.getMonthValue()).orElseGet(() -> new DatabaseObject.Row(Map.of())));
-        return "admin";
+        return "admin/admin";
     }
 
     @ResponseBody
     @GetMapping("/admin/list/{item}")
     public Map<String, ?> fetchItemList(Model model, Principal loggedUser, @PathVariable String item) {
+        if (loggedUser == null) return null;
         User U = User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return null;
         addEssential(model, loggedUser, U);
@@ -64,6 +65,7 @@ public class AdminController {
     @ResponseBody
     @GetMapping("/admin/stats/{year}/{month}")
     public Map<String, Object> fetchItemList(Model model, Principal loggedUser, @PathVariable Long year, @PathVariable Long month) {
+        if (loggedUser == null) return null;
         User U = User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return null;
         addEssential(model, loggedUser, U);

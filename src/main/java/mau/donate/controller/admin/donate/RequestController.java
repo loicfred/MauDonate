@@ -1,7 +1,8 @@
-package mau.donate.controller.admin;
+package mau.donate.controller.admin.donate;
 
 import mau.donate.objects.Donation_Request;
 import mau.donate.objects.User;
+import mau.donate.objects.enums.DonationStatus;
 import mau.donate.service.EmailService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 import static mau.donate.controller.AppController.addEssential;
@@ -26,6 +26,7 @@ public class RequestController {
 
     @GetMapping("/donation/request")
     public String requestPage(Model model, Principal loggedUser) {
+        if (loggedUser == null) return "redirect:/accounts/login";
         User U = User.getByAuthentication(loggedUser);
         addEssential(model, loggedUser, U);
 
@@ -37,25 +38,28 @@ public class RequestController {
 
     @PostMapping("/donation/request")
     public String makeRequest(Model model, Principal loggedUser, @ModelAttribute Donation_Request req, RedirectAttributes redirectAttributes) {
+        if (loggedUser == null) return "redirect:/accounts/login";
         User U = User.getByAuthentication(loggedUser);
         addEssential(model, loggedUser, U);
 
         req.CreatedAt = LocalDateTime.now();
         req.UpdatedAt = LocalDateTime.now();
+        req.Status = DonationStatus.PENDING.toString();
         req.UserID = U.getID();
         req.Approved = false;
         if (req.Write() > 0) {
-            redirectAttributes.addFlashAttribute("successReq", "Successfully sent a donation request. Once it's approved you will receive an email.");
-            return "redirect:/home?page=0&requestSuccess";
+            redirectAttributes.addFlashAttribute("successDon", "Successfully sent a donation request. Once it's approved you will receive an email.");
+            return "redirect:/home?page=0";
         } else {
-            redirectAttributes.addFlashAttribute("failedReq", "Failed to send a donation request. Try again later.");
-            return "redirect:/donation/request?requestSuccess";
+            redirectAttributes.addFlashAttribute("failed", "Failed to send a donation request. Try again later.");
+            return "redirect:/donation/request";
         }
     }
 
 
     @PostMapping("/admin/request/validate/{id}/accept")
     public String acceptDonationReqRequest(Model model, Principal loggedUser, @PathVariable Long id, @RequestParam String message, RedirectAttributes redirectAttributes) {
+        if (loggedUser == null) return "redirect:/accounts/login";
         User U = User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
@@ -73,6 +77,7 @@ public class RequestController {
     }
     @PostMapping("/admin/request/validate/{id}/deny")
     public String denyDonationReqRequest(Model model, Principal loggedUser, @PathVariable Long id, @RequestParam String message, RedirectAttributes redirectAttributes) {
+        if (loggedUser == null) return "redirect:/accounts/login";
         User U = User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);

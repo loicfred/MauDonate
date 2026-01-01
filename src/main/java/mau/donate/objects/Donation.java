@@ -2,11 +2,9 @@ package mau.donate.objects;
 
 import mau.donate.service.DatabaseObject;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static my.utilities.util.Utilities.CutString;
 import static my.utilities.util.Utilities.StopString;
 
 public class Donation extends DatabaseObject<Donation> {
@@ -16,22 +14,12 @@ public class Donation extends DatabaseObject<Donation> {
     public long ReceiverID;
     public double Rupees;
     public String Message;
-    public String Status; // PENDING, COMPLETED, CANCELLED
-    public boolean isAnonymous;
+    public boolean Approved;
+    public boolean Anonymous;
     public LocalDateTime CreatedAt;
+    public LocalDateTime UpdatedAt;
 
     public Donation() {}
-    public Donation(long donorID, long receiverID, double rupees, String message, String status, boolean isAnonymous) {
-        this.ID = Instant.now().toEpochMilli();
-        DonorID = donorID;
-        ReceiverID = receiverID;
-        Rupees = rupees;
-        Message = StopString(message, 512);
-        Status = CutString(status, 64);
-        this.isAnonymous = isAnonymous;
-        CreatedAt = LocalDateTime.now();
-        Write();
-    }
 
     public long getID() {
         return ID;
@@ -48,14 +36,17 @@ public class Donation extends DatabaseObject<Donation> {
     public String getMessage() {
         return Message;
     }
-    public String getStatus() {
-        return Status;
+    public boolean isApproved() {
+        return Approved;
     }
     public boolean isAnonymous() {
-        return isAnonymous;
+        return Anonymous;
     }
     public LocalDateTime getCreatedAt() {
         return CreatedAt;
+    }
+    public LocalDateTime getUpdatedAt() {
+        return UpdatedAt;
     }
 
 
@@ -74,14 +65,17 @@ public class Donation extends DatabaseObject<Donation> {
     public void setMessage(String message) {
         Message = StopString(message, 512);
     }
-    public void setStatus(String status) {
-        Status = status;
+    public void setApproved(boolean approved) {
+        Approved = approved;
     }
     public void setAnonymous(boolean anonymous) {
-        isAnonymous = anonymous;
+        Anonymous = anonymous;
     }
     public void setCreatedAt(LocalDateTime createdAt) {
         CreatedAt = createdAt;
+    }
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        UpdatedAt = updatedAt;
     }
 
 

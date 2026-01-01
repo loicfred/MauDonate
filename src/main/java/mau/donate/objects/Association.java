@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 
 public class Association extends DatabaseObject<Association> {
 
-    public long ID;
     public String Name;
     public String Description;
     public byte[] Image;

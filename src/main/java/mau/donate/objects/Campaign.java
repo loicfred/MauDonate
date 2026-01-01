@@ -10,7 +10,6 @@ import static my.utilities.util.Utilities.StopString;
 public class Campaign extends DatabaseObject<Campaign> {
     private transient Association A;
 
-    public long ID;
     public long AssociationID;
     public String Title;
     public String Message;

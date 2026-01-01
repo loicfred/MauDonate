@@ -1,8 +1,7 @@
-package mau.donate.controller;
+package mau.donate.controller.system;
 
 import mau.donate.objects.User;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

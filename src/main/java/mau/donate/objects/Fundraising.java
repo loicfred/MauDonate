@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 import static my.utilities.util.Utilities.StopString;
 
 public class Fundraising extends DatabaseObject<Fundraising> {
-    public long ID;
     public long DonorID;
     public double USD;
     public String Title;

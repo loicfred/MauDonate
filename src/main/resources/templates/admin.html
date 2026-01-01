@@ -58,7 +58,29 @@
 
         <!-- PAGE 1 -->
         <section class="page">
-
+            <p style="justify-content: center; align-items: center; text-align: center; padding: 30px;" th:if="${pending_items.isEmpty()}">No donations currently.</p>
+            <div th:each="pndi : ${pending_items}" class="request-card card mb-3">
+                <div class="card-body">
+                    <div class="text-muted d-flex align-items-center">
+                        <h5 th:text="${'Item: ' + pndi.ItemName}"></h5>
+                        <h5 class="ms-auto" th:text="${'Quantity: ' + pndi.Quantity}"></h5>
+                    </div>
+                    <div class="mb-2">
+                        <h6 class="mb-0">Sender Details:</h6>
+                        <p class="mb-0" th:text="${pndi.Sender_FName + ' ' + pndi.Sender_LName}"></p>
+                        <small class="text-muted" th:text="${pndi.Sender_Address}"></small>
+                    </div>
+                    <div class="mb-2">
+                        <h6 class="mb-0">Receiver Details:</h6>
+                        <p class="mb-0" th:text="${pndi.Receiver_FName + ' ' + pndi.Receiver_LName}"></p>
+                        <small class="text-muted" th:text="${pndi.Receiver_Address}"></small>
+                    </div>
+                    <p class="mb-2" th:text="${pndi.Message}"></p>
+                    <div class="text-muted d-flex align-items-center">
+                        <small th:text="${'Created at ' + pndi.CreatedAt}"></small>
+                     </div>
+                </div>
+            </div>
         </section>
 
         <!-- PAGE 2 -->
@@ -100,22 +122,6 @@
                     </div>
                 </div>
             </a>
-            <a th:each="ware : ${warehouses}" th:href="${'/admin/warehouse/' + ware.ID}" class="delivery-card card mb-3" draggable="false">
-                <div class="card-body">
-                    <div class="text-muted d-flex align-items-center">
-                        <h5 th:text="${ware.Name}"></h5>
-                        <img class="ms-auto m-1" src="/img/delivery_box_w.png" height="26" alt="box.png">
-                        <h5 class="mb-0" th:text="${ware.CapacityUtilization + '/' + ware.MaxCapacity}"></h5>
-                    </div>
-                    <div class="text-muted d-flex">
-                        <div class="row">
-                            <small class="mb-0" th:text="${ware.Address}"></small>
-                            <small class="mb-0 fw-bold" th:text="${ware.Region}"></small>
-                        </div>
-                        <h1 class="ms-auto mt-auto mb-0" th:text="${ware.getUtilizationRate() + '%'}"></h1>
-                    </div>
-                </div>
-            </a>
         </section>
 
         <!-- PAGE 4 -->
@@ -123,9 +129,9 @@
             <h2 class="settings-header">Database Accessor</h2>
 
             <form id="databaseForm">
-                <div class="mb-3">
-                    <label for="table" class="form-label">Table</label>
-                    <select id="table" onchange="addSelect()" class="form-select">
+                <div class="mb-3 d-flex align-items-center">
+                    <label for="tableSelect" class="form-label mb-0 w-25 me-1">Table</label>
+                    <select id="tableSelect" onchange="addSelect(this)" class="form-select">
                         <option value="" disabled selected>- Public -</option>
                         <option value="User">User Accounts</option>
                         <option value="Donation_Request">Donation request</option>
@@ -133,83 +139,148 @@
                         <option value="Fundraising">Fundraising</option>
                         <option value="Association">Association</option>
                         <option value="Campaign">Campaigns</option>
-                        <option value="" disabled selected>- Private -</option>
+                        <option value="" disabled>- Private -</option>
                         <option value="Staff">Staffs</option>
                         <option value="Vehicle">Vehicles</option>
                         <option value="Warehouse">Warehouses</option>
                         <option value="Trip">Trips</option>
-                        <option value="" disabled selected>- Other -</option>
+                        <option value="" disabled>- Other -</option>
                         <option value="Email_Verification">Email verifications</option>
                     </select>
                 </div>
 
-                <div class="mb-3">
-                    <label for="ID" class="form-label">ID</label>
-                    <select id="IDs" class="form-control mb-2 d-none"></select>
-                    <input type="text" id="ID" maxlength="16" class="form-control">
+                <div class="mb-3 d-flex align-items-center">
+                    <label for="ID" class="form-label w-25 me-1">ID</label>
+                    <select id="IDs" class="form-control me-1" style="width: 50%" disabled></select>
+                    <input type="text" id="ID" maxlength="16" style="width: 50%" class="form-control" disabled>
                 </div>
 
                 <div class="mb-3">
                     <h5 class="form-label">Database information:</h5>
                     <p class="mb-0" th:text="${'Table count: ' + dbstat.totalTables}"></p>
+                    <p class="mb-0" th:text="${'Views count: ' + dbstat.totalViews}"></p>
                     <p class="mb-0" th:text="${'Total rows: ' + dbstat.totalRows}"></p>
                 </div>
-                <div class="mb-3 d-none tablestat" th:id="'IDTable_' + ${table.key}" th:each="table : ${dbstat.tableRowCounts.entrySet()}">
+                <div class="mb-3 d-none" id="TableDetails">
                     <h5 class="form-label">Table information:</h5>
-                    <p class="mb-0" th:text="${'Name: ' + table.key}"></p>
-                    <p class="mb-0" th:text="${'Rows count: ' + table.value}"></p>
+                    <p class="mb-0" id="TableDetailsName"></p>
+                    <p class="mb-0" id="TableDetailsRows"></p>
+                    <p class="mb-0" id="TableDetailsColumns"></p>
                 </div>
 
-                <div id="error" class="alert alert-danger d-none">Please select and input values.</div>
+                <div th:if="${param.errorDb}" class="alert alert-danger">Please input a valid and existing entry.</div>
 
-                <button type="submit" class="btn btn-primary w-100">Go to entry</button>
+                <div class="d-flex mb-3">
+                    <button type="submit" id="submitDb" class="btn btn-primary w-50 me-1" disabled>Go to entry</button>
+                    <button type="button" id="insertDb" class="btn btn-primary w-50 ms-1" disabled>Add new entry</button>
+                </div>
+
+                <div class="mb-3 pt-2" style="border-top: 1px solid gray;">
+                    <h5 class="form-label">Statistics:</h5>
+                    <p class="mb-0" th:text="${'Total USD Raised: ' + tstats.get('TotalFundraiseUSD')}"></p>
+                    <p class="mb-0" th:text="${'Total Donations: ' + tstats.get('TotalDonations')}"></p>
+                    <p class="mb-0" th:text="${'Total Items Donated: ' + tstats.get('TotalItemsDonated')}"></p>
+                    <p class="mb-0" th:text="${'Total Donation Requests: ' + tstats.get('TotalRequests')}"></p>
+                </div>
+                <div class="mb-3" >
+                    <div class="mb-1 d-flex align-items-center">
+                        <h5 class="form-label mb-0 me-3 w-50">Monthly statistics:</h5>
+                        <select id="monthlySelect" onchange="addStats()" class="form-select w-50"></select>
+                    </div>
+                    <p class="mb-0" ID="MonthlyDonationReqCount"></p>
+                    <p class="mb-0" ID="MonthlyDonationCount"></p>
+                    <p class="mb-0" ID="MonthlyFundraiseCount"></p>
+                    <p class="mb-0" ID="MonthlyFundraiseUSD"></p>
+                </div>
 
                 <script>
+                    const submitDb = document.getElementById('submitDb');
+                    const insertDb = document.getElementById('insertDb');
+                    const tableSelect = document.getElementById('tableSelect');
+
                     const error = document.getElementById('error');
-                    const table = document.getElementById('table');
                     const id = document.getElementById('ID');
                     const ids = document.getElementById('IDs');
 
-                    function addSelect() {
-                        fetch('/admin/list/' + table.value)
+                    function addSelect(select) {
+                        fetch('/admin/list/' + select.value)
                             .then(res => res.json())
                             .then(data => {
-                                document.querySelectorAll(".tablestat").forEach(el => el.classList.add("d-none"));
-                                document.getElementById("IDTable_" + table.value.toLowerCase()).classList.remove('d-none');
-                                ids.classList.remove('d-none');
+                                insertDb.disabled = false;
+                                id.disabled = false;
+                                ids.disabled = false;
+                                document.getElementById('TableDetailsName').innerText = 'Table name: ' + data.tblstats.tableName;
+                                document.getElementById('TableDetailsRows').innerText = 'Rows count: ' + data.tblstats.totalRows;
+                                document.getElementById('TableDetailsColumns').innerText = 'Columns count: ' + data.tblstats.columnNames.length;
+                                document.getElementById('TableDetails').classList.remove('d-none');
                                 ids.innerHTML = '<option value="" disabled selected>- Select an item -</option>';
-                                data.forEach(item => {
-                                    if (table.value === 'Donation_Request' || table.value === 'Fundraising' || table.value === 'Campaign' || table.value === 'Notification') {
+                                data.items.forEach(item => {
+                                    if (select.value === 'Donation_Request' || select.value === 'Fundraising' || select.value === 'Campaign' || select.value === 'Notification') {
                                         ids.innerHTML += `<option value="${item.ID}">${item.ID} - ${item.Title}</option>`;
                                     }
-                                    else if (table.value === 'Warehouse' || table.value === 'Vehicle' || table.value === 'Association') {
+                                    else if (select.value === 'Warehouse' || select.value === 'Vehicle' || select.value === 'Association') {
                                         ids.innerHTML += `<option value="${item.ID}">${item.ID} - ${item.Name}</option>`;
                                     }
-                                    else if (table.value === 'User' || table.value === 'Staff') {
+                                    else if (select.value === 'User' || select.value === 'Staff') {
                                         ids.innerHTML += `<option value="${item.ID}">${item.ID} - ${item.FirstName} - ${item.LastName}</option>`;
                                     }
-                                    else if (table.value === 'User' || table.value === 'Staff') {
+                                    else if (select.value === 'User' || select.value === 'Staff') {
                                         ids.innerHTML += `<option value="${item.ID}">${item.ID} - ${item.FirstName} - ${item.LastName}</option>`;
-                                    } else {
-                                        ids.classList.add('d-none');
                                     }
                                 })
-                        });
+                            });
                     }
 
                     document.getElementById('databaseForm').addEventListener('submit', function (e) {
                         e.preventDefault();
-                        if (table.value && (id.value || ids.value)) {
-                            error.classList.add('d-none');
-                            window.location.href = '/admin/edit/' + table.value + '/' + (id.value ? id.value : ids.value);
-                        } else {
-                            error.classList.remove('d-none');
-                        }
+                        error.classList.add('d-none');
+                        window.location.href = '/admin/edit/' + tableSelect.value + '/' + (id.value ? id.value : ids.value);
                     });
+                    insertDb.addEventListener("click", () => {
+                        window.location.href = '/admin/edit/' + tableSelect.value;
+                    })
 
                     id.addEventListener("input", () => {
                         ids.disabled = !!id.value;
+                        submitDb.disabled = !(id.value || ids.value) || tableSelect.value === '';
                     });
+                    ids.addEventListener("change", () => {
+                        submitDb.disabled = !(id.value || ids.value) || tableSelect.value === '';
+                    });
+                </script>
+                <script>
+                    const select = document.getElementById('monthlySelect');
+                    const now = new Date();
+                    const currentYear = now.getFullYear();
+                    const currentMonth = now.getMonth() + 1; // 1-12
+
+                    // Loop over the last 3 years
+                    for (let year = currentYear; year >= currentYear - 2; year--) {
+                        // Determine starting and ending month for this year
+                        let startMonth = (year === currentYear) ? currentMonth : 12;
+                        let endMonth = (year === currentYear - 2) ? 1 : 1;
+
+                        for (let month = startMonth; month >= endMonth; month--) {
+                            const monthPadded = String(month).padStart(2, '0');
+                            const option = document.createElement('option');
+                            option.value = `${year}-${monthPadded}`;
+                            option.textContent = `${year}-${monthPadded}`;
+                            select.appendChild(option);
+                        }
+                    }
+                    function addStats() {
+                        let year = select.value.split('-')[0];
+                        let month = select.value.split('-')[1];
+                        fetch('/admin/stats/' + year + '/' + month)
+                            .then(res => res.json())
+                            .then(data => {
+                                document.getElementById('MonthlyDonationReqCount').innerText = 'Monthly donation requests: ' + data.MonthlyDonationReqCount;
+                                document.getElementById('MonthlyDonationCount').innerText = 'Monthly donations: ' + data.MonthlyDonationCount;
+                                document.getElementById('MonthlyFundraiseCount').innerText = 'Monthly fundraises: ' + data.MonthlyFundraiseCount;
+                                document.getElementById('MonthlyFundraiseUSD').innerText = 'Monthly fundraises revenue: ' + data.MonthlyFundraiseUSD + ' USD';
+                            });
+                    }
+                    addStats(now.getFullYear(), now.getMonth())
                 </script>
             </form>
         </section>
@@ -256,7 +327,7 @@
 <script src="/js/app.js"></script>
 <script src="/js/pagecarousel.js"></script>
 
-<script src="/pwa-init.js"></script>
+
 
 
 

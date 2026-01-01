@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 
 public class Staff extends DatabaseObject<User> {
 
-    public long ID;
     public String FirstName;
     public String LastName;
     public String Department;

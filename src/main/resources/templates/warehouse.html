@@ -1,10 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head id="master-head">
+    <title>Warehouse | MauDonate</title>
+
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#822BD9">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="icon" href="/img/logo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="/css/main.css">
+
+    <style>
+        main {
+            padding: 1rem;
+        }
+
+        .settings-card {
+            max-width: 600px;
+            margin: auto;
+            padding: 1rem;
+            background: var(--primary-color-lighter);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .settings-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+    </style>
 </head>
 <body>
+
+<header th:replace="/fragments/header :: mainHeader" id="master-header"></header>
+
+<main>
+    <div class="settings-card">
+        <div class="d-flex mb-1 align-items-center justify-content-center">
+            <h4 class="mb-0"  th:text="${warehouse.Name}"></h4>
+            <div class="d-flex align-items-center justify-content-center">
+                <img class="m-1" src="/img/delivery_box_w.png" height="28" alt="box.png">
+                <h4 class="mb-0" th:text="${warehouse.CapacityUtilization + '/' + warehouse.MaxCapacity + ' (' + warehouse.getUtilizationRate() + '%)'}"></h4>
+            </div>
+        </div>
+        <h6 class="settings-header mb-3" th:text="${warehouse.Region + ' ' + warehouse.Address}"></h6>
+
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Capacity Used</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${warehouse.getItems()}">
+                <td th:text="${item.ID}"></td>
+                <td th:text="${item.ItemName}"></td>
+                <td th:text="${item.Quantity}"></td>
+                <td th:text="${(item.CapacityPerQty * item.Quantity)} + ' (' + ${item.getPercentage(warehouse.MaxCapacity)} + '%)'">
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <form class="d-flex flex-column" th:object="${warehouse}" th:action="${'/admin/warehouse/' + warehouse.ID + '/items/update'}" method="post">
+            <div th:each="item, stat : ${warehouse.getItems()}" class="mb-3 d-flex align-items-center" >
+                <input type="number" class="d-none" th:field="*{items[__${stat.index}__].ID}">
+                <label th:for="${item.ID + '-status'}" th:text="${item.ID} + ': ' + ${item.ItemName}" class="form-label w-75 mb-0"></label>
+                <select class="form-select" th:id="${item.ID + '-status'}" th:field="*{items[__${stat.index}__].Status}">
+                    <option th:each="st : ${T(mau.donate.objects.enums.StorageStatus).values()}" th:value="${st}" th:text="${st}" th:selected="${st.toString() == item.Status}"></option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary flex-grow-1">Save Entries</button>
+        </form>
+    </div>
+</main>
+
+<script src="/js/app.js"></script>
 
 </body>
 </html>

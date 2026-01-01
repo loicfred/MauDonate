@@ -45,6 +45,8 @@
 
         <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+        <div th:if="${param.phoneNumber}" class="alert alert-danger">You must set a valid phone number first to perform this action.</div>
+        <div th:if="${param.address}" class="alert alert-danger">You must set a valid address first to perform this action.</div>
 
         <form th:action="@{/settings}" th:object="${user}" method="post" class="d-flex flex-column">
             <div class="mb-3">
@@ -117,6 +119,6 @@
 </main>
 
 <script src="/js/app.js"></script>
-<script src="/pwa-init.js"></script>
+
 </body>
 </html>

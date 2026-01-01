@@ -12,7 +12,6 @@ import static my.utilities.util.Utilities.CutString;
 
 public class User extends DatabaseObject<User> {
 
-    public long ID;
     public String Email;
     public String Password;
     public String FirstName;
@@ -69,9 +68,6 @@ public class User extends DatabaseObject<User> {
         if (U != null) U.Delete();
     }
 
-    public long getID() {
-        return ID;
-    }
     public String getEmail() {
         return Email;
     }
@@ -118,9 +114,6 @@ public class User extends DatabaseObject<User> {
         return Image;
     }
 
-    public void setID(long id) {
-        ID = id;
-    }
     public void setPassword(String password) {
         Password = password;
     }

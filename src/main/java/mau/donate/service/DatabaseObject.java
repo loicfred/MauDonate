@@ -16,8 +16,6 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static my.utilities.json.JSONItem.GSON;
@@ -355,10 +353,10 @@ public abstract class DatabaseObject<T> {
     }
 
     public static class Row {
-        public transient Map<String, Object> rows;
+        public transient Map<String, Object> columns;
 
         public Row(Map<String, Object> qp) {
-            this.rows = qp;
+            this.columns = qp;
         }
 
         public <T> T get(Class<T> clazz, String fieldName) {
@@ -366,7 +364,7 @@ public abstract class DatabaseObject<T> {
         }
 
         public Object get(String fieldName) {
-            return rows.get(fieldName);
+            return columns.get(fieldName);
         }
 
         public String getAsString(String fieldName) {
@@ -505,15 +503,47 @@ public abstract class DatabaseObject<T> {
         jdbcTemplate.execute((Connection con) -> {
             DatabaseMetaData metaData = con.getMetaData();
             try (ResultSet tables = metaData.getTables(con.getCatalog(), null, "%", new String[]{"TABLE"})) {
-                int tableCount = 0;
                 while (tables.next()) {
                     String tableName = tables.getString("TABLE_NAME");
-                    Long rowCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM " + tableName, Long.class);
-                    stats.tableRowCounts.put(tableName, rowCount);
-                    stats.totalRows += rowCount;
-                    tableCount++;
+                    stats.totalTables++;
+                    stats.tableNames.add(tableName);
                 }
-                stats.totalTables = tableCount;
+            }
+
+            // --- Views ---
+            try (ResultSet views = metaData.getTables(con.getCatalog(), null, "%", new String[]{"VIEW"})) {
+                while (views.next()) {
+                    String viewName = views.getString("TABLE_NAME");
+                    stats.totalViews++;
+                    stats.viewNames.add(viewName);
+                }
+            }
+
+            stats.totalRows = jdbcTemplate.queryForObject("""
+            SELECT SUM(TABLE_ROWS) AS total_rows
+            FROM information_schema.tables
+            WHERE table_schema = DATABASE()
+            AND TABLE_TYPE = 'BASE TABLE';
+            """, Long.class).intValue();
+
+            return null;
+        });
+        return stats;
+    }
+    public static TableStats getTableStats(String name) {
+        TableStats stats = new TableStats();
+        jdbcTemplate.execute((Connection con) -> {
+            stats.tableName = name.toLowerCase();
+            DatabaseMetaData metaData = con.getMetaData();
+            try (ResultSet columns = metaData.getColumns(con.getCatalog(), null, stats.tableName, null)) {
+                while (columns.next()) {
+                    stats.columnNames.add(columns.getString("COLUMN_NAME"));
+                }
+            }
+            try (ResultSet count = con.createStatement().executeQuery("SELECT COUNT(*) FROM " + stats.tableName)) {
+                if (count.next()) {
+                    stats.totalRows = count.getLong(1);
+                }
             }
             return null;
         });
@@ -521,13 +551,30 @@ public abstract class DatabaseObject<T> {
     }
     public static class DatabaseStats {
         public int totalTables = 0;
+        public int totalViews = 0;
         public long totalRows = 0;
-        public Map<String, Long> tableRowCounts = new HashMap<>();
+        public List<String> tableNames = new ArrayList<>();
+        public List<String> viewNames = new ArrayList<>();
+    }
+    public static class TableStats {
+        public String tableName;
+        public long totalRows = 0;
+        public List<String> columnNames = new ArrayList<>();
     }
 
     @Inherited
     @Retention(RetentionPolicy.RUNTIME)
     public static @interface TableName {
         String value();
+    }
+
+
+    public long ID;
+
+    public long getID() {
+        return ID;
+    }
+    public void setID(long id) {
+        ID = id;
     }
 }

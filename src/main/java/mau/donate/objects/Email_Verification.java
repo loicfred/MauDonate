@@ -8,7 +8,6 @@ import java.time.temporal.ChronoUnit;
 public class Email_Verification extends DatabaseObject<Email_Verification> {
     private transient User U;
 
-    public long ID;
     public long UserID;
     public String Token;
     public String Type;

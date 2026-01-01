@@ -6,7 +6,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 
 public class Payment_Method extends DatabaseObject<Payment_Method> {
-    public long ID;
     public long UserID;
     public String Provider;
     public String Provider_token;

@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.time.Instant;
+import java.time.LocalDateTime;
 
 import static mau.donate.controller.AppController.addEssential;
 
@@ -22,14 +24,33 @@ public class RequestController {
         this.emailService = emailService;
     }
 
-    @PostMapping("/donation/request")
-    public String makeRequest(Model model, Principal loggedUser, Donation_Request req) {
+    @GetMapping("/donation/request")
+    public String requestPage(Model model, Principal loggedUser) {
         User U = User.getByAuthentication(loggedUser);
         addEssential(model, loggedUser, U);
 
+        if (U.getPhone() == null) return "redirect:/settings?phoneNumber";
+        else if (U.getAddress() == null) return "redirect:/settings?address";
+        model.addAttribute("request", new Donation_Request());
+        return "request";
+    }
+
+    @PostMapping("/donation/request")
+    public String makeRequest(Model model, Principal loggedUser, @ModelAttribute Donation_Request req, RedirectAttributes redirectAttributes) {
+        User U = User.getByAuthentication(loggedUser);
+        addEssential(model, loggedUser, U);
+
+        req.CreatedAt = LocalDateTime.now();
+        req.UpdatedAt = LocalDateTime.now();
+        req.UserID = U.getID();
         req.Approved = false;
-        if (req.Write() > 0) return "redirect:/home?page=0&request=1";
-        else return "redirect:/home?page=0&request=0";
+        if (req.Write() > 0) {
+            redirectAttributes.addFlashAttribute("successReq", "Successfully sent a donation request. Once it's approved you will receive an email.");
+            return "redirect:/home?page=0&requestSuccess";
+        } else {
+            redirectAttributes.addFlashAttribute("failedReq", "Failed to send a donation request. Try again later.");
+            return "redirect:/donation/request?requestSuccess";
+        }
     }
 
 
@@ -40,8 +61,9 @@ public class RequestController {
         addEssential(model, loggedUser, U);
 
         Donation_Request req = Donation_Request.getById(Donation_Request.class, id).orElseThrow();
+        req.UpdatedAt = LocalDateTime.now();
         req.Approved = true;
-        req.UpdateOnly("Approved");
+        req.UpdateOnly("Approved", "UpdatedAt");
 
         User sender = req.getUser();
         emailService.acceptRequest(sender.getEmail(), sender.getFirstName() + " " + sender.getLastName(), message);
@@ -56,8 +78,9 @@ public class RequestController {
         addEssential(model, loggedUser, U);
 
         Donation_Request req = Donation_Request.getById(Donation_Request.class, id).orElseThrow();
+        req.UpdatedAt = LocalDateTime.now();
         req.Approved = false;
-        req.UpdateOnly("Approved");
+        req.UpdateOnly("Approved", "UpdatedAt");
 
         User sender = req.getUser();
         emailService.denyRequest(sender.getEmail(), sender.getFirstName() + " " + sender.getLastName(), message);

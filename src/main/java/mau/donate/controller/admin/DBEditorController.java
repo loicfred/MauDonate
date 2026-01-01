@@ -2,14 +2,13 @@ package mau.donate.controller.admin;
 
 import mau.donate.objects.User;
 import mau.donate.service.DatabaseObject;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -60,7 +59,9 @@ public class DBEditorController {
 
             model.addAttribute("item", item);
             model.addAttribute("id", id);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            return "redirect:/admin?page=3&errorDb";
+        }
         return "editor";
     }
 
@@ -72,8 +73,13 @@ public class DBEditorController {
         try {
             item = item.substring(0,1).toUpperCase() + item.substring(1);
             @SuppressWarnings("unchecked")
-            Class<? extends DatabaseObject<?>> objClass = (Class<? extends DatabaseObject<?>>) Class.forName(DBObjectPackage + item);
-            DatabaseObject<?> entity = DatabaseObject.getById(objClass, id).orElseThrow();
+            Class<? extends DatabaseObject<?>> objClass = (Class<? extends DatabaseObject<?>>) Class.forName(DBObjectPackage + item).asSubclass(DatabaseObject.class);
+            DatabaseObject<?> entity = id != null ? DatabaseObject.getById(objClass, id).orElseThrow() : null;
+            if (entity == null) {
+                Constructor<DatabaseObject<?>> ctor = (Constructor<DatabaseObject<?>>) objClass.getDeclaredConstructor();
+                ctor.setAccessible(true);
+                entity = ctor.newInstance();
+            }
 
             for (FieldMeta entry : form.fields) {
                 Field field = entity.getClass().getDeclaredField(entry.name);
@@ -87,11 +93,16 @@ public class DBEditorController {
                 Convert(field, entity, entry.value);
             }
             objClass.getField("UpdatedAt").set(entity, java.time.LocalDateTime.now());
-            entity.Update();
+            if (id == null) {
+                entity = (DatabaseObject<?>) entity.WriteThenReturn().orElse(null);
+                id = entity.getID();
+            } else {
+                entity.Update();
+            }
             redirectAttributes.addFlashAttribute("success", "Entry updated successfully.");
             return "redirect:/admin/" + item + "/" + id;
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "An error occurred while editing the item: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "An error occurred: " + e.getMessage());
             return "redirect:/admin/" + item + "/" + id;
         }
     }

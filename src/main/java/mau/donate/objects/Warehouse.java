@@ -1,13 +1,15 @@
 package mau.donate.objects;
 
+import mau.donate.objects.enums.StorageStatus;
 import mau.donate.service.DatabaseObject;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class Warehouse extends DatabaseObject<Warehouse> {
+    public transient List<Donation_Item> items = null;
 
-    public long ID;
     public String Name;
     public String Region;
     public String Address;
@@ -24,6 +26,13 @@ public class Warehouse extends DatabaseObject<Warehouse> {
         MaxCapacity = maxCapacity;
         CreatedAt = LocalDateTime.now();
         Write();
+    }
+
+    public List<Donation_Item> getItems() {
+        return items == null ? items = DatabaseObject.getAllWhere(Donation_Item.class, "WarehouseID = ? AND NOT Status = ? ORDER BY Quantity * CapacityPerQty DESC", ID, StorageStatus.DELIVERED.name()) : items;
+    }
+    private void setItems(List<Donation_Item> items) {
+        this.items = items;
     }
 
     public static Warehouse getById(long id) {

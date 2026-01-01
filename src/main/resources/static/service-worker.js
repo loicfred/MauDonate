@@ -1,48 +1,99 @@
 const CACHE_NAME = "maudonate-v1";
 
-const ASSETS_TO_CACHE = [
-    "/manifest.json",
-    "/css/main.css",
-    "/assets/js/app.js",
-    "/img/logo.png",
-    "/img/logo_transparent.png"
+const STATIC_ASSETS = [
+    '/',
+    '/css/main.css',
+    '/js/app.js',
+    '/manifest.json'
 ];
 
-// Install event
-self.addEventListener("install", (event) => {
+/* ---------------- INSTALL ---------------- */
+self.addEventListener('install', event => {
+    console.log('[SW] Installing');
+
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            console.log("Caching assets...");
-            return cache.addAll(ASSETS_TO_CACHE);
-        }).catch(err => console.log("Error caching assets:", err))
+        caches.open(CACHE_NAME).then(cache => {
+            return cache.addAll(STATIC_ASSETS);
+        })
     );
+
     self.skipWaiting();
 });
 
-// Fetch event
-self.addEventListener("fetch", (event) => {
-    const req = event.request;
-    if (req.mode === "navigate") {
-        event.respondWith(
-            fetch(req).catch(() => caches.match("/offline.html"))
-        );
-        return;
-    }
-    event.respondWith(
-        caches.match(req).then(res => res || fetch(req))
-    );
-});
+/* ---------------- ACTIVATE ---------------- */
+self.addEventListener('activate', event => {
+    console.log('[SW] Activating');
 
-// Activate event
-self.addEventListener("activate", (event) => {
     event.waitUntil(
-        caches.keys().then((keys) =>
+        caches.keys().then(keys =>
             Promise.all(
                 keys
-                    .filter((key) => key !== CACHE_NAME)
-                    .map((key) => caches.delete(key))
+                    .filter(key => key !== CACHE_NAME)
+                    .map(key => caches.delete(key))
             )
         )
     );
+
     self.clients.claim();
 });
+
+/* ---------------- FETCH ---------------- */
+self.addEventListener('fetch', event => {
+    const req = event.request;
+    const url = new URL(req.url);
+
+    // 🚫 Ignore non-http(s) requests (Chrome extensions, devtools, etc.)
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+        return;
+    }
+
+    // 🚫 Never cache POST requests (Spring Security / CSRF)
+    if (req.method !== 'GET') {
+        return;
+    }
+
+    // 🚫 Skip admin / API calls
+    if (url.pathname.startsWith('/admin') ||
+        url.pathname.startsWith('/api')) {
+        return;
+    }
+
+    // 🖼 Static resources → cache first
+    if (
+        url.pathname.startsWith('/css') ||
+        url.pathname.startsWith('/js') ||
+        url.pathname.startsWith('/img') ||
+        url.pathname.startsWith('/img/icons')
+    ) {
+        event.respondWith(cacheFirst(req));
+        return;
+    }
+
+    // 📄 HTML pages → network first
+    if (req.headers.get('accept')?.includes('text/html')) {
+        event.respondWith(networkFirst(req));
+
+    }
+});
+
+/* ---------------- STRATEGIES ---------------- */
+async function cacheFirst(request) {
+    const cache = await caches.open("app-cache");
+    const cached = await cache.match(request);
+    if (cached) return cached;
+
+    const response = await fetch(request);
+    await cache.put(request, response.clone());
+    return response;
+}
+
+async function networkFirst(request) {
+    const cache = await caches.open(CACHE_NAME);
+    try {
+        const response = await fetch(request);
+        await cache.put(request, response.clone());
+        return response;
+    } catch {
+        return cache.match(request);
+    }
+}

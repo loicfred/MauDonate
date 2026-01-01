@@ -13,7 +13,7 @@
             <button onclick="goToAbout()">About</button>
             <hr>
             <a th:if="${principal == null}" href="/accounts/login">Log in</a>
-            <a th:if="${principal != null}" href="/request">Make a donation request</a>
+            <a th:if="${principal != null}" href="/donation/request">Make a donation request</a>
             <a th:if="${principal != null}" href="/settings">Settings</a>
             <form th:if="${principal != null}" action="/logout" method="post">
                 <input type="hidden" name="_csrf" th:value="${_csrf.token}">

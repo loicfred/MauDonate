@@ -8,7 +8,6 @@ import java.util.List;
 
 public class Trip extends DatabaseObject<Trip> {
 
-    public long ID;
     public long StaffID;
     public long DonationID;
     public String Address;

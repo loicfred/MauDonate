@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 
 public class Vehicle extends DatabaseObject<Vehicle> {
 
-    public long ID;
     public String Name;
     public int TripsCarriedOut;
     public long CarriageCapacity;

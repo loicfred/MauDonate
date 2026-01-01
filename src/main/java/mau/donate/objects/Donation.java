@@ -12,12 +12,11 @@ import static my.utilities.util.Utilities.StopString;
 public class Donation extends DatabaseObject<Donation> {
     public transient List<Donation_Item> Items = null;
 
-    public long ID;
     public long DonorID;
     public long ReceiverID;
     public double Rupees;
     public String Message;
-    public String Status;
+    public String Status; // PENDING, COMPLETED, CANCELLED
     public boolean isAnonymous;
     public LocalDateTime CreatedAt;
 

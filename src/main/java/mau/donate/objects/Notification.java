@@ -10,7 +10,6 @@ import static my.utilities.util.Utilities.StopString;
 
 public class Notification extends DatabaseObject<Notification> {
 
-    public long ID;
     public long UserID;
     public String Title;
     public String Message;

@@ -1,6 +1,7 @@
 package mau.donate.controller.admin.donate;
 
 import mau.donate.objects.Donation_Request;
+import mau.donate.objects.Notification;
 import mau.donate.objects.User;
 import mau.donate.objects.enums.DonationStatus;
 import mau.donate.service.EmailService;
@@ -12,6 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.security.Principal;
 import java.time.LocalDateTime;
 
+import static mau.donate.config.AppConfig.dbService;
 import static mau.donate.controller.AppController.addEssential;
 
 @CrossOrigin(origins = "*")
@@ -48,6 +50,7 @@ public class RequestController {
         req.UserID = U.getID();
         req.Approved = false;
         if (req.Write() > 0) {
+            dbService.refreshAllWhere(Donation_Request.class, "NOT Approved AND NOT Completed");
             redirectAttributes.addFlashAttribute("successDon", "Successfully sent a donation request. Once it's approved you will receive an email.");
             return "redirect:/home?page=0";
         } else {
@@ -71,7 +74,9 @@ public class RequestController {
 
         User sender = req.getUser();
         emailService.acceptRequest(sender.getEmail(), sender.getFirstName() + " " + sender.getLastName(), message);
+        new Notification(sender.getID(), "Request Approved", "Congratulations, your donation request has been approved !");
 
+        dbService.refreshAllWhere(Donation_Request.class, "NOT Approved AND NOT Completed");
         redirectAttributes.addFlashAttribute("successReq", "Successfully accepted the request from " + sender.getFirstName() + ".");
         return "redirect:/admin?page=1";
     }
@@ -89,6 +94,7 @@ public class RequestController {
 
         User sender = req.getUser();
         emailService.denyRequest(sender.getEmail(), sender.getFirstName() + " " + sender.getLastName(), message);
+        new Notification(sender.getID(), "Denied Request", "Unfortunately your donation request has been denied. More details sent by email.");
 
         redirectAttributes.addFlashAttribute("successReq", "Successfully denied the request from " + sender.getFirstName() + ".");
         return "redirect:/admin?page=1";

@@ -1,9 +1,14 @@
 package mau.donate.config;
 
-import mau.donate.service.DatabaseObject;
+import mau.donate.service.CacheService;
+import mau.donate.service.database.DatabaseObject;
+import mau.donate.service.database.DatabaseService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.web.client.RestClient;
@@ -12,6 +17,8 @@ import javax.sql.DataSource;
 
 @Configuration
 public class AppConfig {
+    public static CacheService cacheService;
+    public static DatabaseService dbService;
 
     @Value("${spring.datasource.url}")
     private String dbUrl;
@@ -24,6 +31,11 @@ public class AppConfig {
 
     @Value("${spring.datasource.driver-class-name}")
     private String dbDriver;
+
+    public ApplicationContext context;
+    public AppConfig(ApplicationContext context) {
+        this.context = context;
+    }
 
     @Bean
     public DataSource dataSource() {
@@ -38,7 +50,7 @@ public class AppConfig {
     @Bean
     public JdbcTemplate jdbcTemplate(DataSource ds) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
-        DatabaseObject.setJdbcTemplate(jdbcTemplate);
+        DatabaseService.setJdbcTemplate(jdbcTemplate);
         return jdbcTemplate;
     }
 
@@ -47,4 +59,10 @@ public class AppConfig {
         return RestClient.create();
     }
 
+    @EventListener(ApplicationReadyEvent.class)
+    public void setStaticReference() {
+        cacheService = context.getBean(CacheService.class);
+        dbService = context.getBean(DatabaseService.class);
+        DatabaseService.setJdbcTemplate(context.getBean(JdbcTemplate.class));
+    }
 }

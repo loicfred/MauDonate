@@ -1,12 +1,8 @@
 package mau.donate.objects;
 
-import mau.donate.objects.enums.DonationStatus;
-import mau.donate.service.DatabaseObject;
+import mau.donate.service.database.DatabaseObject;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-
-import static my.utilities.util.Utilities.StopString;
 
 public class Donation_Request extends DatabaseObject<Donation_Request> {
     public transient User U;

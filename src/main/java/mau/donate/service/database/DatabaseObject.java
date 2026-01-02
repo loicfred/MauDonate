@@ -1,33 +1,42 @@
-package mau.donate.service;
+package mau.donate.service.database;
 
 
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
+import mau.donate.service.CacheService;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Service;
 
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static mau.donate.config.AppConfig.dbService;
+import static mau.donate.service.database.DatabaseService.jdbcTemplate;
+import static mau.donate.service.database.DatabaseService.mapResultSetToObject;
 import static my.utilities.json.JSONItem.GSON;
 
 @SuppressWarnings("all")
 public abstract class DatabaseObject<T> {
-    protected transient static JdbcTemplate jdbcTemplate;
 
     protected transient final Class<T> entityClass;
     protected transient final List<Field> cachedFields;
     protected transient final RowMapper<T> rowMapper;
     protected transient final String tableName;
+
+    public long ID;
+
+    public long getID() {
+        return ID;
+    }
+    public void setID(long id) {
+        ID = id;
+    }
 
     protected DatabaseObject() {
         this.entityClass = (Class<T>) getClass();
@@ -45,62 +54,20 @@ public abstract class DatabaseObject<T> {
         this.rowMapper = (rs, rowNum) -> mapResultSetToObject(rs, entityClass);
     }
 
-    public static void setJdbcTemplate(JdbcTemplate template) {
-        jdbcTemplate = template;
-    }
-
     protected List<String> IDFields() {
         return List.of("ID");
     }
 
-    private static <T> T mapResultSetToObject(ResultSet rs, Class<T> clazz) {
-        try {
-            Constructor<T> ctor = clazz.getDeclaredConstructor();
-            ctor.setAccessible(true);
-            T item = ctor.newInstance();
-            Class<?> clz = clazz;
-            while (clz != null) {
-                for (Field f : clz.getDeclaredFields()) {
-                    if (Modifier.isTransient(f.getModifiers()) || Modifier.isStatic(f.getModifiers())) continue;
-                    f.setAccessible(true);
-                    Object value = rs.getObject(f.getName());
-                    if (value != null) {
-                        if (value instanceof java.sql.Date D) {
-                            f.set(item, D.toLocalDate());
-                        } else if (value instanceof java.sql.Timestamp D) {
-                            f.set(item, D.toLocalDateTime());
-                        } else if (value instanceof BigDecimal D) {
-                            if (f.getType() == float.class) {
-                                f.set(item, D.floatValue());
-                            } else if (f.getType() == long.class) {
-                                f.set(item, D.longValue());
-                            } else if (f.getType() == int.class) {
-                                f.set(item, D.intValue());
-                            } else if (f.getType() == short.class) {
-                                f.set(item, D.shortValue());
-                            } else if (f.getType() == byte.class) {
-                                f.set(item, D.byteValue());
-                            } else if (f.getType() == double.class) {
-                                f.set(item, D.doubleValue());
-                            }
-                        } else {
-                            f.set(item, value);
-                        }
-                    }
-                }
-                clz = clz.getSuperclass();
-            }
-            return item;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to map ResultSet to " + clazz.getSimpleName(), e);
-        }
-    }
-
     public int Write() {
-        Result result = getResult(false);
-        String sql = "INSERT INTO " + tableName + " (" + result.columns() + ") VALUES (" + result.placeholders() + ")";
-        return jdbcTemplate.update(sql, result.values());
+        try {
+            Result result = getResult(false);
+            String sql = "INSERT INTO " + tableName + " (" + result.columns() + ") VALUES (" + result.placeholders() + ")";
+            return jdbcTemplate.update(sql, result.values());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to write object", e);
+        } finally {
+            dbService.refreshID(getClass(), ID);
+        }
     }
     public Optional<T> WriteThenReturn() {
         try {
@@ -109,6 +76,8 @@ public abstract class DatabaseObject<T> {
             return jdbcTemplate.query(sql, (rs, rowNum) -> mapResultSetToObject(rs, entityClass), result.values()).stream().findFirst();
         } catch (Exception e) {
             throw new RuntimeException("Failed to write object", e);
+        } finally {
+            dbService.refreshID(getClass(), ID);
         }
     }
 
@@ -124,6 +93,8 @@ public abstract class DatabaseObject<T> {
             return jdbcTemplate.query(sql, (rs, rowNum) -> mapResultSetToObject(rs, entityClass), result.values()).stream().findFirst();
         } catch (Exception e) {
             throw new RuntimeException("Failed to write object", e);
+        } finally {
+            dbService.refreshID(getClass(), ID);
         }
     }
 
@@ -150,6 +121,8 @@ public abstract class DatabaseObject<T> {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("No ID field found in " + tableName + ".");
+        } finally {
+            dbService.refreshID(getClass(), ID);
         }
     }
     public int UpdateOnly(String... columns) {
@@ -174,8 +147,9 @@ public abstract class DatabaseObject<T> {
             return jdbcTemplate.update(C.newSQL, C.newParams);
         } catch (Exception e) {
             throw new RuntimeException("No ID field found in " + tableName + ".");
+        } finally {
+            dbService.refreshID(getClass(), ID);
         }
-
     }
     public int Delete() {
         try {
@@ -187,6 +161,8 @@ public abstract class DatabaseObject<T> {
             return jdbcTemplate.update(C.newSQL, C.newParams);
         } catch (Exception e) {
             throw new RuntimeException("No ID field found in " + tableName + ".");
+        } finally {
+            dbService.refreshID(getClass(), ID);
         }
     }
     public static <T> int Count(Class<T> clazz) {
@@ -231,6 +207,8 @@ public abstract class DatabaseObject<T> {
             return jdbcTemplate.update(C.newSQL, C.newParams);
         } catch (Exception e) {
             throw new RuntimeException("No ID field found in " + tableName + ".");
+        } finally {
+            dbService.refreshID(getClass(), ID);
         }
     }
     public int IncrementColumns(Map<String, Object> parameters) {
@@ -251,6 +229,8 @@ public abstract class DatabaseObject<T> {
             return jdbcTemplate.update(C.newSQL, C.newParams);
         } catch (Exception e) {
             throw new RuntimeException("No ID field found in " + tableName + ".");
+        } finally {
+            dbService.refreshID(getClass(), ID);
         }
     }
 
@@ -280,77 +260,54 @@ public abstract class DatabaseObject<T> {
     }
 
     public static <T> Optional<T> getById(Class<T> clazz, Object id) {
-        return getWhere(clazz, "ID = ?", id);
+        return dbService.executeQuery(clazz, "SELECT * FROM " + getTableName(clazz) + " WHERE ID = ? LIMIT 1;", id);
     }
     public static <T> Optional<T> getWhere(Class<T> clazz, String whereClause, Object... args) {
-        try {
-            String sql = "SELECT * FROM " + getTableName(clazz) + " WHERE " + whereClause + " LIMIT 1;";
-            SQLCleaner C = new SQLCleaner(sql, args);
-            return Optional.ofNullable(jdbcTemplate.queryForObject(C.newSQL, (rs, rowNum) -> mapResultSetToObject(rs, clazz), C.newParams));
-        } catch (EmptyResultDataAccessException ignored) {
-            return Optional.empty();
-        }
+        return dbService.executeQuery(clazz, "SELECT * FROM " + getTableName(clazz) + " WHERE " + whereClause + " LIMIT 1;", args);
     }
 
     public static <T> List<T> getAll(Class<T> clazz) {
-        String sql = "SELECT * FROM " + getTableName(clazz);
-        return jdbcTemplate.query(sql, (rs, rowNum) -> mapResultSetToObject(rs, clazz));
+        return doQueryAll(clazz, "SELECT * FROM " + getTableName(clazz), null);
     }
     public static <T> List<T> getAllWhere(Class<T> clazz, String whereClause, Object... args) {
-        String sql = "SELECT * FROM " + getTableName(clazz) + " WHERE " + whereClause;
-        SQLCleaner C = new SQLCleaner(sql, args);
-        return jdbcTemplate.query(C.newSQL, (rs, rowNum) -> mapResultSetToObject(rs, clazz), C.newParams);
+        return doQueryAll(clazz, "SELECT * FROM " + getTableName(clazz) + " WHERE " + whereClause, args);
     }
+
+    public static Optional<DatabaseObject.Row> doQuery(String sql, Object... args) {
+        return dbService.executeQuery(sql, args);
+    }
+    public static <T> Optional<T> doQuery(Class<T> clazz, String sql, Object... args) {
+        return dbService.executeQuery(clazz, sql, args);
+    }
+
+    public static List<Row> doQueryAll(String sql, Object... args) {
+        return dbService.executeQueryAll(sql, args);
+    }
+    public static <T> List<T> doQueryAll(Class<T> clazz, String sql, Object... args) {
+         return dbService.executeQueryAll(clazz, sql, args);
+    }
+
+    public static <T> Optional<T> doQueryValue(Class<T> clazz, String sql, Object... args) {
+        return dbService.executeQueryValue(clazz, sql, args);
+    }
+
 
     public static int doUpdate(String sql, Object... args) {
         SQLCleaner C = new SQLCleaner(sql, args);
         return jdbcTemplate.update(C.newSQL, C.newParams);
     }
 
-    public static <T> Optional<T> doQueryValue(Class<T> clazz, String sql, Object... args) {
-        try {
-            SQLCleaner C = new SQLCleaner(sql, args);
-            return Optional.ofNullable(jdbcTemplate.queryForObject(C.newSQL, clazz, C.newParams));
-        } catch (EmptyResultDataAccessException ignored) {
-            return Optional.empty();
-        }
-    }
-
-
-    public static Optional<DatabaseObject.Row> doQuery(String sql, Object... args) {
-        try {
-            SQLCleaner C = new SQLCleaner(sql, args);
-            return Optional.ofNullable(new Row(jdbcTemplate.queryForMap(C.newSQL, C.newParams)));
-        } catch (EmptyResultDataAccessException ignored) {
-            return Optional.empty();
-        }
-    }
-    public static <T> Optional<T> doQuery(Class<T> clazz, String sql, Object... args) {
-        try {
-            SQLCleaner C = new SQLCleaner(sql, args);
-            return Optional.ofNullable(jdbcTemplate.queryForObject(C.newSQL, (rs, rowNum) -> mapResultSetToObject(rs, clazz), C.newParams));
-        } catch (EmptyResultDataAccessException ignored) {
-            return Optional.empty();
-        }
-    }
-    public static List<Row> doQueryAll(String sql, Object... args) {
-        SQLCleaner C = new SQLCleaner(sql, args);
-        return jdbcTemplate.queryForList(C.newSQL, C.newParams).stream().map(DatabaseObject.Row::new).collect(Collectors.toList());
-    }
-    public static <T> List<T> doQueryAll(Class<T> clazz, String sql, Object... args) {
-        SQLCleaner C = new SQLCleaner(sql, args);
-        return jdbcTemplate.query(C.newSQL, (rs, rowNum) -> mapResultSetToObject(rs, clazz), C.newParams);
-    }
 
     public String toJSON() {
         return GSON.toJson(this);
     }
 
-    private static String getTableName(Class<?> clazz) {
+    protected static String getTableName(Class<?> clazz) {
         TableName annotation = clazz.getAnnotation(TableName.class);
         if (annotation != null) return annotation.value().toLowerCase();
         return clazz.getSimpleName().toLowerCase();
     }
+
 
     public static class Row {
         public transient Map<String, Object> columns;
@@ -436,6 +393,10 @@ public abstract class DatabaseObject<T> {
             fixNullParams(sql, params);
         }
         public SQLCleaner(String sql, Object[] params) {
+           if (params == null) {
+               newSQL = sql;
+               return;
+           }
             fixNullParams(sql, Arrays.asList(params));
         }
 
@@ -569,12 +530,4 @@ public abstract class DatabaseObject<T> {
     }
 
 
-    public long ID;
-
-    public long getID() {
-        return ID;
-    }
-    public void setID(long id) {
-        ID = id;
-    }
 }

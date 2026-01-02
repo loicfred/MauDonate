@@ -65,11 +65,17 @@
                     <option value="Other">Other</option>
                 </select>
 
+                <label th:if="${entry.name.equals('BankName')}" th:text="${entry.name}" th:for="${entry.name}" class="form-label"></label>
+                <select th:if="${entry.name.equals('BankName')}" th:id="${entry.name}" class="form-select" th:field="*{fields[__${stat.index}__].value}">
+                    <option value="" disabled selected>Select Bank</option>
+                    <option th:each="b : ${T(mau.donate.objects.enums.Bank).values()}" th:value="${b.toString()}" th:text="${b.getName()}" th:selected="${b.toString() == request.BankName}"></option>
+                </select>
+
                 <label th:if="${entry.name.equals('ID')}" th:text="${entry.name}" th:for="${entry.name}" class="form-label"></label>
                 <input th:if="${entry.name.equals('ID')}" th:id="${entry.name}" class="form-control" disabled th:field="*{fields[__${stat.index}__].value}">
 
-                <label th:if="${entry.type.equals('String') && !(entry.name.equals('Email') || entry.name.equals('Password') || entry.name.equals('Gender') || entry.name.equals('ID') || entry.name.equals('Message'))}" th:text="${entry.name}" th:for="${entry.name}" class="form-label"></label>
-                <input th:if="${entry.type.equals('String') && !(entry.name.equals('Email') || entry.name.equals('Password') || entry.name.equals('Gender') || entry.name.equals('ID') || entry.name.equals('Message'))}" th:id="${entry.name}" th:maxlength="${entry.name.equals('Address') || entry.name.equals('Title') ? 128 : 64}" class="form-control" th:field="*{fields[__${stat.index}__].value}">
+                <label th:if="${entry.type.equals('String') && !(entry.name.equals('Email') || entry.name.equals('Password') || entry.name.equals('Gender') || entry.name.equals('BankName') || entry.name.equals('ID') || entry.name.equals('Message'))}" th:text="${entry.name}" th:for="${entry.name}" class="form-label"></label>
+                <input th:if="${entry.type.equals('String') && !(entry.name.equals('Email') || entry.name.equals('Password') || entry.name.equals('Gender') || entry.name.equals('BankName') || entry.name.equals('ID') || entry.name.equals('Message'))}" th:id="${entry.name}" th:maxlength="${entry.name.equals('Address') || entry.name.equals('Title') ? 128 : 64}" class="form-control" th:field="*{fields[__${stat.index}__].value}">
 
                 <label th:if="${(entry.type.equals('Integer') || entry.type.equals('int')  || entry.type.equals('Double') || entry.type.equals('double') || entry.type.equals('Long') || entry.type.equals('long')) && !(entry.name.equals('ID'))}" th:text="${entry.name}" th:for="${entry.name}" class="form-label"></label>
                 <input th:if="${(entry.type.equals('Integer') || entry.type.equals('int')  || entry.type.equals('Double') || entry.type.equals('double')  || entry.type.equals('Long') || entry.type.equals('long')) && !(entry.name.equals('ID'))}" type="number" th:id="${entry.name}" class="form-control" th:field="*{fields[__${stat.index}__].value}">

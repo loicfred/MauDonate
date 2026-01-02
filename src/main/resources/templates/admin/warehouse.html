@@ -45,7 +45,7 @@
             <h4 class="mb-0"  th:text="${warehouse.Name}"></h4>
             <div class="d-flex align-items-center justify-content-center">
                 <img class="m-1" src="/img/delivery_box_w.png" height="28" alt="box.png">
-                <h4 class="mb-0" th:text="${warehouse.CapacityUtilization + '/' + warehouse.MaxCapacity + ' (' + warehouse.getUtilizationRate() + '%)'}"></h4>
+                <h4 class="mb-0" th:text="${warehouse.CapacityUtilization + '/' + warehouse.MaxCapacity + ' m²  (' + warehouse.getUtilizationRate() + '%)'}"></h4>
             </div>
         </div>
         <h6 class="settings-header mb-3" th:text="${warehouse.Region + ' ' + warehouse.Address}"></h6>
@@ -56,7 +56,7 @@
                 <th>ID</th>
                 <th>Item</th>
                 <th>Quantity</th>
-                <th>Capacity Used</th>
+                <th>Capacity (m²)</th>
             </tr>
             </thead>
             <tbody>

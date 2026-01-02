@@ -1,6 +1,6 @@
 package mau.donate.objects;
 
-import mau.donate.service.DatabaseObject;
+import mau.donate.service.database.DatabaseObject;
 
 import java.time.Instant;
 import java.time.LocalDateTime;

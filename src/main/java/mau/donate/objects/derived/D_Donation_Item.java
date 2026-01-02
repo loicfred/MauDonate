@@ -15,5 +15,4 @@ public class D_Donation_Item extends Donation_Item {
     public String Receiver_LName;
     public String Receiver_Address;
 
-    public D_Donation_Item() {}
 }

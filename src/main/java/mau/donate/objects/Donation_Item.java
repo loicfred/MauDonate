@@ -1,11 +1,10 @@
 package mau.donate.objects;
 
 import mau.donate.objects.enums.StorageStatus;
-import mau.donate.service.DatabaseObject;
+import mau.donate.service.database.DatabaseObject;
 
 import java.text.DecimalFormat;
 
-import static my.utilities.util.Utilities.CutString;
 import static my.utilities.util.Utilities.StopString;
 
 public class Donation_Item extends DatabaseObject<Donation_Item> {
@@ -29,6 +28,12 @@ public class Donation_Item extends DatabaseObject<Donation_Item> {
         ItemName = StopString(itemName, 128);
     }
 
+    public int getQuantity() {
+        return Quantity;
+    }
+    public void setQuantity(int quantity) {
+        Quantity = quantity;
+    }
 
     public String getStatus() {
         return Status;

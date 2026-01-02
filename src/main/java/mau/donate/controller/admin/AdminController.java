@@ -6,7 +6,7 @@ import mau.donate.objects.derived.D_Donation_Item;
 import mau.donate.objects.derived.D_Warehouse;
 import mau.donate.objects.enums.StorageStatus;
 import mau.donate.service.CacheService;
-import mau.donate.service.DatabaseObject;
+import mau.donate.service.database.DatabaseObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +15,7 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.util.Map;
 
+import static mau.donate.config.AppConfig.dbService;
 import static mau.donate.controller.AppController.addEssential;
 import static mau.donate.controller.admin.DBEditorController.DBObjectPackage;
 
@@ -43,6 +44,7 @@ public class AdminController {
         model.addAttribute("tstats", DatabaseObject.doQuery("call maudonate.TotalStat();").orElseGet(() -> new DatabaseObject.Row(Map.of())));
         LocalDate LD = LocalDate.now();
         model.addAttribute("mstats", DatabaseObject.doQuery("call maudonate.MonthlyStat(?,?);", LD.getYear(), LD.getMonthValue()).orElseGet(() -> new DatabaseObject.Row(Map.of())));
+
         return "admin/admin";
     }
 

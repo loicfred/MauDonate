@@ -111,7 +111,7 @@
                     <div class="text-muted d-flex align-items-center">
                         <h5 th:text="${ware.Name}"></h5>
                         <img class="ms-auto m-1" src="/img/delivery_box_w.png" height="26" alt="box.png">
-                        <h5 class="mb-0" th:text="${ware.CapacityUtilization + '/' + ware.MaxCapacity}"></h5>
+                        <h5 class="mb-0" th:text="${ware.CapacityUtilization + '/' + ware.MaxCapacity} + ' m²'"></h5>
                     </div>
                     <div class="text-muted d-flex">
                         <div class="row">
@@ -198,7 +198,6 @@
                     const insertDb = document.getElementById('insertDb');
                     const tableSelect = document.getElementById('tableSelect');
 
-                    const error = document.getElementById('error');
                     const id = document.getElementById('ID');
                     const ids = document.getElementById('IDs');
 
@@ -233,7 +232,6 @@
 
                     document.getElementById('databaseForm').addEventListener('submit', function (e) {
                         e.preventDefault();
-                        error.classList.add('d-none');
                         window.location.href = '/admin/edit/' + tableSelect.value + '/' + (id.value ? id.value : ids.value);
                     });
                     insertDb.addEventListener("click", () => {
@@ -287,7 +285,7 @@
 
     </div>
 
-    <form class="modal fade" id="reqValidationModal" tabindex="-1" method="post">
+    <form class="modal fade" id="reqValidationModal" tabindex="-1" method="post" th:action="${'/admin/request/validate/id/deny'}">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -313,10 +311,10 @@
             const modal = new bootstrap.Modal(document.getElementById("reqValidationModal"));
             if (accept) {
                 reqTitle.innerText = "Accept donation request";
-                modal.action = "/admin/request/validate/" + button.getAttribute("req-id") + "/accept";
+                document.getElementById("reqValidationModal").action = "/admin/request/validate/" + button.getAttribute("req-id") + "/accept";
             } else {
                 reqTitle.innerText = "Deny donation request";
-                modal.action = "/admin/request/validate/" + button.getAttribute("req-id") + "/deny";
+                document.getElementById("reqValidationModal").action = "/admin/request/validate/" + button.getAttribute("req-id") + "/deny";
             }
             modal.show();
         }

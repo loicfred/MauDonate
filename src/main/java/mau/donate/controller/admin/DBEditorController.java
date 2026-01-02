@@ -1,7 +1,7 @@
 package mau.donate.controller.admin;
 
 import mau.donate.objects.User;
-import mau.donate.service.DatabaseObject;
+import mau.donate.service.database.DatabaseObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -101,10 +101,10 @@ public class DBEditorController {
                 entity.Update();
             }
             redirectAttributes.addFlashAttribute("success", "Entry updated successfully.");
-            return "redirect:/admin/" + item + "/" + id;
+            return "redirect:/admin/edit/" + item + "/" + id;
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "An error occurred: " + e.getMessage());
-            return "redirect:/admin/" + item + "/" + id;
+            return "redirect:/admin/edit/" + item + "/" + id;
         }
     }
 

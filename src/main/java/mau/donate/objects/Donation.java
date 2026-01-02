@@ -1,6 +1,6 @@
 package mau.donate.objects;
 
-import mau.donate.service.DatabaseObject;
+import mau.donate.service.database.DatabaseObject;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.List;
 import static my.utilities.util.Utilities.StopString;
 
 public class Donation extends DatabaseObject<Donation> {
-    public transient List<Donation_Item> Items = null;
+    public transient List<Donation_Item> items = null;
 
     public long DonorID;
     public long ReceiverID;
@@ -84,7 +84,10 @@ public class Donation extends DatabaseObject<Donation> {
         return DatabaseObject.getById(Donation.class, id).orElse(null);
     }
 
-    public List<Donation_Item> getItems(long id) {
-        return Items == null ? Items = DatabaseObject.getAllWhere(Donation_Item.class, "DonationID = ?", id) : Items;
+    public List<Donation_Item> getItems() {
+        return items == null ? items = DatabaseObject.getAllWhere(Donation_Item.class, "DonationID = ?", ID) : items;
+    }
+    public void setItems(List<Donation_Item> items) {
+        this.items = items;
     }
 }

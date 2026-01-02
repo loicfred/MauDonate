@@ -1,7 +1,6 @@
 package mau.donate.objects;
 
-import mau.donate.service.DatabaseObject;
-import org.springframework.context.annotation.Profile;
+import mau.donate.service.database.DatabaseObject;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.Instant;

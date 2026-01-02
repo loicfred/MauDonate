@@ -95,13 +95,13 @@
 
         row.innerHTML = `
             <td>
-                <input type="text" name="items[${index}].ItemName"/>
+                <input type="text" class="form-control" name="items[${index}].ItemName"/>
             </td>
             <td>
-                <input type="number" name="items[${index}].Quantity"/>
+                <input type="number" class="form-control" name="items[${index}].Quantity"/>
             </td>
-            <td>
-                <button type="button" onclick="removeItem(this)">Remove</button>
+            <td class="text-center">
+                <button class="btn btn-outline-danger btn-sm" type="button" onclick="removeItem(this)">Remove</button>
             </td>
         `;
 

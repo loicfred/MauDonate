@@ -44,12 +44,8 @@
                             Your kindness. In any way.
                         </p>
 
-                        <button class="btn btn-lg btn-success px-5 mb-3" onclick="goToPage(1)" id="donateNow">
-                            Donate Now
-                        </button>
-
                         <a class="btn btn-lg btn-success px-5 mb-3" href="/fundraise" id="fundraiseNow">
-                            Fundraise Now
+                            Donate Now
                         </a>
 
                         <div th:if="${successDon}" class="alert alert-success" th:text="${successDon}"></div>
@@ -63,13 +59,13 @@
             <p style="justify-content: center; align-items: center; text-align: center; padding: 30px;" th:if="${requests.isEmpty()}">No one has reached out yet.</p>
             <div th:each="req : ${requests}" class="request-card card mb-3">
                 <div class="card-body">
-                    <div class="text-muted d-flex align-items-center">
+                    <div class="mb-1  d-flex align-items-center">
                         <h5 th:text="${req.getUser().getFirstName() + ' ' + req.getUser().getLastName()}"></h5>
                         <h5 class="ms-auto" th:text="${'Goal: Rs ' + req.GoalAmount}"></h5>
                     </div>
-                    <h6 class="mb-0 fw-bold" th:text="${req.Title}"></h6>
-                    <p th:text="${req.Message}"></p>
-                    <div class="text-muted d-flex align-items-center">
+                    <h6 class="mb-1" th:text="${req.Title}"></h6>
+                    <p class="mb-2" style="border-left: 1px gray solid; padding-left: 8px;" th:text="${req.Message}"></p>
+                    <div class="d-flex align-items-center">
                         <small th:text="${'Created at ' + req.CreatedAt}"></small>
                         <button class="ms-auto btn btn-primary" onclick="showDonatePopup(this)"
                                 th:data-id="${req.ID}"
@@ -89,6 +85,12 @@
         <!-- PAGE 4 -->
         <section class="page">
             <p style="justify-content: center; align-items: center; text-align: center; padding: 30px;">Coming soon.</p>
+
+
+
+
+
+
         </section>
 
     </div>

@@ -4,6 +4,8 @@ import mau.donate.objects.Donation;
 import mau.donate.objects.Donation_Item;
 import mau.donate.objects.Donation_Request;
 import mau.donate.objects.User;
+import mau.donate.objects.derived.D_Donation_Item;
+import mau.donate.objects.enums.StorageStatus;
 import mau.donate.service.EmailService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,7 +14,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import static mau.donate.config.AppConfig.dbService;
 import static mau.donate.controller.AppController.addEssential;
 
 @CrossOrigin(origins = "*")
@@ -33,8 +38,10 @@ public class DonationController {
 
         Donation_Request req = Donation_Request.getById(Donation_Request.class, reqId).orElseThrow();
 
+        Donation D = new Donation();
+        D.items = new ArrayList<>();
         model.addAttribute("req", req);
-        model.addAttribute("donation", new Donation());
+        model.addAttribute("donation", D);
         return "donate";
     }
     @PostMapping("/donate/{reqId}")
@@ -44,6 +51,7 @@ public class DonationController {
         addEssential(model, loggedUser, U);
 
         Donation_Request req = Donation_Request.getById(Donation_Request.class, reqId).orElseThrow();
+        List<Donation_Item> items = donation.getItems();
 
         donation.CreatedAt = LocalDateTime.now();
         donation.UpdatedAt = LocalDateTime.now();
@@ -51,9 +59,10 @@ public class DonationController {
         donation.ReceiverID = req.UserID;
         donation.Approved = false;
 
+
         donation = donation.WriteThenReturn().orElse(null);
         if (donation != null) {
-            for (Donation_Item item : donation.Items) {
+            for (Donation_Item item : items) {
                 item.DonationID = donation.ID;
                 if (item.Write() == 0) {
                     donation.Delete();
@@ -61,7 +70,7 @@ public class DonationController {
                     return "redirect:/donate/" + reqId;
                 }
             }
-
+            dbService.refreshAllWhere(D_Donation_Item.class, "NOT Status = ? OR WarehouseID IS NULL", StorageStatus.DELIVERED.toString());
             redirectAttributes.addFlashAttribute("successDon", "Successfully made a donation. Once it's approved you will receive an email or phone call to come fetch the items.");
             return "redirect:/home?page=0";
         } else {

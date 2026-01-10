@@ -4,6 +4,7 @@ import mau.donate.objects.Donation_Item;
 import mau.donate.objects.User;
 import mau.donate.objects.Warehouse;
 import mau.donate.objects.derived.D_Warehouse;
+import mau.donate.objects.enums.StorageStatus;
 import mau.donate.service.CacheService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,16 +13,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 
+import static mau.donate.config.AppConfig.dbService;
 import static mau.donate.controller.AppController.addEssential;
 
 @CrossOrigin(origins = "*")
 @Controller
 public class WarehouseController {
 
-    private final CacheService cacheService;
-
-    public WarehouseController(CacheService cacheService) {
-        this.cacheService = cacheService;
+    public WarehouseController() {
     }
 
     @GetMapping("/admin/warehouse/{id}")
@@ -31,8 +30,7 @@ public class WarehouseController {
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
 
-        D_Warehouse WH = D_Warehouse.getById(D_Warehouse.class, id).orElse(null);
-        model.addAttribute("warehouse", WH);
+        model.addAttribute("warehouse", D_Warehouse.getById(D_Warehouse.class, id).orElse(null));
         return "admin/warehouse";
     }
 

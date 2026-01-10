@@ -1,49 +1,96 @@
-const pageWrap = document.getElementById('pageWrap');
-const pageCarousel = document.getElementById('pageCarousel');
-const pages = pageCarousel.querySelectorAll('.page');
-let pageIndex = 0;
+const carousel = document.getElementById("pageCarousel");
+const pages = document.querySelectorAll(".page");
+let currentIndex = 0;
+(() => {
+    let startX = 0;
+    let startY = 0;
+    let deltaX = 0;
+    let isSwiping = false;
+    let isDragging = false;
 
-let startX = 0, isDown = false, isDragging = false;
+    const threshold = 60;
 
+    function updatePosition(animate = true) {
+        carousel.style.transition = animate ? "transform 0.3s ease" : "none";
+        carousel.style.transform = `translateX(-${currentIndex * window.innerWidth}px)`;
+    }
 
-pageWrap.addEventListener('pointerdown', e => {
-    if (e.target.closest('button')) return;
-    startX = e.clientX;
-    isDown = true;
-    isDragging = false;
-});
-
-pageWrap.addEventListener('pointermove', e => {
-    if (!isDown) return;
-    const dx = e.clientX - startX;
-    if (Math.abs(dx) > 10 && !isDragging) {
+    function start(x, y) {
+        startX = x;
+        startY = y;
+        deltaX = 0;
+        isSwiping = false;
         isDragging = true;
-        pageWrap.setPointerCapture(e.pointerId);
     }
-    if (!isDragging) return;
-    pageCarousel.style.transition = 'none';
-    pageCarousel.style.transform = `translateX(calc(-${pageIndex * 100}% + ${dx}px))`;
-});
 
-pageWrap.addEventListener('pointerup', e => {
-    if (!isDown) return;
-    isDown = false;
-    if (isDragging) pageWrap.releasePointerCapture(e.pointerId);
+    function move(x, y, preventDefault) {
+        if (!isDragging) return;
 
-    pageCarousel.style.transition = '';
-    if (!isDragging) return;
-    const dx = e.clientX - startX;
-    if (Math.abs(dx) > 80) {
-        if (dx < 0 && pageIndex < pages.length - 1) pageIndex++;
-        if (dx > 0 && pageIndex > 0) pageIndex--;
+        deltaX = x - startX;
+        const deltaY = y - startY;
+
+        if (!isSwiping) {
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                isSwiping = true;
+            } else {
+                return;
+            }
+        }
+
+        if (preventDefault) preventDefault();
+
+        const offset = (-currentIndex * window.innerWidth) + deltaX;
+        carousel.style.transition = "none";
+        carousel.style.transform = `translateX(${offset}px)`;
     }
-    pageCarousel.style.transform = `translateX(-${pageIndex * 100}%)`;
-});
+
+    function end() {
+        if (!isDragging) return;
+        isDragging = false;
+
+        if (!isSwiping) return;
+
+        if (deltaX > threshold && currentIndex > 0) {
+            currentIndex--;
+        } else if (deltaX < -threshold && currentIndex < pages.length - 1) {
+            currentIndex++;
+        }
+
+        updatePosition(true);
+    }
+
+    // 🔹 TOUCH EVENTS
+    carousel.addEventListener("touchstart", e => {
+        const t = e.touches[0];
+        start(t.clientX, t.clientY);
+    }, { passive: true });
+
+    carousel.addEventListener("touchmove", e => {
+        const t = e.touches[0];
+        move(t.clientX, t.clientY, () => e.preventDefault());
+    }, { passive: false });
+
+    carousel.addEventListener("touchend", end);
+
+    // 🔹 MOUSE EVENTS (DESKTOP)
+    carousel.addEventListener("mousedown", e => {
+        start(e.clientX, e.clientY);
+    });
+
+    window.addEventListener("mousemove", e => {
+        move(e.clientX, e.clientY);
+    });
+
+    window.addEventListener("mouseup", end);
+    window.addEventListener("mouseleave", end);
+
+    window.addEventListener("resize", () => updatePosition(false));
+})();
 
 function goToPage(i) {
     if (i == null) return;
     closeSidebar();
-    pageIndex = i;
-    pageCarousel.style.transform = `translateX(-${i * 100}%)`;
+    currentIndex = i;
+    carousel.style.transform = `translateX(-${i * 100}%)`;
 }
 goToPage(new URLSearchParams(window.location.search).get('page'))

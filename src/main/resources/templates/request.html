@@ -71,7 +71,7 @@
                 <label for="BankName" class="form-label">BankName</label>
                 <select id="BankName" class="form-select" required th:field="*{BankName}">
                     <option value="" disabled selected>Select Bank</option>
-                    <option th:each="b : ${T(mau.donate.objects.enums.Bank).values()}" th:value="${b.toString()}" th:text="${b.getName()}" th:selected="${b.toString() == request.BankName}"></option>
+                    <option th:each="b : ${T(mau.donate.objects.enums.Bank).values()}" th:value="${b.toString()}" th:text="${b.getName()}"></option>
                 </select>
             </div>
             <button type="submit" class="btn btn-primary flex-grow-1">Submit</button>

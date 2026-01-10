@@ -50,7 +50,6 @@ public class RequestController {
         req.UserID = U.getID();
         req.Approved = false;
         if (req.Write() > 0) {
-            dbService.refreshAllWhere(Donation_Request.class, "NOT Approved AND NOT Completed");
             redirectAttributes.addFlashAttribute("successDon", "Successfully sent a donation request. Once it's approved you will receive an email.");
             return "redirect:/home?page=0";
         } else {
@@ -61,7 +60,7 @@ public class RequestController {
 
 
     @PostMapping("/admin/request/validate/{id}/accept")
-    public String acceptDonationReqRequest(Model model, Principal loggedUser, @PathVariable Long id, @RequestParam String message, RedirectAttributes redirectAttributes) {
+    public String acceptDonationRequest(Model model, Principal loggedUser, @PathVariable Long id, @RequestParam String message, RedirectAttributes redirectAttributes) {
         if (loggedUser == null) return "redirect:/accounts/login";
         User U = User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
@@ -76,12 +75,11 @@ public class RequestController {
         emailService.acceptRequest(sender.getEmail(), sender.getFirstName() + " " + sender.getLastName(), message);
         new Notification(sender.getID(), "Request Approved", "Congratulations, your donation request has been approved !");
 
-        dbService.refreshAllWhere(Donation_Request.class, "NOT Approved AND NOT Completed");
         redirectAttributes.addFlashAttribute("successReq", "Successfully accepted the request from " + sender.getFirstName() + ".");
         return "redirect:/admin?page=1";
     }
     @PostMapping("/admin/request/validate/{id}/deny")
-    public String denyDonationReqRequest(Model model, Principal loggedUser, @PathVariable Long id, @RequestParam String message, RedirectAttributes redirectAttributes) {
+    public String denyDonationRequest(Model model, Principal loggedUser, @PathVariable Long id, @RequestParam String message, RedirectAttributes redirectAttributes) {
         if (loggedUser == null) return "redirect:/accounts/login";
         User U = User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";

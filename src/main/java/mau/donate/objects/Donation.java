@@ -8,6 +8,8 @@ import java.util.List;
 import static my.utilities.util.Utilities.StopString;
 
 public class Donation extends DatabaseObject<Donation> {
+    private transient User D = null;
+    private transient User R = null;
     public transient List<Donation_Item> items = null;
 
     public long DonorID;
@@ -78,7 +80,12 @@ public class Donation extends DatabaseObject<Donation> {
         UpdatedAt = updatedAt;
     }
 
-
+    public User getDonor() {
+        return D == null ? D = User.getById(DonorID) : D;
+    }
+    public User getReceiver() {
+        return R == null ? R = User.getById(ReceiverID) : R;
+    }
 
     public static Donation getById(long id) {
         return DatabaseObject.getById(Donation.class, id).orElse(null);

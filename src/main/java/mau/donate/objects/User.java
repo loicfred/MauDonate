@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 
+import static mau.donate.config.AppConfig.dbService;
 import static my.utilities.util.Utilities.CutString;
 
 public class User extends DatabaseObject<User> {
@@ -51,6 +52,7 @@ public class User extends DatabaseObject<User> {
         Write();
     }
 
+
     public static User getById(long id) {
         return DatabaseObject.getById(User.class, id).orElse(null);
     }
@@ -58,11 +60,15 @@ public class User extends DatabaseObject<User> {
     public static User getByEmail(String email) {
         return DatabaseObject.getWhere(User.class, "Email = ?", email).orElse(null);
     }
+    public static User getByPhone(String phone) {
+        return DatabaseObject.getWhere(User.class, "Phone = ?", phone).orElse(null);
+    }
 
     public static User getByAuthentication(Principal principal) {
         if (principal == null) return null;
         return DatabaseObject.getWhere(User.class, "Email = ?", principal.getName()).orElse(null);
     }
+
 
     public static void ClearFailedLogins(String email) {
         User U = DatabaseObject.getWhere(User.class, "Email = ? OR (Enabled = ? AND Verified = ?)", email, false, false).orElse(null);

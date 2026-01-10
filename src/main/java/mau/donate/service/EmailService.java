@@ -14,9 +14,23 @@ public class EmailService {
 
     public void sendVerificationEmail(String to, String token) {
         String subject = "Verify your MauDonate account";
-        String verificationUrl = "http://localhost:8080/accounts/email/verify?token=" + token;
+        String verificationUrl = "http://maudonate.mu:8081/accounts/email/verify?token=" + token;
 
         String message = "Welcome! Please click the link below to verify your MauDonate account:\n" + verificationUrl;
+
+        SimpleMailMessage email = new SimpleMailMessage();
+        email.setTo(to);
+        email.setSubject(subject);
+        email.setText(message);
+        mailSender.send(email);
+        System.out.println("Email sent to " + to + " with subject: " + subject + "\n" + message);
+    }
+    public void sendResetPasswordEmail(String to, String token) {
+        String subject = "Reset your MauDonate account password";
+        String verificationUrl = "http://maudonate.mu:8081/accounts/newpassword?token=" + token;
+
+        String message = "Hello dear. To reset your password, please click the link below:\n" + verificationUrl + "\n";
+        message += "\nIf you did not request a password reset, please ignore this email.";
 
         SimpleMailMessage email = new SimpleMailMessage();
         email.setTo(to);
@@ -28,7 +42,7 @@ public class EmailService {
 
     public void sendDeleteConfirmationEmail(String to, String token) {
         String subject = "Confirm deletion of MauDonate account";
-        String verificationUrl = "http://localhost:8080/accounts/delete/verify?token=" + token;
+        String verificationUrl = "http://maudonate.mu:8081/accounts/delete/verify?token=" + token;
 
         String message = "Welcome! Please click the link below to confirm the deletion of your MauDonate account:\n" + verificationUrl;
 

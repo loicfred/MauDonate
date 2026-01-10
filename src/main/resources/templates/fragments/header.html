@@ -16,8 +16,7 @@
             <a th:if="${principal != null}" href="/donation/request">Make a donation request</a>
             <a th:if="${principal != null}" href="/fundraise">Fundraise</a>
             <a th:if="${principal != null}" href="/settings">Settings</a>
-            <form th:if="${principal != null}" action="/logout" method="post">
-                <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+            <form th:if="${principal != null}" th:action="${'/logout'}" method="post">
                 <button type="submit">Logout</button>
             </form>
             <script>

@@ -1,5 +1,6 @@
 package mau.donate.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import mau.donate.objects.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -50,6 +51,18 @@ public class AppController {
     }
 
 
+
+    @GetMapping("/error")
+    public String error(HttpServletRequest request, Model model) {
+        Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
+        Throwable throwable = (Throwable) request.getAttribute("javax.servlet.error.exception");
+        String message = (throwable != null) ? throwable.getMessage() : "N/A";
+
+        model.addAttribute("error", true);
+        model.addAttribute("status", statusCode);
+        model.addAttribute("message", message);
+        return "error";
+    }
 
 
 

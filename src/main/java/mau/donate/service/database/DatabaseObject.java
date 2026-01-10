@@ -65,8 +65,6 @@ public abstract class DatabaseObject<T> {
             return jdbcTemplate.update(sql, result.values());
         } catch (Exception e) {
             throw new RuntimeException("Failed to write object", e);
-        } finally {
-            dbService.refreshID(getClass(), ID);
         }
     }
     public Optional<T> WriteThenReturn() {
@@ -76,8 +74,6 @@ public abstract class DatabaseObject<T> {
             return jdbcTemplate.query(sql, (rs, rowNum) -> mapResultSetToObject(rs, entityClass), result.values()).stream().findFirst();
         } catch (Exception e) {
             throw new RuntimeException("Failed to write object", e);
-        } finally {
-            dbService.refreshID(getClass(), ID);
         }
     }
 
@@ -94,7 +90,7 @@ public abstract class DatabaseObject<T> {
         } catch (Exception e) {
             throw new RuntimeException("Failed to write object", e);
         } finally {
-            dbService.refreshID(getClass(), ID);
+            dbService.refreshID(this);
         }
     }
 
@@ -122,7 +118,7 @@ public abstract class DatabaseObject<T> {
             e.printStackTrace();
             throw new RuntimeException("No ID field found in " + tableName + ".");
         } finally {
-            dbService.refreshID(getClass(), ID);
+            dbService.refreshID(this);
         }
     }
     public int UpdateOnly(String... columns) {
@@ -148,7 +144,7 @@ public abstract class DatabaseObject<T> {
         } catch (Exception e) {
             throw new RuntimeException("No ID field found in " + tableName + ".");
         } finally {
-            dbService.refreshID(getClass(), ID);
+            dbService.refreshID(this);
         }
     }
     public int Delete() {
@@ -162,7 +158,7 @@ public abstract class DatabaseObject<T> {
         } catch (Exception e) {
             throw new RuntimeException("No ID field found in " + tableName + ".");
         } finally {
-            dbService.refreshID(getClass(), ID);
+            dbService.refreshID(this);
         }
     }
     public static <T> int Count(Class<T> clazz) {
@@ -208,7 +204,7 @@ public abstract class DatabaseObject<T> {
         } catch (Exception e) {
             throw new RuntimeException("No ID field found in " + tableName + ".");
         } finally {
-            dbService.refreshID(getClass(), ID);
+            dbService.refreshID(this);
         }
     }
     public int IncrementColumns(Map<String, Object> parameters) {
@@ -230,7 +226,7 @@ public abstract class DatabaseObject<T> {
         } catch (Exception e) {
             throw new RuntimeException("No ID field found in " + tableName + ".");
         } finally {
-            dbService.refreshID(getClass(), ID);
+            dbService.refreshID(this);
         }
     }
 
@@ -260,10 +256,13 @@ public abstract class DatabaseObject<T> {
     }
 
     public static <T> Optional<T> getById(Class<T> clazz, Object id) {
-        return dbService.executeQuery(clazz, "SELECT * FROM " + getTableName(clazz) + " WHERE ID = ? LIMIT 1;", id);
+        return doQuery(clazz, "SELECT * FROM " + getTableName(clazz) + " WHERE ID = ? LIMIT 1;", id);
     }
     public static <T> Optional<T> getWhere(Class<T> clazz, String whereClause, Object... args) {
-        return dbService.executeQuery(clazz, "SELECT * FROM " + getTableName(clazz) + " WHERE " + whereClause + " LIMIT 1;", args);
+        return doQuery(clazz, "SELECT * FROM " + getTableName(clazz) + " WHERE " + whereClause + " LIMIT 1;", args);
+    }
+    public static <T> Optional<T> doQuery(Class<T> clazz, String sql, Object... args) {
+        return dbService.executeQuery(clazz, sql, args);
     }
 
     public static <T> List<T> getAll(Class<T> clazz) {
@@ -272,19 +271,15 @@ public abstract class DatabaseObject<T> {
     public static <T> List<T> getAllWhere(Class<T> clazz, String whereClause, Object... args) {
         return doQueryAll(clazz, "SELECT * FROM " + getTableName(clazz) + " WHERE " + whereClause, args);
     }
+    public static <T> List<T> doQueryAll(Class<T> clazz, String sql, Object... args) {
+        return dbService.executeQueryAll(clazz, sql, args);
+    }
 
     public static Optional<DatabaseObject.Row> doQuery(String sql, Object... args) {
         return dbService.executeQuery(sql, args);
     }
-    public static <T> Optional<T> doQuery(Class<T> clazz, String sql, Object... args) {
-        return dbService.executeQuery(clazz, sql, args);
-    }
-
     public static List<Row> doQueryAll(String sql, Object... args) {
         return dbService.executeQueryAll(sql, args);
-    }
-    public static <T> List<T> doQueryAll(Class<T> clazz, String sql, Object... args) {
-         return dbService.executeQueryAll(clazz, sql, args);
     }
 
     public static <T> Optional<T> doQueryValue(Class<T> clazz, String sql, Object... args) {

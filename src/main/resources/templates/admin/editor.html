@@ -68,7 +68,7 @@
                 <label th:if="${entry.name.equals('BankName')}" th:text="${entry.name}" th:for="${entry.name}" class="form-label"></label>
                 <select th:if="${entry.name.equals('BankName')}" th:id="${entry.name}" class="form-select" th:field="*{fields[__${stat.index}__].value}">
                     <option value="" disabled selected>Select Bank</option>
-                    <option th:each="b : ${T(mau.donate.objects.enums.Bank).values()}" th:value="${b.toString()}" th:text="${b.getName()}" th:selected="${b.toString() == request.BankName}"></option>
+                    <option th:each="b : ${T(mau.donate.objects.enums.Bank).values()}" th:value="${b.toString()}" th:text="${b.getName()}"></option>
                 </select>
 
                 <label th:if="${entry.name.equals('ID')}" th:text="${entry.name}" th:for="${entry.name}" class="form-label"></label>
@@ -84,10 +84,10 @@
                 <input th:if="${entry.type.equals('LocalDate')}" type="date" th:id="${entry.name}" class="form-control" th:field="*{fields[__${stat.index}__].value}">
 
                 <input th:if="${entry.type.equals('Boolean') || entry.type.equals('boolean')}" type="checkbox" th:id="${entry.name}" class="form-check-input" th:field="*{fields[__${stat.index}__].booleanValue}">
-                <label th:if="${entry.type.equals('Boolean') || entry.type.equals('boolean')}" th:text="${entry.name}" th:for="${entry.name}" class="form-check-label"></label>
+                <label th:if="${entry.type.equals('Boolean') || entry.type.equals('boolean')}" th:text="${entry.name}" th:for="${entry.name}" class="form-label"></label>
 
-                <label th:if="${entry.type.equals('byte[]')}" th:text="${entry.name}" th:for="${entry.name}" class="form-check-label"></label>
-                <input th:if="${entry.type.equals('byte[]')}" type="file" th:id="${entry.name}" class="form-check-input" th:field="*{fields[__${stat.index}__].value}">
+                <label th:if="${entry.type.equals('byte[]')}" th:text="${entry.name}" th:for="${entry.name}" class="form-label"></label>
+                <input th:if="${entry.type.equals('byte[]')}" type="file" th:id="${entry.name}" class="form-control" th:field="*{fields[__${stat.index}__].value}">
 
             </div>
             <button type="submit" class="btn btn-success flex-grow-1">Save Entry</button>

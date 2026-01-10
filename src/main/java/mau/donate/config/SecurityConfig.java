@@ -118,7 +118,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, RememberMeServices rememberMeServices) {
         String[] publicPaths = {
-                "/home", "/accounts/**", "/post/accounts/**",
+                "/", "/home", "/accounts/**", "/error",
                 "/service-worker.js", "/manifest.json", "/offline",
                 "/css/**", "/js/**", "/img/**"
         };
@@ -144,7 +144,7 @@ public class SecurityConfig {
                 // ----------------------
                 .formLogin(form -> form
                         .loginPage("/accounts/login")
-                        .loginProcessingUrl("/post/accounts/login")
+                        .loginProcessingUrl("/accounts/login")
                         .successHandler(formLoginSuccessHandler())
                         .failureUrl("/accounts/login?error")
                         .permitAll()

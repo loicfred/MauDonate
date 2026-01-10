@@ -1,9 +1,6 @@
 package mau.donate.controller.admin.donate;
 
-import mau.donate.objects.Donation;
-import mau.donate.objects.Donation_Item;
-import mau.donate.objects.Donation_Request;
-import mau.donate.objects.User;
+import mau.donate.objects.*;
 import mau.donate.objects.derived.D_Donation_Item;
 import mau.donate.objects.enums.StorageStatus;
 import mau.donate.service.EmailService;
@@ -59,7 +56,6 @@ public class DonationController {
         donation.ReceiverID = req.UserID;
         donation.Approved = false;
 
-
         donation = donation.WriteThenReturn().orElse(null);
         if (donation != null) {
             for (Donation_Item item : items) {
@@ -70,12 +66,51 @@ public class DonationController {
                     return "redirect:/donate/" + reqId;
                 }
             }
-            dbService.refreshAllWhere(D_Donation_Item.class, "NOT Status = ? OR WarehouseID IS NULL", StorageStatus.DELIVERED.toString());
             redirectAttributes.addFlashAttribute("successDon", "Successfully made a donation. Once it's approved you will receive an email or phone call to come fetch the items.");
             return "redirect:/home?page=0";
         } else {
             redirectAttributes.addFlashAttribute("failed", "Failed to send a donation. Try again later.");
             return "redirect:/donate/" + reqId;
         }
+    }
+
+
+    @PostMapping("/admin/donate/{id}/accept")
+    public String acceptDonation(Model model, Principal loggedUser, @PathVariable Long id, @RequestParam String message, RedirectAttributes redirectAttributes) {
+        if (loggedUser == null) return "redirect:/accounts/login";
+        User U = User.getByAuthentication(loggedUser);
+        if (!U.getRole().equals("ADMIN")) return "redirect:/home";
+        addEssential(model, loggedUser, U);
+
+        Donation req = Donation.getById(Donation.class, id).orElseThrow();
+        req.UpdatedAt = LocalDateTime.now();
+        req.Approved = true;
+        req.UpdateOnly("Approved", "UpdatedAt");
+
+        User sender = req.getDonor();
+        emailService.acceptRequest(sender.getEmail(), sender.getFirstName() + " " + sender.getLastName(), message);
+        new Notification(sender.getID(), "Donation Approved", "Congratulations, your donation has been approved !");
+
+        redirectAttributes.addFlashAttribute("successReq", "Successfully accepted the donation from " + sender.getFirstName() + ".");
+        return "redirect:/admin?page=1";
+    }
+    @PostMapping("/admin/donate/{id}/deny")
+    public String denyDonation(Model model, Principal loggedUser, @PathVariable Long id, @RequestParam String message, RedirectAttributes redirectAttributes) {
+        if (loggedUser == null) return "redirect:/accounts/login";
+        User U = User.getByAuthentication(loggedUser);
+        if (!U.getRole().equals("ADMIN")) return "redirect:/home";
+        addEssential(model, loggedUser, U);
+
+        Donation req = Donation.getById(Donation.class, id).orElseThrow();
+        req.UpdatedAt = LocalDateTime.now();
+        req.Approved = false;
+        req.UpdateOnly("Approved", "UpdatedAt");
+
+        User sender = req.getDonor();
+        emailService.denyRequest(sender.getEmail(), sender.getFirstName() + " " + sender.getLastName(), message);
+        new Notification(sender.getID(), "Donation Denied", "Unfortunately your donation has been denied. More details sent by email.");
+
+        redirectAttributes.addFlashAttribute("successReq", "Successfully denied the donation from " + sender.getFirstName() + ".");
+        return "redirect:/admin?page=0";
     }
 }

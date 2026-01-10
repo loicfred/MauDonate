@@ -7,6 +7,7 @@ import mau.donate.objects.derived.D_Warehouse;
 import mau.donate.objects.enums.StorageStatus;
 import mau.donate.service.CacheService;
 import mau.donate.service.database.DatabaseObject;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +51,7 @@ public class AdminController {
 
     @ResponseBody
     @GetMapping("/admin/list/{item}")
+    @Cacheable(value = "dbSelectItemList", key = "#item")
     public Map<String, ?> fetchItemList(Model model, Principal loggedUser, @PathVariable String item) {
         if (loggedUser == null) return null;
         User U = User.getByAuthentication(loggedUser);
@@ -66,6 +68,7 @@ public class AdminController {
 
     @ResponseBody
     @GetMapping("/admin/stats/{year}/{month}")
+    @Cacheable(value = "dbSelectMonth", key = "#year + #month")
     public Map<String, Object> fetchItemList(Model model, Principal loggedUser, @PathVariable Long year, @PathVariable Long month) {
         if (loggedUser == null) return null;
         User U = User.getByAuthentication(loggedUser);

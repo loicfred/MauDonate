@@ -1,29 +1,12 @@
-const CACHE_NAME = "maudonate-v1";
+const CACHE_NAME = 'maudonate-assets-v1';
 
-const STATIC_ASSETS = [
-    '/',
-    '/css/main.css',
-    '/js/app.js',
-    '/manifest.json'
-];
-
-/* ---------------- INSTALL ---------------- */
 self.addEventListener('install', event => {
     console.log('[SW] Installing');
-
-    event.waitUntil(
-        caches.open(CACHE_NAME).then(cache => {
-            return cache.addAll(STATIC_ASSETS);
-        })
-    );
-
     self.skipWaiting();
 });
 
-/* ---------------- ACTIVATE ---------------- */
 self.addEventListener('activate', event => {
     console.log('[SW] Activating');
-
     event.waitUntil(
         caches.keys().then(keys =>
             Promise.all(
@@ -33,67 +16,30 @@ self.addEventListener('activate', event => {
             )
         )
     );
-
     self.clients.claim();
 });
 
-/* ---------------- FETCH ---------------- */
 self.addEventListener('fetch', event => {
     const req = event.request;
+
+    if (req.method !== 'GET') return;
+
     const url = new URL(req.url);
 
-    // 🚫 Ignore non-http(s) requests (Chrome extensions, devtools, etc.)
-    if (url.protocol !== "http:" && url.protocol !== "https:") {
-        return;
-    }
-
-    // 🚫 Never cache POST requests (Spring Security / CSRF)
-    if (req.method !== 'GET') {
-        return;
-    }
-
-    // 🚫 Skip admin / API calls
-    if (url.pathname.startsWith('/admin') ||
-        url.pathname.startsWith('/api')) {
-        return;
-    }
-
-    // 🖼 Static resources → cache first
-    if (
-        url.pathname.startsWith('/css') ||
-        url.pathname.startsWith('/js') ||
-        url.pathname.startsWith('/img') ||
-        url.pathname.startsWith('/img/icons')
-    ) {
-        event.respondWith(cacheFirst(req));
-        return;
-    }
-
-    // 📄 HTML pages → network first
-    if (req.headers.get('accept')?.includes('text/html')) {
-        event.respondWith(networkFirst(req));
-
+    if (url.origin === self.location.origin && url.pathname.startsWith('/assets/')) {
+        event.respondWith(
+            caches.open(CACHE_NAME).then(async cache => {
+                const cached = await cache.match(req);
+                if (cached) return cached;
+                const response = await fetch(req);
+                if (response.ok && response.type === 'basic') {
+                    cache.put(req, response.clone());
+                }
+                return response;
+            }).catch(err => {
+                console.error('[SW] Asset fetch failed:', url.pathname, err);
+                return new Response('', { status: 504 });
+            })
+        );
     }
 });
-
-/* ---------------- STRATEGIES ---------------- */
-async function cacheFirst(request) {
-    const cache = await caches.open("app-cache");
-    const cached = await cache.match(request);
-    if (cached) return cached;
-
-    const response = await fetch(request);
-    await cache.put(request, response.clone());
-    return response;
-}
-
-async function networkFirst(request) {
-    const cache = await caches.open(CACHE_NAME);
-    try {
-        const response = await fetch(request);
-        await cache.put(request, response.clone());
-        return response;
-    } catch {
-        return cache.match(request);
-    }
-}

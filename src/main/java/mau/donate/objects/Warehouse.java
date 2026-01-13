@@ -7,7 +7,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class Warehouse extends DatabaseObject<Warehouse> {
+public class Warehouse extends DatabaseObject.ID_OBJ<Long, Warehouse> {
     public transient List<Donation_Item> items = null;
 
     public String Name;

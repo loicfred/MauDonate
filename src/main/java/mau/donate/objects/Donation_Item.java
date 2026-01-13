@@ -7,7 +7,7 @@ import java.text.DecimalFormat;
 
 import static my.utilities.util.Utilities.StopString;
 
-public class Donation_Item extends DatabaseObject<Donation_Item> {
+public class Donation_Item extends DatabaseObject.ID_OBJ<Long, Donation_Item> {
     public long DonationID;
     public Long WarehouseID;
     public String ItemName;

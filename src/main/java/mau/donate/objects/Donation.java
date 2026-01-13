@@ -7,7 +7,7 @@ import java.util.List;
 
 import static my.utilities.util.Utilities.StopString;
 
-public class Donation extends DatabaseObject<Donation> {
+public class Donation extends DatabaseObject.ID_OBJ<Long, Donation> {
     private transient User D = null;
     private transient User R = null;
     public transient List<Donation_Item> items = null;
@@ -23,9 +23,6 @@ public class Donation extends DatabaseObject<Donation> {
 
     public Donation() {}
 
-    public long getID() {
-        return ID;
-    }
     public long getDonorID() {
         return DonorID;
     }

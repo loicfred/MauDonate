@@ -5,7 +5,7 @@ import mau.donate.service.database.DatabaseObject;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
-public class Association extends DatabaseObject<Association> {
+public class Association extends DatabaseObject.ID_OBJ<Long, Association> {
 
     public String Name;
     public String Description;

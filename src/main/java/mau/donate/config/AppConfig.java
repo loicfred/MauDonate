@@ -1,7 +1,5 @@
 package mau.donate.config;
 
-import mau.donate.service.CacheService;
-import mau.donate.service.database.DatabaseObject;
 import mau.donate.service.database.DatabaseService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -17,7 +15,6 @@ import javax.sql.DataSource;
 
 @Configuration
 public class AppConfig {
-    public static CacheService cacheService;
     public static DatabaseService dbService;
 
     @Value("${spring.datasource.url}")
@@ -61,7 +58,6 @@ public class AppConfig {
 
     @EventListener(ApplicationReadyEvent.class)
     public void setStaticReference() {
-        cacheService = context.getBean(CacheService.class);
         dbService = context.getBean(DatabaseService.class);
         DatabaseService.setJdbcTemplate(context.getBean(JdbcTemplate.class));
     }

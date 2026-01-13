@@ -66,12 +66,12 @@
 <main>
   <div class="error-card">
     <div class="error-icon">⚠️</div>
-    <h1 class="error-title" th:text="${error ?: 'Error'}">Error</h1>
+    <h1 class="error-title">Error</h1>
     <p class="error-message" th:text="${message ?: 'An unexpected error occurred. Please try again later.'}">
       An unexpected error occurred. Please try again later.
     </p>
     <small class="error-code" th:if="${status}" th:text="'Error Code: ' + ${status}"></small>
-    <a href="/" class="btn btn-primary">Go to Home</a>
+    <a href="/" class="btn btn-primary">Go to home</a>
   </div>
 </main>
 

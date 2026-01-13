@@ -5,7 +5,7 @@ import mau.donate.service.database.DatabaseObject;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
-public class Payment_Method extends DatabaseObject<Payment_Method> {
+public class Payment_Method extends DatabaseObject.ID_OBJ<Long, Payment_Method> {
     public long UserID;
     public String Provider;
     public String Provider_token;

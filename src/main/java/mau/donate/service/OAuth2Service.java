@@ -36,7 +36,6 @@ public class OAuth2Service extends DefaultOAuth2UserService {
                     null,                  // dateOfBirth
                     false                  // isAnonymous
             );
-            System.err.println(registrationId);
             user.AccountProvider = registrationId;
             user.Enabled = true;
             user.Verified = true;

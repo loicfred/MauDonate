@@ -12,7 +12,7 @@ import java.time.Period;
 import static mau.donate.config.AppConfig.dbService;
 import static my.utilities.util.Utilities.CutString;
 
-public class User extends DatabaseObject<User> {
+public class User extends DatabaseObject.ID_OBJ<Long, User> {
 
     public String Email;
     public String Password;

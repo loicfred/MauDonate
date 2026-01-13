@@ -4,7 +4,7 @@ import mau.donate.service.database.DatabaseObject;
 
 import java.time.LocalDateTime;
 
-public class Donation_Request extends DatabaseObject<Donation_Request> {
+public class Donation_Request extends DatabaseObject.ID_OBJ<Long, Donation_Request> {
     public transient User U;
 
     public long UserID;

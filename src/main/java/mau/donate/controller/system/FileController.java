@@ -15,7 +15,7 @@ public class FileController {
 
     // Profile picture
     @GetMapping("/avatar/{id}.png")
-    @Cacheable(value = "profilePic", key = "#id")
+    @Cacheable(value = "IMG", key = "'PFP' + #id")
     public ResponseEntity<byte[]> getProfilePic(@PathVariable Long id) {
         User user = User.getById(id);
         HttpHeaders headers = new HttpHeaders();

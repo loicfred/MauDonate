@@ -5,7 +5,7 @@ import mau.donate.service.database.DatabaseObject;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
-public class Vehicle extends DatabaseObject<Vehicle> {
+public class Vehicle extends DatabaseObject.ID_OBJ<Long, Vehicle> {
 
     public String Name;
     public int TripsCarriedOut;

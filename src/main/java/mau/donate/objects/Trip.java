@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class Trip extends DatabaseObject<Trip> {
+public class Trip extends DatabaseObject.ID_OBJ<Long, Trip> {
 
     public long StaffID;
     public long DonationID;

@@ -8,7 +8,7 @@ import java.util.List;
 
 import static my.utilities.util.Utilities.StopString;
 
-public class Notification extends DatabaseObject<Notification> {
+public class Notification extends DatabaseObject.ID_OBJ<Long, Notification> {
 
     public long UserID;
     public String Title;
@@ -26,9 +26,6 @@ public class Notification extends DatabaseObject<Notification> {
         Write();
     }
 
-    public long getID() {
-        return ID;
-    }
     public long getUserID() {
         return UserID;
     }

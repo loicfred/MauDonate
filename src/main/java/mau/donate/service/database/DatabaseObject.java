@@ -1,18 +1,13 @@
 package mau.donate.service.database;
 
 
-import mau.donate.service.CacheService;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Service;
 
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,19 +18,20 @@ import static my.utilities.json.JSONItem.GSON;
 
 @SuppressWarnings("all")
 public abstract class DatabaseObject<T> {
-
     protected transient final Class<T> entityClass;
     protected transient final List<Field> cachedFields;
     protected transient final RowMapper<T> rowMapper;
     protected transient final String tableName;
 
-    public long ID;
-
-    public long getID() {
-        return ID;
-    }
-    public void setID(long id) {
-        ID = id;
+    protected String hashedIdentifiers() {
+        List<Object> ids = cachedFields.stream().filter(f -> IDFields().contains(f.getName())).map(f -> {
+            try {
+                return f.get(this);
+            } catch (IllegalAccessException e) {
+                return null;
+            }
+        }).toList();
+        return String.valueOf(ids.stream().map(Object::toString).collect(Collectors.joining("/")).hashCode());
     }
 
     protected DatabaseObject() {
@@ -51,6 +47,7 @@ public abstract class DatabaseObject<T> {
             this.cachedFields.addAll(Arrays.stream(clz.getDeclaredFields()).filter(f -> !Modifier.isTransient(f.getModifiers())).peek(f -> f.setAccessible(true)).collect(Collectors.toList()));
             clz = clz.getSuperclass();
         }
+        this.cachedFields.removeIf(f -> !dbService.getTableStats(tableName).columnNames.contains(f.getName()));
         this.rowMapper = (rs, rowNum) -> mapResultSetToObject(rs, entityClass);
     }
 
@@ -388,10 +385,10 @@ public abstract class DatabaseObject<T> {
             fixNullParams(sql, params);
         }
         public SQLCleaner(String sql, Object[] params) {
-           if (params == null) {
-               newSQL = sql;
-               return;
-           }
+            if (params == null) {
+                newSQL = sql;
+                return;
+            }
             fixNullParams(sql, Arrays.asList(params));
         }
 
@@ -454,57 +451,6 @@ public abstract class DatabaseObject<T> {
     }
 
 
-    public static DatabaseStats getDatabaseStats() {
-        DatabaseStats stats = new DatabaseStats();
-        jdbcTemplate.execute((Connection con) -> {
-            DatabaseMetaData metaData = con.getMetaData();
-            try (ResultSet tables = metaData.getTables(con.getCatalog(), null, "%", new String[]{"TABLE"})) {
-                while (tables.next()) {
-                    String tableName = tables.getString("TABLE_NAME");
-                    stats.totalTables++;
-                    stats.tableNames.add(tableName);
-                }
-            }
-
-            // --- Views ---
-            try (ResultSet views = metaData.getTables(con.getCatalog(), null, "%", new String[]{"VIEW"})) {
-                while (views.next()) {
-                    String viewName = views.getString("TABLE_NAME");
-                    stats.totalViews++;
-                    stats.viewNames.add(viewName);
-                }
-            }
-
-            stats.totalRows = jdbcTemplate.queryForObject("""
-            SELECT SUM(TABLE_ROWS) AS total_rows
-            FROM information_schema.tables
-            WHERE table_schema = DATABASE()
-            AND TABLE_TYPE = 'BASE TABLE';
-            """, Long.class).intValue();
-
-            return null;
-        });
-        return stats;
-    }
-    public static TableStats getTableStats(String name) {
-        TableStats stats = new TableStats();
-        jdbcTemplate.execute((Connection con) -> {
-            stats.tableName = name.toLowerCase();
-            DatabaseMetaData metaData = con.getMetaData();
-            try (ResultSet columns = metaData.getColumns(con.getCatalog(), null, stats.tableName, null)) {
-                while (columns.next()) {
-                    stats.columnNames.add(columns.getString("COLUMN_NAME"));
-                }
-            }
-            try (ResultSet count = con.createStatement().executeQuery("SELECT COUNT(*) FROM " + stats.tableName)) {
-                if (count.next()) {
-                    stats.totalRows = count.getLong(1);
-                }
-            }
-            return null;
-        });
-        return stats;
-    }
     public static class DatabaseStats {
         public int totalTables = 0;
         public int totalViews = 0;
@@ -525,4 +471,15 @@ public abstract class DatabaseObject<T> {
     }
 
 
+    public static class ID_OBJ<IDTYPE, T> extends DatabaseObject<T> {
+        public IDTYPE ID;
+        public IDTYPE getID() {
+            return ID;
+        }
+        private void setID(IDTYPE ID) {
+            this.ID = ID;
+        }
+
+        protected ID_OBJ() {}
+    }
 }

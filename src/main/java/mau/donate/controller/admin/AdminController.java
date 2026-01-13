@@ -5,7 +5,6 @@ import mau.donate.objects.User;
 import mau.donate.objects.derived.D_Donation_Item;
 import mau.donate.objects.derived.D_Warehouse;
 import mau.donate.objects.enums.StorageStatus;
-import mau.donate.service.CacheService;
 import mau.donate.service.database.DatabaseObject;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Controller;
@@ -24,11 +23,7 @@ import static mau.donate.controller.admin.DBEditorController.DBObjectPackage;
 @Controller
 public class AdminController {
 
-    private final CacheService cacheService;
-
-    public AdminController(CacheService cacheService) {
-        this.cacheService = cacheService;
-    }
+    public AdminController() {}
 
     @GetMapping("/admin")
     public String admin(Model model, Principal loggedUser) {
@@ -41,7 +36,7 @@ public class AdminController {
         model.addAttribute("unapproved_reqs", Donation_Request.getAllWhere(Donation_Request.class, "NOT Approved AND NOT Completed"));
         model.addAttribute("warehouses", D_Warehouse.getAll(D_Warehouse.class));
 
-        model.addAttribute("dbstat", cacheService.getDatabaseStats());
+        model.addAttribute("dbstat", dbService.getDatabaseStats());
         model.addAttribute("tstats", DatabaseObject.doQuery("call maudonate.TotalStat();").orElseGet(() -> new DatabaseObject.Row(Map.of())));
         LocalDate LD = LocalDate.now();
         model.addAttribute("mstats", DatabaseObject.doQuery("call maudonate.MonthlyStat(?,?);", LD.getYear(), LD.getMonthValue()).orElseGet(() -> new DatabaseObject.Row(Map.of())));
@@ -60,7 +55,7 @@ public class AdminController {
         try {
             item = item.substring(0, 1).toUpperCase() + item.substring(1);
             Class<?> objClass = Class.forName(DBObjectPackage + item);
-            return Map.of("tblstats", cacheService.getTableStats(item), "items", DatabaseObject.getAll(objClass));
+            return Map.of("tblstats", dbService.getTableStats(item), "items", DatabaseObject.getAll(objClass));
         } catch (Exception e) {
             return null;
         }
@@ -75,7 +70,7 @@ public class AdminController {
         if (!U.getRole().equals("ADMIN")) return null;
         addEssential(model, loggedUser, U);
         try {
-            return cacheService.getMonthlyStats(year, month);
+            return DatabaseObject.doQuery("call maudonate.MonthlyStat(?,?);", year, month).orElseThrow().columns;
         } catch (Exception e) {
             return null;
         }

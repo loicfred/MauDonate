@@ -10,11 +10,6 @@ let currentIndex = 0;
 
     const threshold = 60;
 
-    function updatePosition(animate = true) {
-        carousel.style.transition = animate ? "transform 0.3s ease" : "none";
-        carousel.style.transform = `translateX(-${currentIndex * window.innerWidth}px)`;
-    }
-
     function start(x, y) {
         startX = x;
         startY = y;
@@ -55,8 +50,7 @@ let currentIndex = 0;
         } else if (deltaX < -threshold && currentIndex < pages.length - 1) {
             currentIndex++;
         }
-
-        updatePosition(true);
+        goToPage(currentIndex);
     }
 
     // 🔹 TOUCH EVENTS
@@ -84,13 +78,21 @@ let currentIndex = 0;
     window.addEventListener("mouseup", end);
     window.addEventListener("mouseleave", end);
 
-    window.addEventListener("resize", () => updatePosition(false));
+    window.addEventListener("resize", () => {
+        carousel.style.transition = "none";
+        carousel.style.transform = `translateX(-${currentIndex * window.innerWidth}px)`;
+    });
 })();
 
 function goToPage(i) {
-    if (i == null) return;
+    if (i == null) i = 0;
     closeSidebar();
     currentIndex = i;
     carousel.style.transform = `translateX(-${i * 100}%)`;
+    carousel.style.transition = "transform 0.3s ease";
+    document.querySelectorAll(".bottom-nav .nav-item").forEach(item => {
+        item.classList.remove("active");
+    });
+    document.querySelectorAll(".bottom-nav .nav-item")[currentIndex].classList.add("active");
 }
 goToPage(new URLSearchParams(window.location.search).get('page'))

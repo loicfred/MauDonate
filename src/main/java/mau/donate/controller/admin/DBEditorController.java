@@ -23,7 +23,6 @@ public class DBEditorController {
 
     public static final String DBObjectPackage = "mau.donate.objects.";
 
-
     @GetMapping("/admin/edit/{item}")
     public String adminEdit(Model model, Principal loggedUser, @PathVariable String item) {
         return adminEdit(model, loggedUser, item, null);
@@ -66,7 +65,7 @@ public class DBEditorController {
     }
 
     @PostMapping("/admin/update/{item}/{id}")
-    public String editItem(Model model, Principal loggedUser, RedirectAttributes redirectAttributes, @PathVariable String item, @PathVariable Long id, @ModelAttribute UniversalForm form) {
+    public String editItem(Model model, Principal loggedUser, RedirectAttributes redirectAttributes, @PathVariable String item, @PathVariable Object id, @ModelAttribute UniversalForm form) {
         if (loggedUser == null) return "redirect:/accounts/login";
         User U = User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
@@ -74,10 +73,10 @@ public class DBEditorController {
         try {
             item = item.substring(0,1).toUpperCase() + item.substring(1);
             @SuppressWarnings("unchecked")
-            Class<? extends DatabaseObject<?>> objClass = (Class<? extends DatabaseObject<?>>) Class.forName(DBObjectPackage + item).asSubclass(DatabaseObject.class);
-            DatabaseObject<?> entity = id != null ? DatabaseObject.getById(objClass, id).orElseThrow() : null;
+            Class<? extends DatabaseObject.ID_OBJ<?, ?>> objClass = (Class<? extends DatabaseObject.ID_OBJ<?, ?>>) Class.forName(DBObjectPackage + item).asSubclass(DatabaseObject.class);
+            DatabaseObject.ID_OBJ<?,?> entity = id != null ? DatabaseObject.getById(objClass, id).orElseThrow() : null;
             if (entity == null) {
-                Constructor<DatabaseObject<?>> ctor = (Constructor<DatabaseObject<?>>) objClass.getDeclaredConstructor();
+                Constructor<DatabaseObject.ID_OBJ<?,?>> ctor = (Constructor<DatabaseObject.ID_OBJ<?,?>>) objClass.getDeclaredConstructor();
                 ctor.setAccessible(true);
                 entity = ctor.newInstance();
             }
@@ -95,7 +94,7 @@ public class DBEditorController {
             }
             objClass.getField("UpdatedAt").set(entity, java.time.LocalDateTime.now());
             if (id == null) {
-                entity = (DatabaseObject<?>) entity.WriteThenReturn().orElse(null);
+                entity = (DatabaseObject.ID_OBJ<?,?>) entity.WriteThenReturn().orElse(null);
                 id = entity.getID();
             } else {
                 entity.Update();

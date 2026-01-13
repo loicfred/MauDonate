@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.security.Principal;
 import java.util.UUID;
 
 @Controller
@@ -28,19 +29,21 @@ public class AuthController {
     }
 
     @GetMapping("/accounts/login")
-    public String login(Model model) {
+    public String login(Principal loggedUser) {
+        if (loggedUser != null) return "redirect:/";
         return "accounts/login";
     }
 
 
 
     @GetMapping("/accounts/signup")
-    public String signupForm(Model model) {
+    public String signupForm(Model model, Principal loggedUser) {
+        if (loggedUser != null) return "redirect:/";
         model.addAttribute("user", new User());
         return "accounts/signup";
     }
     @PostMapping("/accounts/signup")
-    public String register(User user) {
+    public String register(User user, Principal loggedUser) {
         if (!user.isPasswordValid()) return "redirect:/accounts/signup?badpassword";
         if (User.getByEmail(user.Email) != null) return "redirect:/accounts/signup?bademail";
         if (user.getAge() < 18) return "redirect:/accounts/signup?badage";
@@ -89,10 +92,6 @@ public class AuthController {
 
     @GetMapping("/accounts/resetpassword")
     public String resetPassword(Model model) {
-        System.out.println(passwordEncoder.encode("MauDonate@1234"));
-        System.out.println(passwordEncoder.encode("Feu@2004"));
-        System.out.println(passwordEncoder.encode("aa"));
-
         model.addAttribute("user", new User());
         return "accounts/resetpassword";
     }

@@ -7,7 +7,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class Staff extends DatabaseObject<User> {
+public class Staff extends DatabaseObject.ID_OBJ<Long, User> {
 
     public String FirstName;
     public String LastName;

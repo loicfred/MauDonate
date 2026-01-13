@@ -1,4 +1,4 @@
-<nav th:fragment="mainHeader" class="navbar navbar-dark" style="padding: 3px">
+<nav th:fragment="mainHeader" class="top-nav navbar navbar-dark">
     <div class="container d-flex align-items-center" style="justify-content: space-between;">
         <button class="hamburger-btn me-3" id="hamburgerBtn" aria-label="Open menu">☰</button>
         <a class="navbar-brand me-auto" href="/home">
@@ -64,7 +64,7 @@
         </div>
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-        <div class="nav-item notification" th:if="${principal != null}">
+        <div class="nav-item nav-item notification" th:if="${principal != null}">
             <svg viewBox="0 0 24 24" class="nav-icon" id="notificationBtn" style="position: relative;">
                 <path fill="currentColor"
                       d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/>
@@ -109,7 +109,7 @@
             </script>
         </div>
 
-        <div class="nav-item" th:if="${principal == null}">
+        <div class="nav-item nav-item" th:if="${principal == null}">
             <svg viewBox="0 0 24 24" class="nav-icon" id="loginBtn">
                 <path fill="currentColor"
                       d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>

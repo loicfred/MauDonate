@@ -1,18 +1,12 @@
 package mau.donate.service;
 
-import mau.donate.objects.User;
-import mau.donate.service.database.DatabaseService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import static mau.donate.config.AppConfig.dbService;
 
 @Component
 public class ScheduledTasks {
 
-    private final CacheService cacheService;
-    public ScheduledTasks(CacheService cacheService) {
-        this.cacheService = cacheService;
+    public ScheduledTasks() {
     }
 
     @Scheduled(fixedRate = 1000 * 60 * 5, initialDelay = 1000 * 60 * 5)

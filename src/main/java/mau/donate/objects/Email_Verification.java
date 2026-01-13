@@ -5,7 +5,7 @@ import mau.donate.service.database.DatabaseObject;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-public class Email_Verification extends DatabaseObject<Email_Verification> {
+public class Email_Verification extends DatabaseObject.ID_OBJ<Long, Email_Verification> {
     private transient User U;
 
     public long UserID;

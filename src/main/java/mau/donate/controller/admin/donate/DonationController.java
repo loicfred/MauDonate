@@ -1,8 +1,6 @@
 package mau.donate.controller.admin.donate;
 
 import mau.donate.objects.*;
-import mau.donate.objects.derived.D_Donation_Item;
-import mau.donate.objects.enums.StorageStatus;
 import mau.donate.service.EmailService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,7 +12,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static mau.donate.config.AppConfig.dbService;
 import static mau.donate.controller.AppController.addEssential;
 
 @CrossOrigin(origins = "*")
@@ -33,6 +30,7 @@ public class DonationController {
         User U = User.getByEmail(loggedUser.getName());
         addEssential(model, loggedUser, U);
 
+        // the request to which we are donating
         Donation_Request req = Donation_Request.getById(Donation_Request.class, reqId).orElseThrow();
 
         Donation D = new Donation();
@@ -75,39 +73,37 @@ public class DonationController {
     }
 
 
-    @PostMapping("/admin/donate/{id}/accept")
+    @PostMapping("/admin/donation/validate/{id}/accept")
     public String acceptDonation(Model model, Principal loggedUser, @PathVariable Long id, @RequestParam String message, RedirectAttributes redirectAttributes) {
         if (loggedUser == null) return "redirect:/accounts/login";
         User U = User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
 
-        Donation req = Donation.getById(Donation.class, id).orElseThrow();
-        req.UpdatedAt = LocalDateTime.now();
-        req.Approved = true;
-        req.UpdateOnly("Approved", "UpdatedAt");
+        Donation donation = Donation.getById(Donation.class, id).orElseThrow();
+        donation.UpdatedAt = LocalDateTime.now();
+        donation.Approved = true;
+        donation.UpdateOnly("Approved", "UpdatedAt");
 
-        User sender = req.getDonor();
-        emailService.acceptRequest(sender.getEmail(), sender.getFirstName() + " " + sender.getLastName(), message);
+        User sender = donation.getDonor();
+        emailService.acceptDonation(sender.getEmail(), sender.getFirstName() + " " + sender.getLastName(), message);
         new Notification(sender.getID(), "Donation Approved", "Congratulations, your donation has been approved !");
 
         redirectAttributes.addFlashAttribute("successReq", "Successfully accepted the donation from " + sender.getFirstName() + ".");
         return "redirect:/admin?page=1";
     }
-    @PostMapping("/admin/donate/{id}/deny")
+    @PostMapping("/admin/donation/validate/{id}/deny")
     public String denyDonation(Model model, Principal loggedUser, @PathVariable Long id, @RequestParam String message, RedirectAttributes redirectAttributes) {
         if (loggedUser == null) return "redirect:/accounts/login";
         User U = User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
 
-        Donation req = Donation.getById(Donation.class, id).orElseThrow();
-        req.UpdatedAt = LocalDateTime.now();
-        req.Approved = false;
-        req.UpdateOnly("Approved", "UpdatedAt");
+        Donation donation = Donation.getById(Donation.class, id).orElseThrow();
+        donation.Delete();
 
-        User sender = req.getDonor();
-        emailService.denyRequest(sender.getEmail(), sender.getFirstName() + " " + sender.getLastName(), message);
+        User sender = donation.getDonor();
+        emailService.denyDonation(sender.getEmail(), sender.getFirstName() + " " + sender.getLastName(), message);
         new Notification(sender.getID(), "Donation Denied", "Unfortunately your donation has been denied. More details sent by email.");
 
         redirectAttributes.addFlashAttribute("successReq", "Successfully denied the donation from " + sender.getFirstName() + ".");

@@ -20,10 +20,10 @@ public class Campaign extends DatabaseObject.ID_OBJ<Long, Campaign> {
     public LocalDateTime UpdatedAt;
 
     public Campaign() {}
-    public Campaign(long associationID, String name, String message, String hyperlink, LocalDateTime startAt, byte[] image) {
+    public Campaign(long associationID, String title, String message, String hyperlink, LocalDateTime startAt, byte[] image) {
         this.ID = Instant.now().toEpochMilli();
         AssociationID = associationID;
-        Title = StopString(message, 128);
+        Title = StopString(title, 128);
         Message = StopString(message, 512);
         Hyperlink = hyperlink;
         Image = image;

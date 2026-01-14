@@ -49,6 +49,7 @@ public class RequestController {
         req.Status = DonationStatus.PENDING.toString();
         req.UserID = U.getID();
         req.Approved = false;
+        req.Completed = false;
         if (req.Write() > 0) {
             redirectAttributes.addFlashAttribute("successDon", "Successfully sent a donation request. Once it's approved you will receive an email.");
             return "redirect:/home?page=0";
@@ -86,9 +87,7 @@ public class RequestController {
         addEssential(model, loggedUser, U);
 
         Donation_Request req = Donation_Request.getById(Donation_Request.class, id).orElseThrow();
-        req.UpdatedAt = LocalDateTime.now();
-        req.Approved = false;
-        req.UpdateOnly("Approved", "UpdatedAt");
+        req.Delete();
 
         User sender = req.getUser();
         emailService.denyRequest(sender.getEmail(), sender.getFirstName() + " " + sender.getLastName(), message);

@@ -2,11 +2,10 @@ package mau.donate.controller.admin;
 
 import mau.donate.objects.Donation_Request;
 import mau.donate.objects.User;
-import mau.donate.objects.derived.D_Donation_Item;
+import mau.donate.objects.derived.D_Donation;
 import mau.donate.objects.derived.D_Warehouse;
 import mau.donate.objects.enums.StorageStatus;
 import mau.donate.service.database.DatabaseObject;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +31,7 @@ public class AdminController {
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
 
-        model.addAttribute("pending_items", D_Donation_Item.getAllWhere(D_Donation_Item.class, "NOT Status = ? OR WarehouseID IS NULL", StorageStatus.DELIVERED.toString()));
+        model.addAttribute("pending_dons", D_Donation.getNotBroughtDonations());
         model.addAttribute("unapproved_reqs", Donation_Request.getAllWhere(Donation_Request.class, "NOT Approved AND NOT Completed"));
         model.addAttribute("warehouses", D_Warehouse.getAll(D_Warehouse.class));
 
@@ -46,7 +45,6 @@ public class AdminController {
 
     @ResponseBody
     @GetMapping("/admin/list/{item}")
-    @Cacheable(value = "dbSelectItemList", key = "#item")
     public Map<String, ?> fetchItemList(Model model, Principal loggedUser, @PathVariable String item) {
         if (loggedUser == null) return null;
         User U = User.getByAuthentication(loggedUser);
@@ -63,7 +61,6 @@ public class AdminController {
 
     @ResponseBody
     @GetMapping("/admin/stats/{year}/{month}")
-    @Cacheable(value = "dbSelectMonth", key = "#year + #month")
     public Map<String, Object> fetchItemList(Model model, Principal loggedUser, @PathVariable Long year, @PathVariable Long month) {
         if (loggedUser == null) return null;
         User U = User.getByAuthentication(loggedUser);

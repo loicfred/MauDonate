@@ -58,7 +58,7 @@
 
         <!-- PAGE 1 -->
         <section class="page">
-            <p style="justify-content: center; align-items: center; text-align: center; padding: 30px;" th:if="${pending_dons.isEmpty()}">No donations currently.</p>
+            <p style="justify-content: center; align-items: center; text-align: center; padding: 25px;" th:if="${pending_dons.isEmpty()}">No donations currently.</p>
             <div th:each="don : ${pending_dons}" class="request-card card mb-3">
                 <div class="card-body">
                     <div class="mb-1">
@@ -77,8 +77,8 @@
                     </div>
                     <div class="mt-1 d-flex align-items-center">
                         <small th:text="${'Created at ' + don.CreatedAt}"></small>
-                        <button class="ms-auto btn btn-primary" style="min-width: 75px;" onclick="showDonationValidationPopup(this, true)" th:don-id="${don.ID}">Accept</button>
-                        <button class="ms-2 btn btn-primary" style="min-width: 75px;" onclick="showDonationValidationPopup(this, false)" th:don-id="${don.ID}">Deny</button>
+                        <button class="ms-auto btn btn-primary" style="min-width: 90px;" onclick="showDonationValidationPopup(this, true)" th:don-id="${don.ID}">Accept</button>
+                        <button class="ms-2 btn btn-primary" style="min-width: 90px;" onclick="showDonationValidationPopup(this, false)" th:don-id="${don.ID}">Deny</button>
                     </div>
                 </div>
             </div>
@@ -86,7 +86,7 @@
 
         <!-- PAGE 2 -->
         <section class="page">
-            <p style="justify-content: center; align-items: center; text-align: center; padding: 30px;" th:if="${unapproved_reqs.isEmpty()}">No one has reached out yet.</p>
+            <p style="justify-content: center; align-items: center; text-align: center; padding: 25px;" th:if="${unapproved_reqs.isEmpty()}">No one has reached out yet.</p>
             <div th:if="${successReq}" class="alert alert-success" th:text="${successReq}"></div>
             <div th:each="req : ${unapproved_reqs}" class="request-card card mb-3">
                 <div class="card-body">
@@ -98,8 +98,8 @@
                     <p th:text="${req.Message}"></p>
                     <div class="text-muted d-flex align-items-center">
                         <small th:text="${'Created at ' + req.CreatedAt}"></small>
-                        <button class="ms-auto btn btn-primary" style="min-width: 75px;" onclick="showRequestValidationPopup(this, true)" th:req-id="${req.ID}">Accept</button>
-                        <button class="ms-2 btn btn-primary" style="min-width: 75px;" onclick="showRequestValidationPopup(this, false)" th:req-id="${req.ID}">Deny</button>
+                        <button class="ms-auto btn btn-primary" style="min-width: 90px;" onclick="showRequestValidationPopup(this, true)" th:req-id="${req.ID}">Accept</button>
+                        <button class="ms-2 btn btn-primary" style="min-width: 90px;" onclick="showRequestValidationPopup(this, false)" th:req-id="${req.ID}">Deny</button>
                     </div>
                 </div>
             </div>

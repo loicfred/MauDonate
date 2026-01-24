@@ -19,16 +19,22 @@
 
         .donate-panel {
             position: fixed;
-            height: 76vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: scroll;
+            height: 70vh;
             bottom: 0;
             left: 0;
             right: 0;
             margin: 0 5px;
             background: var(--primary-color-lighter);
             border-radius: 30px 30px 0 0;
-            padding: 20px;
             box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
             animation: slideUp 0.3s ease-out;
+        }
+        .donate-panel::-webkit-scrollbar {
+            display: none;
         }
 
         @keyframes slideUp {
@@ -39,15 +45,6 @@
                 transform: translateY(0);
             }
         }
-
-        .container {
-            overflow-y: scroll;
-            height: 100%;
-        }
-        .container::-webkit-scrollbar {
-            display: none;
-        }
-
         .amount-input {
             margin: 0 auto;
         }
@@ -56,6 +53,10 @@
             margin-top: 20px;
             text-align: center;
             font-weight: 600;
+        }
+
+        #paypal-button-container div iframe {
+            min-height: 30vh;
         }
     </style>
     <script src="https://www.paypal.com/sdk/js?client-id=AbYaxvdrhP-eHrsOaZtVJL4yVXysjAjvaS000Hfy4WYozpX8YUTwkfOBCNSeEcH6mFW-g-j5tUtqUbp3&currency=USD"></script>
@@ -74,38 +75,23 @@
 
     <!-- Bottom donation panel -->
     <div class="donate-panel">
-        <div class="container text-center">
+        <h4 class="m-3 text-center">Choose your donation amount</h4>
 
-            <h4 class="mb-3">Choose your donation amount</h4>
-
-            <input type="text"
-                    id="title"
-                    class="form-control mb-3"
-                    placeholder="Title"
-                    maxlength="128">
-
-            <textarea id="comment"
-                    class="form-control mb-4"
-                    placeholder="Comment"
-                    maxlength="512"
-                    rows="3"></textarea>
+        <div class="d-flex flex-column m-3">
+            <input type="text" id="title" class="form-control mb-3" placeholder="Title" maxlength="128">
+            <textarea id="comment" class="form-control mb-3" placeholder="Comment" maxlength="512" rows="3"></textarea>
 
             <div class="input-group mb-3">
                 <span class="input-group-text">USD</span>
-                <input type="number"
-                        id="amountUsd"
-                        class="form-control amount-input"
-                        value="10"
-                        min="1"
-                        step="0.01">
+                <input type="number" class="form-control amount-input" id="amountUsd" value="10" min="1" step="0.01">
             </div>
-<!--            <small id="usdPreview" class="opacity-75"></small>-->
+            <!--<small id="usdPreview" class="opacity-75"></small>-->
 
             <div id="error-text" class="alert alert-danger d-none"></div>
             <div id="success-text" class="alert alert-success d-none"></div>
-
-            <div id="paypal-button-container"></div>
         </div>
+
+        <div class="w-100" id="paypal-button-container"></div>
     </div>
 
     <script src="/js/app.js"></script>

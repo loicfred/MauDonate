@@ -4,7 +4,6 @@ import mau.donate.objects.Donation_Request;
 import mau.donate.objects.User;
 import mau.donate.objects.derived.D_Donation;
 import mau.donate.objects.derived.D_Warehouse;
-import mau.donate.objects.enums.StorageStatus;
 import mau.donate.service.database.DatabaseObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

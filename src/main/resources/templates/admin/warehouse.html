@@ -74,6 +74,7 @@
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
         <form class="d-flex flex-column" th:object="${warehouse}" th:action="${'/admin/warehouse/' + warehouse.ID + '/items/update'}" method="post">
+            <input type="number" class="d-none" th:field="*{ID}">
             <div th:each="item, stat : ${warehouse.getItems()}" class="mb-3 d-flex align-items-center" >
                 <input type="number" class="d-none" th:field="*{items[__${stat.index}__].ID}">
                 <label th:for="${item.ID + '-status'}" th:text="${item.ID} + ': ' + ${item.ItemName}" class="form-label w-75 mb-0"></label>

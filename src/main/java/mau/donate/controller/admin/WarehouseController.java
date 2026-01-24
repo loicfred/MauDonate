@@ -37,11 +37,14 @@ public class WarehouseController {
         User U = User.getByAuthentication(loggedUser);
         try {
             if (!U.getRole().equals("ADMIN")) throw new Exception("Unauthorized");
-            for (Donation_Item I : warehouse.getItems()) I.UpdateOnly("Status");
+            for (Donation_Item I : warehouse.getItems()) {
+                I.UpdateOnly("Status");
+            }
 
             redirectAttributes.addFlashAttribute("success", "Successfully updated the warehouse.");
             return "redirect:/admin/warehouse/" + warehouseId;
         } catch (Exception e) {
+            e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", "An error occurred: " + e.getMessage());
             return "redirect:/admin/warehouse/" + warehouseId;
         }

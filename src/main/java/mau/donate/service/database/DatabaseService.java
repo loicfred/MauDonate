@@ -56,19 +56,20 @@ public class DatabaseService {
                         switch (value) {
                             case java.sql.Date D -> f.set(item, D.toLocalDate());
                             case java.sql.Timestamp D -> f.set(item, D.toLocalDateTime());
+                            case java.sql.Time D -> f.set(item, D.toLocalTime());
                             case BigDecimal D -> {
-                                if (f.getType() == float.class) {
-                                    f.set(item, D.floatValue());
-                                } else if (f.getType() == long.class) {
+                                if (f.getType() == long.class) {
                                     f.set(item, D.longValue());
                                 } else if (f.getType() == int.class) {
                                     f.set(item, D.intValue());
-                                } else if (f.getType() == short.class) {
-                                    f.set(item, D.shortValue());
-                                } else if (f.getType() == byte.class) {
-                                    f.set(item, D.byteValue());
                                 } else if (f.getType() == double.class) {
                                     f.set(item, D.doubleValue());
+                                } else if (f.getType() == short.class) {
+                                    f.set(item, D.shortValue());
+                                } else if (f.getType() == float.class) {
+                                    f.set(item, D.floatValue());
+                                } else if (f.getType() == byte.class) {
+                                    f.set(item, D.byteValue());
                                 }
                             }
                             default -> f.set(item, value);

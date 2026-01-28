@@ -5,6 +5,7 @@ import mau.donate.service.database.DatabaseObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.lang.reflect.*;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static mau.donate.controller.AppController.addEssential;
 
@@ -27,7 +29,6 @@ public class DBEditorController {
     public String adminEdit(Model model, Principal loggedUser, @PathVariable String item) {
         return adminEdit(model, loggedUser, item, null);
     }
-
     @GetMapping("/admin/edit/{item}/{id}")
     public String adminEdit(Model model, Principal loggedUser, @PathVariable String item, @PathVariable Long id) {
         if (loggedUser == null) return "redirect:/accounts/login";
@@ -43,7 +44,8 @@ public class DBEditorController {
                 field.setAccessible(true);
                 if (Modifier.isStatic(field.getModifiers())) continue;
                 if (Modifier.isTransient(field.getModifiers())) continue;
-                if (field.getName().endsWith("At")) continue;
+                if (field.getName().endsWith("CreatedAt")) continue;
+                if (field.getName().endsWith("UpdatedAt")) continue;
                 if (field.getName().endsWith("Password")) continue;
 
                 FieldMeta meta = new FieldMeta();
@@ -64,16 +66,20 @@ public class DBEditorController {
         return "admin/editor";
     }
 
-    @PostMapping("/admin/update/{item}/{id}")
-    public String editItem(Model model, Principal loggedUser, RedirectAttributes redirectAttributes, @PathVariable String item, @PathVariable Object id, @ModelAttribute UniversalForm form) {
+    @PostMapping("/admin/update/{objectName}")
+    public String updateItem(Model model, Principal loggedUser, RedirectAttributes redirectAttributes, @PathVariable String objectName, @ModelAttribute UniversalForm form) {
+        return updateItem(model, loggedUser, redirectAttributes, objectName, null, form);
+    }
+    @PostMapping("/admin/update/{objectName}/{id}")
+    public String updateItem(Model model, Principal loggedUser, RedirectAttributes redirectAttributes, @PathVariable String objectName, @PathVariable Object id, @ModelAttribute UniversalForm form) {
         if (loggedUser == null) return "redirect:/accounts/login";
         User U = User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
         try {
-            item = item.substring(0,1).toUpperCase() + item.substring(1);
+            objectName = objectName.substring(0,1).toUpperCase() + objectName.substring(1);
             @SuppressWarnings("unchecked")
-            Class<? extends DatabaseObject.ID_OBJ<?, ?>> objClass = (Class<? extends DatabaseObject.ID_OBJ<?, ?>>) Class.forName(DBObjectPackage + item).asSubclass(DatabaseObject.class);
+            Class<? extends DatabaseObject.ID_OBJ<?, ?>> objClass = (Class<? extends DatabaseObject.ID_OBJ<?, ?>>) Class.forName(DBObjectPackage + objectName).asSubclass(DatabaseObject.class);
             DatabaseObject.ID_OBJ<?,?> entity = id != null ? DatabaseObject.getById(objClass, id).orElseThrow() : null;
             if (entity == null) {
                 Constructor<DatabaseObject.ID_OBJ<?,?>> ctor = (Constructor<DatabaseObject.ID_OBJ<?,?>>) objClass.getDeclaredConstructor();
@@ -86,13 +92,18 @@ public class DBEditorController {
                 field.setAccessible(true);
                 if (Modifier.isStatic(field.getModifiers())) continue;
                 if (Modifier.isTransient(field.getModifiers())) continue;
-                if (field.getName().endsWith("At")) continue;
+                if (field.getName().endsWith("CreatedAt")) continue;
+                if (field.getName().endsWith("UpdatedAt")) continue;
                 if (field.getName().endsWith("Password")) continue;
                 if (field.getName().endsWith("ID")) continue;
-
                 Convert(field, entity, entry.value);
             }
-            objClass.getField("UpdatedAt").set(entity, java.time.LocalDateTime.now());
+            try {
+                Field updatedAt = objClass.getField("UpdatedAt");
+                updatedAt.setAccessible(true);
+                updatedAt.set(entity, java.time.LocalDateTime.now());
+            } catch (Exception ignored) {}
+
             if (id == null) {
                 entity = (DatabaseObject.ID_OBJ<?,?>) entity.WriteThenReturn().orElse(null);
                 id = entity.getID();
@@ -100,10 +111,10 @@ public class DBEditorController {
                 entity.Update();
             }
             redirectAttributes.addFlashAttribute("success", "Entry updated successfully.");
-            return "redirect:/admin/edit/" + item + "/" + id;
+            return "redirect:/admin/edit/" + objectName + (id != null ? "/" + id : "");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "An error occurred: " + e.getMessage());
-            return "redirect:/admin/edit/" + item + "/" + id;
+            return "redirect:/admin/edit/" + objectName + (id != null ? "/" + id : "");
         }
     }
 
@@ -129,7 +140,13 @@ public class DBEditorController {
             } else if (type.equals(LocalDate.class)) {
                 field.set(entity, LocalDate.parse(value.toString())); // optionally use formatter
             } else if (type.equals(LocalDateTime.class)) {
-                field.set(entity, LocalDateTime.parse(value.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")));
+                if (value instanceof String s && !s.isBlank()) {
+                    field.set(entity, LocalDateTime.parse(value.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")));
+                }
+            } else if (type.equals(byte[].class)) {
+                if (value instanceof MultipartFile F && !F.isEmpty()) {
+                    field.set(entity, F.getBytes());
+                }
             } else {
                 field.set(entity, value);
             }

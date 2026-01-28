@@ -69,11 +69,11 @@
                         <h5 class="mb-0" th:text="${'To: ' + don.Receiver_FName + ' ' + don.Receiver_LName}"></h5>
                         <small class="mb-0" th:text="${'~ ' + don.Receiver_Address}"></small>
                     </div>
-                    <p style="border-left: 1px solid gray; padding-left: 5px;" class="mb-2" th:text="${don.Message}"></p>
+                    <p style="border-left: 1px solid gray; padding-left: 8px;" class="mb-2" th:text="${don.Message}"></p>
 
                     <h5 class="mb-0">Items</h5>
                     <div th:each="item : ${don.getItems()}" class="d-flex flex-column">
-                        <p class="mb-0" style="border-left: 1px solid gray; padding-left: 5px;" th:text="${'• ' + item.ItemName + ' (x' + item.Quantity + ')'}"></p>
+                        <p class="mb-0" style="border-left: 1px solid gray; padding-left: 8px;" th:text="${'• ' + item.ItemName + ' (x' + item.Quantity + ')'}"></p>
                     </div>
                     <div class="mt-1 d-flex align-items-center">
                         <small th:text="${'Created at ' + don.CreatedAt}"></small>

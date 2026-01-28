@@ -2,6 +2,7 @@ package mau.donate.objects;
 
 import mau.donate.service.database.DatabaseObject;
 
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 
 public class Donation_Request extends DatabaseObject.ID_OBJ<Long, Donation_Request> {
@@ -64,6 +65,10 @@ public class Donation_Request extends DatabaseObject.ID_OBJ<Long, Donation_Reque
 
     public User getUser() {
         return U == null ? U = User.getById(UserID) : U;
+    }
+
+    public String getGoalAmountString() {
+        return new DecimalFormat("#,###.##").format(GoalAmount);
     }
 
     public static Donation_Request getById(long id) {

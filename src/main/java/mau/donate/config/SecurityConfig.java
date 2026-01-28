@@ -51,7 +51,7 @@ public class SecurityConfig {
             return org.springframework.security.core.userdetails.User.builder()
                     .username(user.getEmail())
                     .password(user.getPassword())
-                    .disabled(!user.isEnabled())
+                    .disabled(!user.isEnabled() && !user.isVerified())
                     .authorities(Collections.emptyList())
                     .build();
         };
@@ -118,7 +118,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, RememberMeServices rememberMeServices) {
         String[] publicPaths = {
-                "/", "/home", "/accounts/**", "/error",
+                "/", "/home", "/accounts/**", "/api/**", "/error",
                 "/service-worker.js", "/manifest.json", "/offline",
                 "/css/**", "/js/**", "/img/**"
         };

@@ -1,5 +1,6 @@
 package mau.donate.objects;
 
+import mau.donate.objects.enums.PaymentStatus;
 import mau.donate.service.database.DatabaseObject;
 
 import java.time.Instant;
@@ -12,11 +13,12 @@ public class Fundraising extends DatabaseObject.ID_OBJ<Long, Fundraising> {
     public double USD;
     public String Title;
     public String Message;
+    public String Status = PaymentStatus.PENDING.toString();
     public LocalDateTime CreatedAt;
     
     public Fundraising() {}
-    public Fundraising(long donorID, double usd, String title, String message) {
-        ID = Instant.now().toEpochMilli();
+    public Fundraising(long id, long donorID, double usd, String title, String message) {
+        ID = id;
         DonorID = donorID;
         USD = usd;
         Title = StopString(title, 128);
@@ -28,4 +30,5 @@ public class Fundraising extends DatabaseObject.ID_OBJ<Long, Fundraising> {
     public static Fundraising getById(long id) {
         return DatabaseObject.getById(Fundraising.class, id).orElse(null);
     }
+
 }

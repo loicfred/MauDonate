@@ -1,9 +1,11 @@
 package mau.donate.objects;
 
+import mau.donate.objects.enums.StorageStatus;
 import mau.donate.service.database.DatabaseObject;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static my.utilities.util.Utilities.StopString;
 
@@ -93,5 +95,18 @@ public class Donation extends DatabaseObject.ID_OBJ<Long, Donation> {
     }
     public void setItems(List<Donation_Item> items) {
         this.items = items;
+    }
+
+    public String getItemsAsString() {
+        return getItems().stream().map(i -> "• " + i.Quantity + "x " + i.ItemName).collect(Collectors.joining("\n"));
+    }
+
+    public String getItemsStatus() {
+        for (StorageStatus status : StorageStatus.values()) {
+            if (getItems().stream().allMatch(i -> i.Status.equalsIgnoreCase(status.name()))) {
+                return status.name();
+            }
+        }
+        return StorageStatus.NOT_YET_BROUGHT.name();
     }
 }

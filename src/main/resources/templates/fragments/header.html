@@ -1,126 +1,245 @@
-<nav th:fragment="mainHeader" class="top-nav navbar navbar-dark">
-    <div class="container d-flex align-items-center" style="justify-content: space-between;">
-        <button class="hamburger-btn me-3" id="hamburgerBtn" aria-label="Open menu">☰</button>
-        <a class="navbar-brand me-auto" href="/home">
-            <img style="border-radius: 50%" src="/img/logo.png" draggable="false" height="40" alt="BeatCam">
-        </a>
+<div class="position-relative" th:fragment="mainHeader" >
+    <nav class="top-nav navbar navbar-dark">
+        <div class="container d-flex align-items-center gap-2" style="flex-wrap: nowrap;">
+            <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu">☰</button>
+            <a class="navbar-brand me-auto" href="/home">
+                <img style="border-radius: 50%" src="/img/logo.png" draggable="false" height="40" alt="BeatCam">
+            </a>
 
-        <div class="sidebar" id="sidebar">
-            <h5 class="mb-3">Menu</h5>
-            <button onclick="goToHome()">Home</button>
-            <button onclick="goToDonate()">Donate</button>
-            <button onclick="goToCampaign()">Campaigns</button>
-            <button onclick="goToAbout()">About</button>
-            <hr>
-            <a th:if="${principal == null}" href="/accounts/login">Log in</a>
-            <a th:if="${principal != null}" href="/donation/request">Make a donation request</a>
-            <a th:if="${principal != null}" href="/fundraise">Fundraise</a>
-            <a th:if="${principal != null}" href="/settings">Settings</a>
-            <form th:if="${principal != null}" th:action="${'/logout'}" method="post">
-                <button type="submit">Logout</button>
-            </form>
-            <script>
-                const url = window.location.href;
-                function goToHome() {
-                    if (url.includes("home")) goToPage(0);
-                    else window.location.href = "/?page=0";
-                }
-                function goToDonate() {
-                    if (url.includes("home")) goToPage(1);
-                    else window.location.href = "/?page=1";
-                }
-                function goToCampaign() {
-                    if (url.includes("home")) goToPage(2);
-                    else window.location.href = "/?page=2";
-                }
-                function goToAbout() {
-                    if (url.includes("home")) goToPage(3);
-                    else window.location.href = "/?page=3";
-                }
-            </script>
-            <hr>
-            <button th:if="${principal != null && user.Role.equals('ADMIN')}" class="mt-auto" onclick="goToAdminDonation()">Admin - Review Donations</button>
-            <button th:if="${principal != null && user.Role.equals('ADMIN')}" onclick="goToAdminRequest()">Admin - Review Requests</button>
-            <button th:if="${principal != null && user.Role.equals('ADMIN')}" onclick="goToAdminWarehouse()">Admin - Warehouse</button>
-            <button th:if="${principal != null && user.Role.equals('ADMIN')}" onclick="goToAdminDatabase()">Admin - Database</button>
-            <script>
-                function goToAdminDonation() {
-                    if (url.includes("/admin?")) goToPage(0);
-                    else window.location.href = "/admin?page=0";
-                }
-                function goToAdminRequest() {
-                    if (url.includes("/admin?")) goToPage(1);
-                    else window.location.href = "/admin?page=1";
-                }
-                function goToAdminWarehouse() {
-                    if (url.includes("/admin?")) goToPage(2);
-                    else window.location.href = "/admin?page=2";
-                }
-                function goToAdminDatabase() {
-                    if (url.includes("/admin?")) goToPage(3);
-                    else window.location.href = "/admin?page=3";
-                }
-            </script>
-        </div>
-        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+            <div class="sidebar" id="sidebar">
+                <h5 class="mb-3">Menu</h5>
+                <button onclick="goToHome()">Home</button>
+                <button onclick="goToDonate()">Donate</button>
+                <button onclick="goToCampaign()">Campaigns</button>
+                <button onclick="goToAbout()">About</button>
+                <hr>
+                <a th:if="${principal == null}" href="/accounts/login">Log in</a>
+                <a th:if="${principal != null}" href="/donation/request">Make a donation request</a>
+                <a th:if="${principal != null}" href="/fundraise">Fundraise</a>
+                <a th:if="${principal != null}" href="/settings">Settings</a>
+                <a th:if="${principal != null}" href="/billing">Billing</a>
+                <form th:if="${principal != null}" th:action="${'/logout'}" method="post">
+                    <button type="submit">Log out</button>
+                </form>
+                <script>
+                    const url = window.location.href;
+                    function goToHome() {
+                        if (url.includes("home")) goToPage(0);
+                        else window.location.href = "/?page=0";
+                    }
+                    function goToDonate() {
+                        if (url.includes("home")) goToPage(1);
+                        else window.location.href = "/?page=1";
+                    }
+                    function goToCampaign() {
+                        if (url.includes("home")) goToPage(2);
+                        else window.location.href = "/?page=2";
+                    }
+                    function goToAbout() {
+                        if (url.includes("home")) goToPage(3);
+                        else window.location.href = "/?page=3";
+                    }
+                </script>
+                <hr>
+                <button th:if="${principal != null && user.Role.equals('ADMIN')}" class="mt-auto" onclick="goToAdminDonation()">Admin - Review Donations</button>
+                <button th:if="${principal != null && user.Role.equals('ADMIN')}" onclick="goToAdminRequest()">Admin - Review Requests</button>
+                <button th:if="${principal != null && user.Role.equals('ADMIN')}" onclick="goToAdminWarehouse()">Admin - Warehouse</button>
+                <button th:if="${principal != null && user.Role.equals('ADMIN')}" onclick="goToAdminDatabase()">Admin - Database</button>
+                <script>
+                    function goToAdminDonation() {
+                        if (url.includes("/admin?")) goToPage(0);
+                        else window.location.href = "/admin?page=0";
+                    }
+                    function goToAdminRequest() {
+                        if (url.includes("/admin?")) goToPage(1);
+                        else window.location.href = "/admin?page=1";
+                    }
+                    function goToAdminWarehouse() {
+                        if (url.includes("/admin?")) goToPage(2);
+                        else window.location.href = "/admin?page=2";
+                    }
+                    function goToAdminDatabase() {
+                        if (url.includes("/admin?")) goToPage(3);
+                        else window.location.href = "/admin?page=3";
+                    }
+                </script>
+            </div>
+            <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-        <div class="nav-item nav-item notification" th:if="${principal != null}">
-            <svg viewBox="0 0 24 24" class="nav-icon" id="notificationBtn" style="position: relative;">
-                <path fill="currentColor"
-                      d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/>
-                <div id="notification-dot" class="d-none" style="position: absolute; top: 10px; right: 10px; width: 16px; height: 16px; background: red; border-radius: 50%;">
-                    <div style="position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: bold;">
-                        !
-                    </div>
-                </div>
-            </svg>
 
-            <div class="notification-dropdown" id="notificationDropdown">
-                <div class="notification-header">Notifications</div>
+            <div class="position-relative nav-item search-bar d-none d-flex flex-column" id="searchBar" style="border: 1px solid #ccc; border-radius: 4px; padding: 8px; width: 100%; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <input type="text" placeholder="Search..." id="searchField" style="border: 1px solid #ddd; border-radius: 4px; padding: 6px 10px; width: 100%; outline: none;">
+            </div>
+            <div class="nav-item">
+                <svg viewBox="0 0 24 24" class="nav-icon" id="searchBtn">
+                    <path fill="currentColor" d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+            </div>
 
-                <div id="notification-list">
-                    <div style="justify-content: center; align-items: center; text-align: center; padding: 6px;" th:if="${notifications.isEmpty()}">No notifications yet.</div>
-                    <div th:each="notif : ${notifications}" class="notification-item">
-                        <h1 class="m-0">🔔</h1>
-                        <div class="d-flex align-items-center" style="flex-direction: column;">
-                            <h6 class="mb-0 me-auto" th:text="${notif.Title.length > 40 ? notif.Title.substring(0, 40) + '...' : notif.Title}"></h6>
-                            <p class="mb-0" th:text="${notif.Message.length > 80 ? notif.Message.substring(0, 80) + '...' : notif.Message}"></p>
-                            <small class="ms-auto" th:text="${notif.CreatedAt}"></small>
+            <div class="nav-item nav-item notification" th:if="${principal != null}">
+                <svg viewBox="0 0 24 24" class="nav-icon" id="notificationBtn" style="position: relative;">
+                    <path fill="currentColor"
+                          d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/>
+                    <div id="notification-dot" class="d-none" style="position: absolute; top: 10px; right: 10px; width: 16px; height: 16px; background: red; border-radius: 50%;">
+                        <div style="position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: bold;">
+                            !
                         </div>
                     </div>
-                </div>
+                </svg>
 
-                <div th:if="${notifications.size() >= 10}" class="notification-footer">
-                    <a href="/profile">View all</a>
+                <div class="notification-dropdown" id="notificationDropdown">
+                    <div class="notification-header">Notifications</div>
+
+                    <div id="notification-list">
+                        <div style="justify-content: center; align-items: center; text-align: center; padding: 6px;" th:if="${notifications.isEmpty()}">No notifications yet.</div>
+                        <div th:each="notif : ${notifications}" class="notification-item">
+                            <h1 class="m-0">🔔</h1>
+                            <div class="d-flex align-items-center" style="flex-direction: column;">
+                                <h6 class="mb-0 me-auto" th:text="${notif.Title.length > 40 ? notif.Title.substring(0, 40) + '...' : notif.Title}"></h6>
+                                <p class="mb-0" th:text="${notif.Message.length > 80 ? notif.Message.substring(0, 80) + '...' : notif.Message}"></p>
+                                <small class="ms-auto" th:text="${notif.CreatedAt}"></small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div th:if="${notifications.size() >= 10}" class="notification-footer">
+                        <a href="/profile">View all</a>
+                    </div>
                 </div>
+                <script>
+                    const notificationBtn = document.getElementById("notificationBtn");
+                    const notificationDot = document.getElementById("notification-dot");
+                    const notificationDropdown = document.getElementById("notificationDropdown");
+                    notificationBtn.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        notificationDropdown.classList.toggle("active");
+                        notificationDot.classList.add("d-none");
+                    });
+                    document.addEventListener("click", () => {
+                        notificationDropdown.classList.remove("active");
+                    });
+                </script>
             </div>
-            <script>
-                const notificationBtn = document.getElementById("notificationBtn");
-                const notificationDot = document.getElementById("notification-dot");
-                const notificationDropdown = document.getElementById("notificationDropdown");
-                notificationBtn.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    notificationDropdown.classList.toggle("active");
-                    notificationDot.classList.add("d-none");
-                });
-                document.addEventListener("click", () => {
-                    notificationDropdown.classList.remove("active");
-                });
-            </script>
-        </div>
+            <div class="nav-item" th:if="${principal != null}">
+                <img th:src="${'/api/v1/img/avatar/' + user.ID}" draggable="false" height="28" class="position-relative"
+                     style="border-radius: 50%; cursor: pointer;" alt="avatar.png" id="avatarBtn"/>
+                <div class="avatar-popup" id="avatarPopup">
+                    <a href="/settings">Settings</a>
+                    <a href="/billing">Billing</a>
+                    <a href='/logout'>Log out</a>
+                </div>
+                <script>
+                    const avatarBtn = document.getElementById("avatarBtn");
+                    const avatarPopup = document.getElementById("avatarPopup");
+                    avatarBtn.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        avatarPopup.classList.toggle("active");
+                    });
+                    document.addEventListener("click", () => {
+                        avatarPopup.classList.remove("active");
+                    });
+                </script>
+            </div>
 
-        <div class="nav-item nav-item" th:if="${principal == null}">
-            <svg viewBox="0 0 24 24" class="nav-icon" id="loginBtn">
-                <path fill="currentColor"
-                      d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-            </svg>
-            <script>
-                const loginBtn = document.getElementById("loginBtn");
-                loginBtn.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    document.location.href = "/accounts/login";
-                });
-            </script>
+            <div class="nav-item nav-item" th:if="${principal == null}">
+                <svg viewBox="0 0 24 24" class="nav-icon" id="loginBtn">
+                    <path fill="currentColor"
+                          d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+                <script>
+                    const loginBtn = document.getElementById("loginBtn");
+                    loginBtn.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        document.location.href = "/accounts/login";
+                    });
+                </script>
+            </div>
+
         </div>
+    </nav>
+    <div class="position-absolute d-none flex-column w-100" id="resultBox">
+
     </div>
-</nav>
+    <script>
+        const searchBtn = document.getElementById("searchBtn");
+        const searchBar = document.getElementById("searchBar");
+        const resultBox = document.getElementById("resultBox");
+        const searchField = document.getElementById("searchField");
+        searchBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (searchBar.classList.contains("d-none")) searchBar.classList.remove("d-none");
+            if (resultBox.classList.contains("d-none")) resultBox.classList.remove("d-none");
+            searchBtn.classList.add("d-none")
+            searchBar.querySelector("input").focus();
+        });
+        document.addEventListener("click", (e) => {
+            if (!searchBar.contains(e.target)) {
+                searchBar.classList.add("d-none");
+                resultBox.classList.add("d-none");
+                searchBtn.classList.remove("d-none")
+            }
+        });
+        let searchdata = [];
+        searchField.addEventListener("input", async (e) => {
+            if (searchdata.length === 0) {
+                await fetch(`/api/v1/searchbar`, {method: "GET"}).then(res => res.json()).then(
+                    datas => {
+                        searchdata = datas;
+                    }
+                )
+            }
+            resultBox.innerHTML = "";
+            if (searchField.value.length === 0) return;
+            searchdata.forEach(data => {
+                if (!(data.name.toLowerCase().includes(searchField.value.toLowerCase()) || data.description.toLowerCase().includes(searchField.value.toLowerCase()))) return;
+                if (data.type === "request") {
+                    resultBox.innerHTML += `<div class="d-flex p-2">
+                                                 <svg viewBox="0 0 24 24" class="nav-icon me-1">
+                                                 <path fill="white" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+                                                 2 5.42 4.42 3 7.5 3 c1.74 0 3.41.81 4.5 2.09
+                                                 C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5
+                                                 c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                                 </svg>
+                                                 <p class="mb-0 w-100" style="cursor: pointer;" onclick="jumpToDonation(${data.id});">${data.name}</p>
+                                            </div>`;
+                } else if (data.type === "campaign") {
+                    resultBox.innerHTML += `<div class="d-flex p-2">
+                                                 <svg viewBox="0 0 24 24" class="nav-icon me-1">
+                                                 <path fill="white" d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3
+                                                 -3 1.34-3 3 1.34 3 3 3zM8 11 c1.66 0 3-1.34 3-3S9.66 5 8 5
+                                                 5 6.34 5 8s1.34 3 3 3zm0 2 c-2.33 0-7 1.17-7 3.5V19h14v-2.5
+                                                 c0-2.33-4.67-3.5-7-3.5zm8 0 c-.29 0-.62.02-.97.05
+                                                 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5 c0-2.33-4.67-3.5-7-3.5z"/>
+                                                 </svg>
+                                                 <p class="mb-0 w-100" style="cursor: pointer;" onclick="jumpToCampaign(${data.id});">${data.name}</p>
+                                            </div>`;
+                }
+            });
+        });
+
+        function jumpToDonation(id) {
+            goToDonate();
+            setTimeout(() => {
+                const item = document.getElementById('D-' + id);
+                item.scrollIntoView();
+                item.style.transition = "0.4s ease-in-out";
+                item.style.scale = "1.075";
+                setTimeout(() => {
+                    item.style.scale = "1.00";
+                }, 400);
+            }, 250);
+        }
+        function jumpToCampaign(id) {
+            goToCampaign();
+            setTimeout(() => {
+                const item = document.getElementById('C-' + id);
+                item.scrollIntoView();
+                item.style.transition = "0.4s ease-in-out";
+                item.style.scale = "1.075";
+                setTimeout(() => {
+                    item.style.scale = "1.00";
+                }, 400);
+            }, 250);
+        }
+    </script>
+</div>

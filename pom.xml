@@ -5,14 +5,14 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.0</version>
+        <version>4.0.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>mau.donate</groupId>
     <artifactId>MauDonate</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>MoDonate</name>
-    <description>MoDonate</description>
+    <name>MauDonate</name>
+    <description>MauDonate</description>
     <url/>
     <licenses>
         <license/>

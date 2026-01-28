@@ -1,7 +1,9 @@
 package mau.donate.controller;
 
 
+import jakarta.servlet.http.HttpServletRequest;
 import mau.donate.objects.Email_Verification;
+import mau.donate.objects.Notification;
 import mau.donate.objects.User;
 import mau.donate.service.EmailService;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -43,7 +45,7 @@ public class AuthController {
         return "accounts/signup";
     }
     @PostMapping("/accounts/signup")
-    public String register(User user, Principal loggedUser) {
+    public String register(HttpServletRequest request, User user, Principal loggedUser) {
         if (!user.isPasswordValid()) return "redirect:/accounts/signup?badpassword";
         if (User.getByEmail(user.Email) != null) return "redirect:/accounts/signup?bademail";
         if (user.getAge() < 18) return "redirect:/accounts/signup?badage";
@@ -52,7 +54,7 @@ public class AuthController {
         user.Write();
         String token = UUID.randomUUID().toString();
         new Email_Verification(user, token, "REGISTRATION");
-        emailService.sendVerificationEmail(user.Email, token);
+        emailService.sendVerificationEmail(request, user.Email, token);
         return "redirect:/accounts/login?verify";
     }
     @GetMapping("/accounts/email/verify")
@@ -66,6 +68,7 @@ public class AuthController {
             vToken.getUser().setVerified(true);
             vToken.getUser().UpdateOnly("Verified", "Enabled");
             vToken.Delete();
+            new Notification(vToken.getUser().getID(), "Your account has been verified!", "Your account has been verified successfully! You can now log in.");
             model.addAttribute("success", "Your account has been verified! You can now log in.");
             model.addAttribute("loginparam", "verified");
             return "accounts/verification";
@@ -96,7 +99,7 @@ public class AuthController {
         return "accounts/resetpassword";
     }
     @PostMapping("/accounts/resetpassword")
-    public String resetPassword(RedirectAttributes model, @ModelAttribute User user, @RequestParam String type) {
+    public String resetPassword(HttpServletRequest request, RedirectAttributes model, @ModelAttribute User user, @RequestParam String type) {
         if (type.equals("email")) {
             User u = User.getByEmail(user.Email);
             if (u == null) {
@@ -105,7 +108,7 @@ public class AuthController {
             }
             String token = UUID.randomUUID().toString();
             new Email_Verification(u, token, "PASSWORDRESET");
-            emailService.sendResetPasswordEmail(u.Email, token);
+            emailService.sendResetPasswordEmail(request, u.Email, token);
 
             model.addFlashAttribute("success", "An email has been sent to your email address with further instructions.");
         } else if (type.equals("phone")) {
@@ -114,7 +117,6 @@ public class AuthController {
                 model.addFlashAttribute("error", "No account with this phone number exists.");
                 return "redirect:/accounts/resetpassword";
             }
-
 
             model.addFlashAttribute("success", "An SMS has been sent to your phone number with further instructions.");
         }
@@ -149,6 +151,7 @@ public class AuthController {
                 return "redirect:/accounts/newpassword?token=" + token;
             }
             vToken.getUser().UpdateOnly("Password");
+            new Notification(vToken.getUser().getID(), "Your password has been reset!", "Your password has been reset successfully.");
             vToken.Delete();
             return "redirect:/accounts/login?newpassword";
         }

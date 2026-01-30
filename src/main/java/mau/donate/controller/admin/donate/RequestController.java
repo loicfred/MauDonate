@@ -72,11 +72,11 @@ public class RequestController {
         req.Approved = true;
         req.UpdateOnly("Approved", "UpdatedAt");
 
-        User sender = req.getUser();
-        emailService.acceptRequest(sender.getEmail(), sender.getFirstName() + " " + sender.getLastName(), message);
-        new Notification(sender.getID(), "Request Approved", "Congratulations, your donation request has been approved !");
+        User requester = req.getUser();
+        emailService.acceptRequest(requester.getEmail(), requester.getFirstName() + " " + requester.getLastName(), message);
+        new Notification(requester.getID(), "Request Approved", "Congratulations, your donation request has been approved !");
 
-        redirectAttributes.addFlashAttribute("successReq", "Successfully accepted the request from " + sender.getFirstName() + ".");
+        redirectAttributes.addFlashAttribute("successReq", "Successfully accepted the request from " + requester.getFirstName() + ".");
         return "redirect:/admin?page=1";
     }
     @PostMapping("/admin/request/validate/{id}/deny")
@@ -89,11 +89,11 @@ public class RequestController {
         Donation_Request req = Donation_Request.getById(Donation_Request.class, id).orElseThrow();
         req.Delete();
 
-        User sender = req.getUser();
-        emailService.denyRequest(sender.getEmail(), sender.getFirstName() + " " + sender.getLastName(), message);
-        new Notification(sender.getID(), "Denied Request", "Unfortunately your donation request has been denied. More details sent by email.");
+        User requester = req.getUser();
+        emailService.denyRequest(requester.getEmail(), requester.getFirstName() + " " + requester.getLastName(), message);
+        new Notification(requester.getID(), "Denied Request", "Unfortunately your donation request has been denied. More details sent by email.");
 
-        redirectAttributes.addFlashAttribute("successReq", "Successfully denied the request from " + sender.getFirstName() + ".");
+        redirectAttributes.addFlashAttribute("successReq", "Successfully denied the request from " + requester.getFirstName() + ".");
         return "redirect:/admin?page=1";
     }
 }

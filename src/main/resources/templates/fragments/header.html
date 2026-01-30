@@ -232,13 +232,7 @@
         function jumpToCampaign(id) {
             goToCampaign();
             setTimeout(() => {
-                const item = document.getElementById('C-' + id);
-                item.scrollIntoView();
-                item.style.transition = "0.4s ease-in-out";
-                item.style.scale = "1.075";
-                setTimeout(() => {
-                    item.style.scale = "1.00";
-                }, 400);
+                goToID('C-' + id);
             }, 250);
         }
     </script>

@@ -66,11 +66,11 @@
                 <div class="row justify-content-center">
                     <div class="col-md-8 col-lg-6 text-center text-white">
 
-                        <img src="/img/logo_transparent.png" height="250" class="mb-4" draggable="false" alt="BeatCam Logo">
+                        <img src="/img/logo_transparent.png" height="250" class="mt-4 mb-4" draggable="false" alt="BeatCam Logo">
 
-                        <p class="lead mb-4">
+                        <h4 class="lead mb-4" style="text-shadow: 0 0 10px #000000">
                             Your kindness. In any way.
-                        </p>
+                        </h4>
 
                         <a class="btn btn-lg btn-success px-5 mb-3" href="/fundraise" id="fundraiseNow">
                             Donate Now
@@ -109,7 +109,7 @@
         <section class="page">
             <div class="carousel-wrap" id="carouselWrap">
                 <div class="carousel" id="carousel" >
-                    <div th:each="campaign : ${campaigns}" class="slide d-flex flex-column" >
+                    <div th:each="campaign : ${campaigns}" th:id="${'C-' + campaign.ID}" class="slide d-flex flex-column" >
                         <div draggable="false" th:style="${'background: url(''/api/v1/img/campaign/' + campaign.ID + '''); background-size: cover; background-repeat: no-repeat; background-position: center; height: 50vh; top: 0; width: 100%;'}"></div>
                         <div class="campaign-color-bg" style="display: flex; flex-direction: column; bottom: 0; height: 25vh; width: 100%; padding: 10px;">
                             <p class="mb-0" style="font-size: 12px;" th:text="${campaign.Message.length() > 240 ? campaign.Message.substring(0, 240) + '...' : campaign.Message}"></p>
@@ -239,6 +239,15 @@
     slides.forEach((s,i)=>{ const d=document.createElement('div'); d.className='dot' + (i===0?' active':''); d.dataset.i=i; d.addEventListener('click', ()=> goTo(i)); dots.appendChild(d); });
     function updateCarousel(){ carousel.style.transform = `translateX(-${current*100}%)`; Array.from(dots.children).forEach((d,i)=>d.classList.toggle('active', i===current)); }
     function goTo(i){ current = (i+slides.length)%slides.length; updateCarousel(); }
+    function goToID(id) {
+        for (let i = 0; i < slides.length; i++) {
+            if (slides[i].id === id) {
+                current = i;
+                updateCarousel();
+                break;
+            }
+        }
+    }
     let startX=0, isDown=false;
     carouselWrap.addEventListener('pointerdown', e=>{ isDown=true; startX=e.clientX; carouselWrap.setPointerCapture(e.pointerId); });
     carouselWrap.addEventListener('pointermove', e=>{

@@ -73,7 +73,7 @@
                 <tbody>
                 <tr th:each="item, stat : *{items}">
                     <td><input type="text" class="form-control" placeholder="Item name" th:field="*{items[__${stat.index}__].ItemName}" /></td>
-                    <td><input type="number" class="form-control" min="1" placeholder="Qty" th:field="*{items[__${stat.index}__].Quantity}" /></td>
+                    <td><input type="number" class="form-control" min="1" placeholder="1" th:field="*{items[__${stat.index}__].Quantity}" /></td>
                     <td class="text-center"><button type="button" class="btn btn-outline-danger btn-sm" onclick="removeItem(this)">Remove</button></td>
                 </tr>
                 </tbody>

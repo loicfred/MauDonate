@@ -13,6 +13,16 @@ public class EmailService {
         this.mailSender = mailSender;
     }
 
+    public void sendEmail(String to, String subject, String message) {
+        SimpleMailMessage email = new SimpleMailMessage();
+        email.setTo(to);
+        email.setSubject(subject);
+        email.setText(message);
+        mailSender.send(email);
+        System.out.println("Email sent to " + to + " with subject: " + subject + "\n" + message);
+    }
+
+
     public void sendVerificationEmail(HttpServletRequest req, String to, String token) {
         String subject = "Verify your MauDonate account";
         String verificationUrl = req.getRequestURL().toString().replaceFirst(req.getRequestURI(), "") + "/accounts/email/verify?token=" + token;

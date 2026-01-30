@@ -28,6 +28,41 @@ public class Warehouse extends DatabaseObject.ID_OBJ<Long, Warehouse> {
         Write();
     }
 
+    public String getName() {
+        return Name;
+    }
+    public void setName(String name) {
+        Name = name;
+    }
+
+    public String getRegion() {
+        return Region;
+    }
+    public void setRegion(String region) {
+        Region = region;
+    }
+
+    public String getAddress() {
+        return Address;
+    }
+    public void setAddress(String address) {
+        Address = address;
+    }
+
+    public long getMaxCapacity() {
+        return MaxCapacity;
+    }
+    public void setMaxCapacity(long maxCapacity) {
+        MaxCapacity = maxCapacity;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return CreatedAt;
+    }
+    public void setCreatedAt(LocalDateTime createdAt) {
+        CreatedAt = createdAt;
+    }
+
     public List<Donation_Item> getItems() {
         return items == null ? items = DatabaseObject.getAllWhere(Donation_Item.class, "WarehouseID = ? AND NOT Status = ? ORDER BY Quantity * CapacityPerQty DESC", ID, StorageStatus.DELIVERED.name()) : items;
     }

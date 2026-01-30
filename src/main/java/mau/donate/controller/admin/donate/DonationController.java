@@ -44,7 +44,6 @@ public class DonationController {
         if (loggedUser == null) return "redirect:/accounts/login";
         User U = User.getByEmail(loggedUser.getName());
         addEssential(model, loggedUser, U);
-
         Donation_Request req = Donation_Request.getById(Donation_Request.class, reqId).orElseThrow();
         List<Donation_Item> items = donation.getItems();
 
@@ -85,12 +84,12 @@ public class DonationController {
         donation.Approved = true;
         donation.UpdateOnly("Approved", "UpdatedAt");
 
-        User sender = donation.getDonor();
-        emailService.acceptDonation(sender.getEmail(), sender.getFirstName() + " " + sender.getLastName(), message);
-        new Notification(sender.getID(), "Donation Approved", "Congratulations, your donation has been approved !");
+        User donor = donation.getDonor();
+        emailService.acceptDonation(donor.getEmail(), donor.getFirstName() + " " + donor.getLastName(), message);
+        new Notification(donor.getID(), "Donation Approved", "Congratulations, your donation has been approved !");
 
-        redirectAttributes.addFlashAttribute("successReq", "Successfully accepted the donation from " + sender.getFirstName() + ".");
-        return "redirect:/admin?page=1";
+        redirectAttributes.addFlashAttribute("successDon", "Successfully accepted the donation from " + donor.getFirstName() + ".");
+        return "redirect:/admin?page=0";
     }
     @PostMapping("/admin/donation/validate/{id}/deny")
     public String denyDonation(Model model, Principal loggedUser, @PathVariable Long id, @RequestParam String message, RedirectAttributes redirectAttributes) {
@@ -102,11 +101,11 @@ public class DonationController {
         Donation donation = Donation.getById(Donation.class, id).orElseThrow();
         donation.Delete();
 
-        User sender = donation.getDonor();
-        emailService.denyDonation(sender.getEmail(), sender.getFirstName() + " " + sender.getLastName(), message);
-        new Notification(sender.getID(), "Donation Denied", "Unfortunately your donation has been denied. More details sent by email.");
+        User donor = donation.getDonor();
+        emailService.denyDonation(donor.getEmail(), donor.getFirstName() + " " + donor.getLastName(), message);
+        new Notification(donor.getID(), "Donation Denied", "Unfortunately your donation has been denied. More details sent by email.");
 
-        redirectAttributes.addFlashAttribute("successReq", "Successfully denied the donation from " + sender.getFirstName() + ".");
+        redirectAttributes.addFlashAttribute("successDon", "Successfully denied the donation from " + donor.getFirstName() + ".");
         return "redirect:/admin?page=0";
     }
 }

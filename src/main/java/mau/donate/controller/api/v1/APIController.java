@@ -4,6 +4,7 @@ import mau.donate.objects.Association;
 import mau.donate.objects.Campaign;
 import mau.donate.objects.Donation_Request;
 import mau.donate.objects.User;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -11,12 +12,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1")
 public class APIController {
+
+    private final CacheManager cacheManager;
+    public APIController(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
+    }
 
     @GetMapping("/img/avatar/{id}")
     @Cacheable(value = "IMG", key = "'PFP' + #id")
@@ -59,9 +66,15 @@ public class APIController {
         HttpHeaders headers = new HttpHeaders();
         headers.setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS).cachePublic());
 
-        List<SearchItem> reqs = Donation_Request.getAll(Donation_Request.class).stream().map(SearchItem::new).collect(Collectors.toList());
+        List<SearchItem> reqs = Donation_Request.getAllWhere(Donation_Request.class, "Approved").stream().map(SearchItem::new).collect(Collectors.toList());
         reqs.addAll(Campaign.getAll(Campaign.class).stream().map(SearchItem::new).toList());
         return new ResponseEntity<>(reqs, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/clearcache")
+    public ResponseEntity<String> clearcache() {
+        cacheManager.getCacheNames().forEach(cache -> Objects.requireNonNull(cacheManager.getCache(cache)).clear());
+        return new ResponseEntity<>("All caches cleared !", HttpStatus.OK);
     }
 
     public static class SearchItem {

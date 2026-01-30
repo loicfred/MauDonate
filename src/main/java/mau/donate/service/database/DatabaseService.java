@@ -182,7 +182,7 @@ public class DatabaseService {
         return stats;
     }
 
-    public void refreshID(DatabaseObject<?> dbobject) {
+    public void refreshID(DatabaseObject<?> dbobject, boolean anyList) {
         Cache cache = cacheManager.getCache("DBObject");
         if (cache == null) return;
         com.github.benmanes.caffeine.cache.Cache<Object, Object> nativeCache = (com.github.benmanes.caffeine.cache.Cache<Object, Object>) cache.getNativeCache();
@@ -191,7 +191,7 @@ public class DatabaseService {
                 cache.evict(key);
             } else if (value instanceof List<?> V2) {
                 if (!V2.isEmpty() && V2.getFirst() instanceof DatabaseObject<?> V3 && V3.getClass() == dbobject.getClass()) {
-                    if (V2.stream().anyMatch( dbo -> ((DatabaseObject<?>)dbo).hashedIdentifiers().equals(dbobject.hashedIdentifiers()))) {
+                    if (anyList || V2.stream().anyMatch( dbo -> ((DatabaseObject<?>)dbo).hashedIdentifiers().equals(dbobject.hashedIdentifiers()))) {
                         cache.evict(key);
                     }
                 }

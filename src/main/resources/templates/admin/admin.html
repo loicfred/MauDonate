@@ -16,6 +16,9 @@
     <link rel="stylesheet" href="/css/main.css">
 
     <style>
+        main {
+            background-color: #000000CC;
+        }
         .settings-header {
             text-align: center;
             margin-bottom: 1.5rem;
@@ -59,6 +62,7 @@
         <!-- PAGE 1 -->
         <section class="page">
             <p style="justify-content: center; align-items: center; text-align: center; padding: 25px;" th:if="${pending_dons.isEmpty()}">No donations currently.</p>
+            <div th:if="${successDon}" class="alert alert-success" th:text="${successDon}"></div>
             <div th:each="don : ${pending_dons}" class="request-card card mb-3">
                 <div class="card-body">
                     <div class="mb-1">
@@ -128,6 +132,7 @@
         <!-- PAGE 4 -->
         <section class="page">
             <h2 class="settings-header">Database Accessor</h2>
+            <div th:if="${successDb}" class="alert alert-success" th:text="${successDb}"></div>
             <form id="databaseForm">
                 <div class="mb-3 d-flex align-items-center">
                     <label for="tableSelect" class="form-label mb-0 w-25 me-1">Table</label>
@@ -182,7 +187,7 @@
                     <p class="mb-0" th:text="${'Total Items Donated: ' + tstats.get('TotalItemsDonated')}"></p>
                     <p class="mb-0" th:text="${'Total Donation Requests: ' + tstats.get('TotalRequests')}"></p>
                 </div>
-                <div class="mb-3" >
+                <div class="mb-3">
                     <div class="mb-1 d-flex align-items-center">
                         <h5 class="form-label mb-0 me-3 w-50">Monthly statistics:</h5>
                         <select id="monthlySelect" onchange="addStats()" class="form-select w-50"></select>
@@ -193,9 +198,15 @@
                     <p class="mb-0" ID="MonthlyFundraiseUSD"></p>
                 </div>
 
+                <div class="mb-3">
+                    <button type="button" class="btn btn-success" id="clearcache">Clear all caches</button>
+                    <button type="button" class="btn btn-success" id="sendemail" onclick="showSendEmailPopup()">Email</button>
+                </div>
+
                 <script>
                     const submitDb = document.getElementById('submitDb');
                     const insertDb = document.getElementById('insertDb');
+                    const clearcache = document.getElementById('clearcache');
                     const tableSelect = document.getElementById('tableSelect');
 
                     const id = document.getElementById('ID');
@@ -234,9 +245,18 @@
                         e.preventDefault();
                         window.location.href = '/admin/edit/' + tableSelect.value + '/' + (id.value ? id.value : ids.value);
                     });
-                    insertDb.addEventListener("click", () => {
+                    insertDb.addEventListener("click", (e) => {
+                        e.preventDefault();
                         window.location.href = '/admin/edit/' + tableSelect.value;
                     })
+                    clearcache.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        fetch('/api/v1/clearcache')
+                            .then(res => res.text())
+                            .then(data => {
+                                alert(data);
+                            });
+                    });
 
                     id.addEventListener("input", () => {
                         ids.disabled = !!id.value;
@@ -277,6 +297,8 @@
                             });
                     }
                     addStats(now.getFullYear(), now.getMonth())
+                </script>
+                <script>
                 </script>
             </form>
         </section>
@@ -321,6 +343,33 @@
             </div>
         </div>
     </form>
+    <form class="modal fade" id="emailValidationModal" tabindex="-1" method="post" th:action="${'/admin/email/send'}">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emailValidationTitle">Send email to User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-2">
+                        <label for="emailAddress" class="form-label">Email Address</label>
+                        <input type="email" id="emailAddress" name="email" placeholder="customer@gmail.com" class="form-control">
+                    </div>
+                    <div class="mb-2">
+                        <label for="emailSubject" class="form-label">Subject</label>
+                        <input type="text" id="emailSubject" name="subject" placeholder="Details Clarification" class="form-control">
+                    </div>
+                    <div class="mb-2">
+                        <label for="emailMessage" class="form-label">Message</label>
+                        <textarea id="emailMessage" name="message" rows="12" placeholder="Hello dear {name}, please update your account details. Yours sincerely." class="form-control"></textarea>
+                    </div>
+                    <div class="d-flex">
+                        <button class="ms-auto btn btn-success" type="submit">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 
     <script>
         const donTitle = document.getElementById("donValidationTitle")
@@ -347,6 +396,12 @@
                 reqTitle.innerText = "Deny donation request";
                 document.getElementById("reqValidationModal").action = "/admin/request/validate/" + button.getAttribute("req-id") + "/deny";
             }
+            modal.show();
+        }
+    </script>
+    <script>
+        function showSendEmailPopup() {
+            const modal = new bootstrap.Modal(document.getElementById("emailValidationModal"));
             modal.show();
         }
     </script>

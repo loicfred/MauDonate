@@ -62,6 +62,8 @@ public abstract class DatabaseObject<T> {
             return jdbcTemplate.update(sql, result.values());
         } catch (Exception e) {
             throw new RuntimeException("Failed to write object", e);
+        } finally {
+            dbService.refreshID(this, true);
         }
     }
     public Optional<T> WriteThenReturn() {
@@ -70,14 +72,22 @@ public abstract class DatabaseObject<T> {
             String sql = "INSERT INTO " + tableName + " (" + result.columns() + ") VALUES (" + result.placeholders() + ") RETURNING *";
             return jdbcTemplate.query(sql, (rs, rowNum) -> mapResultSetToObject(rs, entityClass), result.values()).stream().findFirst();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to write object", e);
+            throw new RuntimeException("Failed to insert object", e);
+        } finally {
+            dbService.refreshID(this, true);
         }
     }
 
     public int Upsert() {
-        Result result = getResult(true);
-        String sql = "INSERT INTO " + tableName + " (" + result.columns() + ") VALUES (" + result.placeholders() + ") ON DUPLICATE KEY UPDATE " + result.updateClause();
-        return jdbcTemplate.update(sql, result.values());
+        try {
+            Result result = getResult(true);
+            String sql = "INSERT INTO " + tableName + " (" + result.columns() + ") VALUES (" + result.placeholders() + ") ON DUPLICATE KEY UPDATE " + result.updateClause();
+            return jdbcTemplate.update(sql, result.values());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to upsert object", e);
+        } finally {
+            dbService.refreshID(this, true);
+        }
     }
     public Optional<T> UpsertThenReturn() {
         try {
@@ -85,9 +95,9 @@ public abstract class DatabaseObject<T> {
             String sql = "INSERT INTO " + tableName + " (" + result.columns() + ") VALUES (" + result.placeholders() + ") ON DUPLICATE KEY UPDATE " + result.updateClause() + " RETURNING *";
             return jdbcTemplate.query(sql, (rs, rowNum) -> mapResultSetToObject(rs, entityClass), result.values()).stream().findFirst();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to write object", e);
+            throw new RuntimeException("Failed to upsert object", e);
         } finally {
-            dbService.refreshID(this);
+            dbService.refreshID(this, true);
         }
     }
 
@@ -115,7 +125,7 @@ public abstract class DatabaseObject<T> {
             e.printStackTrace();
             throw new RuntimeException("No ID field found in " + tableName + ".");
         } finally {
-            dbService.refreshID(this);
+            dbService.refreshID(this, false);
         }
     }
     public int UpdateOnly(String... columns) {
@@ -141,9 +151,10 @@ public abstract class DatabaseObject<T> {
         } catch (Exception e) {
             throw new RuntimeException("No ID field found in " + tableName + ".");
         } finally {
-            dbService.refreshID(this);
+            dbService.refreshID(this, false);
         }
     }
+
     public int Delete() {
         try {
             List<Object> values = new ArrayList<>();
@@ -155,8 +166,79 @@ public abstract class DatabaseObject<T> {
         } catch (Exception e) {
             throw new RuntimeException("No ID field found in " + tableName + ".");
         } finally {
-            dbService.refreshID(this);
+            dbService.refreshID(this, false);
         }
+    }
+
+    public int IncrementColumn(String column, int amount) {
+        try {
+            String setClause = column + " = " + column + " + ?";
+            List<Object> setValues = List.of(amount);
+
+            String whereClause = IDFields().stream().map(ID -> ID + " = ?").collect(Collectors.joining(" AND "));
+            List<Object> whereValues = new ArrayList<>();
+            for (String ID : IDFields()) whereValues.add(cachedFields.stream().filter(f -> f.getName().equalsIgnoreCase(ID)).findFirst().orElseThrow().get(this));
+
+            List<Object> finalValues = new ArrayList<>();
+            finalValues.addAll(setValues);
+            finalValues.addAll(whereValues);
+
+            String sql = "UPDATE " + tableName + " SET " + setClause + " WHERE " + whereClause;
+            SQLCleaner C = new SQLCleaner(sql, finalValues);
+            return jdbcTemplate.update(C.newSQL, C.newParams);
+        } catch (Exception e) {
+            throw new RuntimeException("No ID field found in " + tableName + ".");
+        } finally {
+            dbService.refreshID(this, false);
+        }
+    }
+    public int IncrementColumns(Map<String, Object> parameters) {
+        try {
+            String setClause = parameters.entrySet().stream().map(f -> f.getKey() + " = " + f.getKey() + " + ?").collect(Collectors.joining(", "));
+            List<Object> setValues = parameters.entrySet().stream().map(f -> f.getValue()).collect(Collectors.toList());
+
+            String whereClause = IDFields().stream().map(ID -> ID + " = ?").collect(Collectors.joining(" AND "));
+            List<Object> whereValues = new ArrayList<>();
+            for (String ID : IDFields()) whereValues.add(cachedFields.stream().filter(f -> f.getName().equalsIgnoreCase(ID)).findFirst().orElseThrow().get(this));
+
+            List<Object> finalValues = new ArrayList<>();
+            finalValues.addAll(setValues);
+            finalValues.addAll(whereValues);
+
+            String sql = "UPDATE " + tableName + " SET " + setClause + " WHERE " + whereClause;
+            SQLCleaner C = new SQLCleaner(sql, finalValues);
+            return jdbcTemplate.update(C.newSQL, C.newParams);
+        } catch (Exception e) {
+            throw new RuntimeException("No ID field found in " + tableName + ".");
+        } finally {
+            dbService.refreshID(this, false);
+        }
+    }
+
+    private record Result(String columns, String placeholders, Object[] values, String updateClause) {}
+
+    private Result getResult(boolean update) {
+        List<Field> nonNullFields = cachedFields.stream().filter(f -> {
+            try {
+                return f.get(this) != null;
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }).toList();
+
+        String columns = nonNullFields.stream().map(Field::getName).collect(Collectors.joining(", "));
+        String placeholders = nonNullFields.stream().map(p -> "?").collect(Collectors.joining(", "));
+
+        List<Object> values = nonNullFields.stream().map(f -> {
+            try { return f.get(this); }
+            catch (IllegalAccessException e) { throw new RuntimeException(e); }
+        }).toList();
+
+        if (!update) new Result(columns, placeholders, values.toArray(), null);
+        String updateClause = cachedFields.stream()
+                .map(f -> f.getName() + " = VALUES(" + f.getName() + ")")
+                .collect(Collectors.joining(", "));
+        return new Result(columns, placeholders, values.toArray(), updateClause);
     }
     public static <T> int Count(Class<T> clazz) {
         return jdbcTemplate.queryForObject("SELECT COUNT(*) FROM " + getTableName(clazz), Integer.class);
@@ -180,76 +262,6 @@ public abstract class DatabaseObject<T> {
         } catch (Exception ignored) {
             return null;
         }
-    }
-
-    public int IncrementColumn(String column, int amount) {
-        try {
-            String setClause = column + " = " + column + " + ?";
-            List<Object> setValues = List.of(amount);
-
-            String whereClause = IDFields().stream().map(ID -> ID + " = ?").collect(Collectors.joining(" AND "));
-            List<Object> whereValues = new ArrayList<>();
-            for (String ID : IDFields()) whereValues.add(cachedFields.stream().filter(f -> f.getName().equalsIgnoreCase(ID)).findFirst().orElseThrow().get(this));
-
-            List<Object> finalValues = new ArrayList<>();
-            finalValues.addAll(setValues);
-            finalValues.addAll(whereValues);
-
-            String sql = "UPDATE " + tableName + " SET " + setClause + " WHERE " + whereClause;
-            SQLCleaner C = new SQLCleaner(sql, finalValues);
-            return jdbcTemplate.update(C.newSQL, C.newParams);
-        } catch (Exception e) {
-            throw new RuntimeException("No ID field found in " + tableName + ".");
-        } finally {
-            dbService.refreshID(this);
-        }
-    }
-    public int IncrementColumns(Map<String, Object> parameters) {
-        try {
-            String setClause = parameters.entrySet().stream().map(f -> f.getKey() + " = " + f.getKey() + " + ?").collect(Collectors.joining(", "));
-            List<Object> setValues = parameters.entrySet().stream().map(f -> f.getValue()).collect(Collectors.toList());
-
-            String whereClause = IDFields().stream().map(ID -> ID + " = ?").collect(Collectors.joining(" AND "));
-            List<Object> whereValues = new ArrayList<>();
-            for (String ID : IDFields()) whereValues.add(cachedFields.stream().filter(f -> f.getName().equalsIgnoreCase(ID)).findFirst().orElseThrow().get(this));
-
-            List<Object> finalValues = new ArrayList<>();
-            finalValues.addAll(setValues);
-            finalValues.addAll(whereValues);
-
-            String sql = "UPDATE " + tableName + " SET " + setClause + " WHERE " + whereClause;
-            SQLCleaner C = new SQLCleaner(sql, finalValues);
-            return jdbcTemplate.update(C.newSQL, C.newParams);
-        } catch (Exception e) {
-            throw new RuntimeException("No ID field found in " + tableName + ".");
-        } finally {
-            dbService.refreshID(this);
-        }
-    }
-
-    private record Result(String columns, String placeholders, Object[] values, String updateClause) {}
-    private Result getResult(boolean update) {
-        List<Field> nonNullFields = cachedFields.stream().filter(f -> {
-            try {
-                return f.get(this) != null;
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }).toList();
-
-        String columns = nonNullFields.stream().map(Field::getName).collect(Collectors.joining(", "));
-        String placeholders = nonNullFields.stream().map(p -> "?").collect(Collectors.joining(", "));
-
-        List<Object> values = nonNullFields.stream().map(f -> {
-            try { return f.get(this); }
-            catch (IllegalAccessException e) { throw new RuntimeException(e); }
-        }).toList();
-
-        if (!update) new Result(columns, placeholders, values.toArray(), null);
-        String updateClause = cachedFields.stream()
-                .map(f -> f.getName() + " = VALUES(" + f.getName() + ")")
-                .collect(Collectors.joining(", "));
-        return new Result(columns, placeholders, values.toArray(), updateClause);
     }
 
     public static <T> Optional<T> getById(Class<T> clazz, Object id) {
@@ -476,7 +488,7 @@ public abstract class DatabaseObject<T> {
         public IDTYPE getID() {
             return ID;
         }
-        private void setID(IDTYPE ID) {
+        public void setID(IDTYPE ID) {
             this.ID = ID;
         }
 

@@ -100,13 +100,10 @@ class D_Donation {
   {static} getStoredDonations()
 }
 
-class Upvote {
-  Long ID
+class Donation_Upvote {
   Long UserID
-  Long DonationID
-  + getUpvoter()
-  + getDonation()
-  {static} ofDonation(long)
+  Long RequestID
+  {static} getById(long, long)
 }
 
 class Campaign {
@@ -167,6 +164,7 @@ class Trip {
 
   {static} getByStaff(long)
   {static} getByDonation(long)
+  {static} getById(long)
 }
 
 class Staff {
@@ -183,6 +181,8 @@ class Staff {
   String Phone
   LocalDateTime HiredAt
   LocalDateTime UpdatedAt
+
+  {static} getById(long)
 }
 
 class Vehicle {
@@ -211,7 +211,17 @@ class Donation_Request {
   LocalDateTime UpdatedAt
 
   + getUser()
+  + hasUserUpvoted(long)
   {static} getById(long)
+}
+
+class D_Donation_Request {
+  Long Upvotes
+  String Address
+  String Email
+  String Phone
+  String FirstName
+  String LastName
 }
 
 class Fundraising {
@@ -235,6 +245,7 @@ class Notification {
   boolean isRead
 
   {static} ofUser(long, int)
+  {static} getById(long)
 }
 
 class Email_Verification {
@@ -247,6 +258,7 @@ class Email_Verification {
   + getUser()
   {static} getByToken(String)
   {static} ClearUnregisterUsers()
+  {static} getById(long)
 }
 
 ' =========================
@@ -254,6 +266,7 @@ class Email_Verification {
 ' =========================
 Donation_Request --> Bank
 Donation_Item --> StorageStatus
+Donation_Request "1" -- "*" Donation_Upvote
 Donation --> DonationStatus
 
 User "1" -- "*" Donation : donor
@@ -262,14 +275,14 @@ User "1" -- "*" Fundraising
 User "1" -- "*" Donation_Request
 User "1" -- "*" Email_Verification
 User "1" -- "*" Notification
-User "1" -- "*" Upvote
+User "1" -- "*" Donation_Upvote
 
 Association "1" -- "*" Campaign
 
 Donation "1" -- "*" Donation_Item
-Donation "1" -- "*" Upvote
 Donation "1" -- "0..1" Trip
 Donation <|-- D_Donation
+Donation_Request <|-- D_Donation_Request
 
 Warehouse "1" o-- "*" Donation_Item
 Warehouse <|-- D_Warehouse

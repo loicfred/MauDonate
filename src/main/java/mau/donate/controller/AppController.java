@@ -2,15 +2,16 @@ package mau.donate.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import mau.donate.objects.*;
-import mau.donate.objects.derived.D_Warehouse;
+import mau.donate.objects.derived.D_Donation_Request;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import static mau.donate.config.AppConfig.dbService;
 
 @CrossOrigin(origins = "*")
 @Controller
@@ -21,7 +22,7 @@ public class AppController {
         User U = User.getByAuthentication(loggedUser);
         if (loggedUser != null && U == null) return "redirect:/logout";
         addEssential(model, loggedUser, U);
-        model.addAttribute("requests", Donation_Request.getAllWhere(Donation_Request.class, "Approved AND NOT Completed"));
+        model.addAttribute("requests", D_Donation_Request.getAllWhere(D_Donation_Request.class, "Approved AND NOT Completed ORDER BY Upvotes DESC"));
         model.addAttribute("campaigns", Campaign.getAll(Campaign.class));
         return "index";
     }
@@ -78,6 +79,35 @@ public class AppController {
         return "error";
     }
 
+
+    @GetMapping("/read-notifications")
+    @ResponseBody
+    public boolean read_notifications(Principal loggedUser) {
+        if (loggedUser == null) return false;
+        User U = User.getByAuthentication(loggedUser);
+        for (Notification n : Notification.ofUser(U.getID(), 100)) {
+            if (!n.isRead()) {
+                n.setRead(true);
+                n.UpdateOnly("isRead");
+            }
+        }
+        return true;
+    }
+
+    @GetMapping("/upvote/{requestId}/{onoff}")
+    @ResponseBody
+    public boolean upvote_request(Principal loggedUser, @PathVariable long requestId, @PathVariable long onoff) {
+        if (loggedUser == null) return false;
+        User U = User.getByAuthentication(loggedUser);
+        Donation_Upvote upvote = Donation_Upvote.getById(U.getID(), requestId);
+        if (onoff == 0 && upvote != null) {
+            upvote.Delete();
+        } else if (onoff == 1 && upvote == null) {
+            new Donation_Upvote(U.getID(), requestId);
+        }
+        dbService.refreshListOfClass(Donation_Upvote.class);
+        return true;
+    }
 
 
 

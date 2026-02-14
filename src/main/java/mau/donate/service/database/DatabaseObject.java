@@ -125,7 +125,7 @@ public abstract class DatabaseObject<T> {
             e.printStackTrace();
             throw new RuntimeException("No ID field found in " + tableName + ".");
         } finally {
-            dbService.refreshID(this, false);
+            dbService.refreshID(this, true);
         }
     }
     public int UpdateOnly(String... columns) {
@@ -151,7 +151,7 @@ public abstract class DatabaseObject<T> {
         } catch (Exception e) {
             throw new RuntimeException("No ID field found in " + tableName + ".");
         } finally {
-            dbService.refreshID(this, false);
+            dbService.refreshID(this, true);
         }
     }
 
@@ -166,7 +166,7 @@ public abstract class DatabaseObject<T> {
         } catch (Exception e) {
             throw new RuntimeException("No ID field found in " + tableName + ".");
         } finally {
-            dbService.refreshID(this, false);
+            dbService.refreshID(this, true);
         }
     }
 
@@ -189,7 +189,7 @@ public abstract class DatabaseObject<T> {
         } catch (Exception e) {
             throw new RuntimeException("No ID field found in " + tableName + ".");
         } finally {
-            dbService.refreshID(this, false);
+            dbService.refreshID(this, true);
         }
     }
     public int IncrementColumns(Map<String, Object> parameters) {
@@ -211,7 +211,7 @@ public abstract class DatabaseObject<T> {
         } catch (Exception e) {
             throw new RuntimeException("No ID field found in " + tableName + ".");
         } finally {
-            dbService.refreshID(this, false);
+            dbService.refreshID(this, true);
         }
     }
 

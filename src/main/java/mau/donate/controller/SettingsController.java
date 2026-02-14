@@ -93,16 +93,16 @@ public class SettingsController {
         }
     }
 
-    @PostMapping("/delete-account")
-    public String deleteAccount(HttpServletRequest request, Principal loggedUser, RedirectAttributes redirectAttributes) {
-        if (loggedUser == null) return "redirect:/accounts/login";
-        User U = User.getByAuthentication(loggedUser);
-
-        String token = UUID.randomUUID().toString();
-        new Email_Verification(U, token, "DELETE ACCOUNT");
-        emailService.sendDeleteConfirmationEmail(request, U.Email, token);
-
-        redirectAttributes.addFlashAttribute("success", "Account deletion verification email sent.");
-        return "redirect:/settings";
-    }
+//    @PostMapping("/delete-account")
+//    public String deleteAccount(HttpServletRequest request, Principal loggedUser, RedirectAttributes redirectAttributes) {
+//        if (loggedUser == null) return "redirect:/accounts/login";
+//        User U = User.getByAuthentication(loggedUser);
+//
+//        String token = UUID.randomUUID().toString();
+//        new Email_Verification(U, token, "DELETE ACCOUNT");
+//        emailService.sendDeleteConfirmationEmail(request, U.Email, token);
+//
+//        redirectAttributes.addFlashAttribute("success", "Account deletion verification email sent.");
+//        return "redirect:/settings";
+//    }
 }

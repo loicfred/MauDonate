@@ -182,18 +182,31 @@ public class DatabaseService {
         return stats;
     }
 
-    public void refreshID(DatabaseObject<?> dbobject, boolean anyList) {
+    public void refreshID(DatabaseObject<?> dbobject, boolean allListOfSameClass) {
         Cache cache = cacheManager.getCache("DBObject");
         if (cache == null) return;
         com.github.benmanes.caffeine.cache.Cache<Object, Object> nativeCache = (com.github.benmanes.caffeine.cache.Cache<Object, Object>) cache.getNativeCache();
-        nativeCache.asMap().forEach((key, value) -> {
-            if (value instanceof DatabaseObject<?> V && V.getClass() == dbobject.getClass() && V.hashedIdentifiers().equals(dbobject.hashedIdentifiers())) {
+        nativeCache.asMap().forEach((key, cacheItem) -> {
+            if (cacheItem instanceof DatabaseObject<?> V && V.getClass() == dbobject.getClass() && V.hashedIdentifiers().equals(dbobject.hashedIdentifiers())) {
                 cache.evict(key);
-            } else if (value instanceof List<?> V2) {
-                if (!V2.isEmpty() && V2.getFirst() instanceof DatabaseObject<?> V3 && V3.getClass() == dbobject.getClass()) {
-                    if (anyList || V2.stream().anyMatch( dbo -> ((DatabaseObject<?>)dbo).hashedIdentifiers().equals(dbobject.hashedIdentifiers()))) {
+            } else if (cacheItem instanceof List<?> V2) { // If the item cached is a list
+                if (!V2.isEmpty() && V2.getFirst() instanceof DatabaseObject<?> V3 && V3.getClass() == dbobject.getClass()) { // Check if the datatype of the cache list is the same as the current item
+                    if (allListOfSameClass || V2.stream().anyMatch( dbo -> ((DatabaseObject<?>)dbo).hashedIdentifiers().equals(dbobject.hashedIdentifiers()))) {
                         cache.evict(key);
                     }
+                }
+            }
+        });
+    }
+
+    public void refreshListOfClass(Class<?> dbobject) {
+        Cache cache = cacheManager.getCache("DBObject");
+        if (cache == null) return;
+        com.github.benmanes.caffeine.cache.Cache<Object, Object> nativeCache = (com.github.benmanes.caffeine.cache.Cache<Object, Object>) cache.getNativeCache();
+        nativeCache.asMap().forEach((key, cacheItem) -> {
+            if (cacheItem instanceof List<?> V2) { // If the item cached is a list
+                if (!V2.isEmpty() && V2.getFirst() instanceof DatabaseObject<?> V3 && V3.getClass() == dbobject) { // Check if the datatype of the cache list is the same as the current item
+                    cache.evict(key);
                 }
             }
         });

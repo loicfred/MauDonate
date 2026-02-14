@@ -73,7 +73,7 @@ public class RequestController {
         req.UpdateOnly("Approved", "UpdatedAt");
 
         User requester = req.getUser();
-        emailService.acceptRequest(requester.getEmail(), requester.getFirstName() + " " + requester.getLastName(), message);
+        //emailService.acceptRequest(requester.getEmail(), requester.getFirstName() + " " + requester.getLastName(), message);
         new Notification(requester.getID(), "Request Approved", "Congratulations, your donation request has been approved !");
 
         redirectAttributes.addFlashAttribute("successReq", "Successfully accepted the request from " + requester.getFirstName() + ".");

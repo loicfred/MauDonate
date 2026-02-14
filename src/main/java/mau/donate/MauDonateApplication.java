@@ -1,5 +1,6 @@
 package mau.donate;
 
+import mau.donate.objects.Donation_Request;
 import mau.donate.objects.Vehicle;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -74,4 +74,8 @@ public class Donation_Request extends DatabaseObject.ID_OBJ<Long, Donation_Reque
     public static Donation_Request getById(long id) {
         return DatabaseObject.getById(Donation_Request.class, id).orElse(null);
     }
+
+    public boolean hasUserUpvoted(long userID) {
+        return Count(Donation_Upvote.class, "UserID = ? AND RequestID = ?", userID, ID) > 0;
+    }
 }

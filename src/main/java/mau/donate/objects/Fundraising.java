@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 import static my.utilities.util.Utilities.StopString;
 
-public class Fundraising extends DatabaseObject.ID_OBJ<Long, Fundraising> {
+public class Fundraising extends DatabaseObject.ID_OBJ<String, Fundraising> {
     public long DonorID;
     public double USD;
     public String Title;
@@ -17,7 +17,7 @@ public class Fundraising extends DatabaseObject.ID_OBJ<Long, Fundraising> {
     public LocalDateTime CreatedAt;
     
     public Fundraising() {}
-    public Fundraising(long id, long donorID, double usd, String title, String message) {
+    public Fundraising(String id, long donorID, double usd, String title, String message) {
         ID = id;
         DonorID = donorID;
         USD = usd;
@@ -27,7 +27,7 @@ public class Fundraising extends DatabaseObject.ID_OBJ<Long, Fundraising> {
         Write();
     }
 
-    public static Fundraising getById(long id) {
+    public static Fundraising getById(String id) {
         return DatabaseObject.getById(Fundraising.class, id).orElse(null);
     }
 

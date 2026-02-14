@@ -61,7 +61,7 @@ public class PayPalController {
     public Map<String, Object> captureOrder(Principal loggedUser, @PathVariable String orderId, @RequestBody Map<String, Object> payload) throws IOException {
         if (loggedUser == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User must be authenticated");
         User U = User.getByEmail(loggedUser.getName());
-        Fundraising fundraising = new Fundraising(Long.parseLong(orderId), U.getID(), 0, payload.get("title").toString(), payload.get("comment").toString());
+        Fundraising fundraising = new Fundraising(orderId, U.getID(), 0, payload.get("title").toString(), payload.get("comment").toString());
         try {
             Order order = payPalClient.execute(new OrdersCaptureRequest(orderId).requestBody(new OrderRequest())).result();
             String amountUsd = order.purchaseUnits().getFirst().payments().captures().getFirst().amount().value();

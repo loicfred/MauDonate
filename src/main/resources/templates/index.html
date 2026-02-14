@@ -50,6 +50,13 @@
         .campaign-color-bg-2 {
             background: linear-gradient(to bottom left, #1e6980, #163480);
         }
+
+        .upvote:hover {
+            scale: 1.05;
+        }
+        .upvote-outline {
+            border: 1px solid var(--text-color);
+        }
     </style>
 </head>
 
@@ -93,8 +100,15 @@
                     </div>
                     <h6 class="mb-1" th:text="${req.Title}"></h6>
                     <p class="mb-2" style="border-left: 1px gray solid; padding-left: 8px;" th:text="${req.Message}"></p>
-                    <div class="d-flex align-items-center">
-                        <small th:text="${'Created at ' + req.CreatedAt}"></small>
+                    <div class="d-flex align-items-center position-relative">
+                        <div th:class="'upvote position-absolute ' + ${req.hasUserUpvoted(user.ID) ? 'upvote-outline' : ''}"
+                             style="cursor: pointer; bottom: -30px; left: -5px; min-width: 48px; padding: 4px 8px; background-color: var(--secondary-color-lighter); color: var(--text-color); border-radius: 15px; font-size: 14px;"
+                             th:onclick="'upvoteRequest(' + ${req.ID} + ', this)'">❤️<span style="padding-left: 2px;" th:text="${req.Upvotes}"></span>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <small th:text="${req.Address}"></small>
+                            <small th:text="${'Created at ' + req.CreatedAt}"></small>
+                        </div>
                         <button class="ms-auto btn btn-primary" onclick="showDonatePopup(this)"
                                 th:data-id="${req.ID}"
                                 th:data-banks="${req.BankName}"
@@ -103,6 +117,21 @@
                     </div>
                 </div>
             </div>
+            <script>
+                function upvoteRequest(id, element) {
+                    const countSpan = element.querySelector('span');
+                    const currentCount = parseInt(countSpan.textContent);
+                    if (element.classList.contains('upvote-outline')) {
+                        countSpan.textContent = (currentCount - 1);
+                        element.classList.remove('upvote-outline');
+                        fetch('/upvote/' + id + '/0');
+                    } else {
+                        countSpan.textContent = (currentCount + 1);
+                        element.classList.add('upvote-outline');
+                        fetch('/upvote/' + id + '/1');
+                    }
+                }
+            </script>
         </section>
 
         <!-- PAGE 3 -->

@@ -56,11 +56,15 @@ let currentIndex = 0;
     // 🔹 TOUCH EVENTS
     pgCarousel.addEventListener("touchstart", e => {
         const t = e.touches[0];
+        if (e.target.closest("button")) return;
+        if (e.target.closest(".slide")) return;
         start(t.clientX, t.clientY);
     }, { passive: true });
 
     pgCarousel.addEventListener("touchmove", e => {
         const t = e.touches[0];
+        if (e.target.closest("button")) return;
+        if (e.target.closest(".slide")) return;
         move(t.clientX, t.clientY, () => e.preventDefault());
     }, { passive: false });
 

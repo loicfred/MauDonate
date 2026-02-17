@@ -22,7 +22,6 @@
             background-color: var(--primary-color-lighter);
         }
 
-
         .carousel-wrap {
             position:relative;overflow:hidden;border-radius:10px;
             background:linear-gradient(180deg,#07172a,#041226);height:75vh;
@@ -143,9 +142,10 @@
             <div class="carousel-wrap" id="carouselWrap">
                 <div class="carousel" id="carousel" >
                     <div th:each="campaign : ${campaigns}" th:id="${'C-' + campaign.ID}" class="slide d-flex flex-column" >
-                        <div draggable="false" th:style="${'background: url(''/api/v1/img/campaign/' + campaign.ID + '''); background-size: cover; background-repeat: no-repeat; background-position: center; height: 50vh; top: 0; width: 100%;'}"></div>
+                        <div draggable="false" th:style="${'background: url(''/api/v1/img/campaign/' + campaign.ID + '''); color-scheme: light; background-size: cover; background-repeat: no-repeat; background-position: center; height: 50vh; top: 0; width: 100%;'}"></div>
                         <div class="campaign-color-bg" style="display: flex; flex-direction: column; bottom: 0; height: 25vh; width: 100%; padding: 10px;">
-                            <p class="mb-0" style="font-size: 12px;" th:text="${campaign.Message.length() > 240 ? campaign.Message.substring(0, 240) + '...' : campaign.Message}"></p>
+                            <h5 th:text="${campaign.Title}"></h5>
+                            <p class="mb-0" style="font-size: 12px;" th:text="${campaign.Message.length() > 210 ? campaign.Message.substring(0, 210) + '...' : campaign.Message}"></p>
                             <div class="d-flex align-items-center">
                                 <h5 class="mb-0 me-auto" style="font-size: 14px;" th:text="${#temporals.format(campaign.StartAt, 'dd MMM yyyy HH:mm').replace(':','h')}"></h5>
                                 <a class="mb-0 ms-auto" th:href="${campaign.Hyperlink}">Learn More</a>

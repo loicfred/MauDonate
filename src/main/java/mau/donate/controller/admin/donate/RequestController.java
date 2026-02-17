@@ -3,6 +3,7 @@ package mau.donate.controller.admin.donate;
 import mau.donate.objects.Donation_Request;
 import mau.donate.objects.Notification;
 import mau.donate.objects.User;
+import mau.donate.objects.derived.D_Donation_Request;
 import mau.donate.objects.enums.DonationStatus;
 import mau.donate.service.EmailService;
 import org.springframework.stereotype.Controller;
@@ -71,9 +72,10 @@ public class RequestController {
         req.UpdatedAt = LocalDateTime.now();
         req.Approved = true;
         req.UpdateOnly("Approved", "UpdatedAt");
+        dbService.refreshListOfClass(D_Donation_Request.class);
 
         User requester = req.getUser();
-        //emailService.acceptRequest(requester.getEmail(), requester.getFirstName() + " " + requester.getLastName(), message);
+        emailService.acceptRequest(requester.getEmail(), requester.getFirstName() + " " + requester.getLastName(), message);
         new Notification(requester.getID(), "Request Approved", "Congratulations, your donation request has been approved !");
 
         redirectAttributes.addFlashAttribute("successReq", "Successfully accepted the request from " + requester.getFirstName() + ".");

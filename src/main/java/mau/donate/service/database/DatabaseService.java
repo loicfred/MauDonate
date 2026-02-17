@@ -18,6 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static mau.donate.service.database.DatabaseObject.*;
+import static my.utilities.util.Utilities.isClassRelated;
 
 @Service
 public class DatabaseService {
@@ -190,7 +191,7 @@ public class DatabaseService {
             if (cacheItem instanceof DatabaseObject<?> V && V.getClass() == dbobject.getClass() && V.hashedIdentifiers().equals(dbobject.hashedIdentifiers())) {
                 cache.evict(key);
             } else if (cacheItem instanceof List<?> V2) { // If the item cached is a list
-                if (!V2.isEmpty() && V2.getFirst() instanceof DatabaseObject<?> V3 && V3.getClass() == dbobject.getClass()) { // Check if the datatype of the cache list is the same as the current item
+                if (!V2.isEmpty() && V2.getFirst() instanceof DatabaseObject<?> V3 && isClassRelated(V3, dbobject.getClass())) { // Check if the datatype of the cache list is the same as the current item
                     if (allListOfSameClass || V2.stream().anyMatch( dbo -> ((DatabaseObject<?>)dbo).hashedIdentifiers().equals(dbobject.hashedIdentifiers()))) {
                         cache.evict(key);
                     }
@@ -205,10 +206,15 @@ public class DatabaseService {
         com.github.benmanes.caffeine.cache.Cache<Object, Object> nativeCache = (com.github.benmanes.caffeine.cache.Cache<Object, Object>) cache.getNativeCache();
         nativeCache.asMap().forEach((key, cacheItem) -> {
             if (cacheItem instanceof List<?> V2) { // If the item cached is a list
-                if (!V2.isEmpty() && V2.getFirst() instanceof DatabaseObject<?> V3 && V3.getClass() == dbobject) { // Check if the datatype of the cache list is the same as the current item
+                if (!V2.isEmpty() && V2.getFirst() instanceof DatabaseObject<?> V3 && isClassRelated(V3, dbobject)) { // Check if the datatype of the cache list is the same as the current item
                     cache.evict(key);
                 }
             }
         });
+    }
+
+    public void clearCache(String cacheName) {
+        Cache cache = cacheManager.getCache(cacheName);
+        if (cache != null) cache.clear();
     }
 }

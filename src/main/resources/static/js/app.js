@@ -19,7 +19,7 @@ document.addEventListener('keydown', e => {
 /* App Ready Log */
 console.log("app.js loaded successfully");
 
-if (false) (() => {
+(() => {
     'use strict';
 
     // PWA requires secure context (localhost is OK)

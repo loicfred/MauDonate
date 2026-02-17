@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 import static my.utilities.util.Utilities.StopString;
 
 public class Campaign extends DatabaseObject.ID_OBJ<Long, Campaign> {
-    private transient Association A;
 
     public long AssociationID;
     public String Title;

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static mau.donate.config.AppConfig.dbService;
 import static mau.donate.controller.AppController.addEssential;
 
 @CrossOrigin(origins = "*")
@@ -109,6 +110,9 @@ public class DBEditorController {
                 id = entity.getID();
             } else {
                 entity.Update();
+            }
+            if (form.getFields().stream().anyMatch(f -> f.getType().equals(byte[].class.getSimpleName()))) {
+                dbService.clearCache("IMG");
             }
             redirectAttributes.addFlashAttribute("success", "Entry updated successfully.");
             return "redirect:/admin/edit/" + objectName + (id != null ? "/" + id : "");

@@ -76,6 +76,6 @@ public class Donation_Request extends DatabaseObject.ID_OBJ<Long, Donation_Reque
     }
 
     public boolean hasUserUpvoted(long userID) {
-        return Count(Donation_Upvote.class, "UserID = ? AND RequestID = ?", userID, ID) > 0;
+        return getWhere(Donation_Upvote.class, "UserID = ? AND RequestID = ?", userID, ID).orElse(null) != null;
     }
 }

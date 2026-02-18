@@ -105,7 +105,7 @@ public class AppController {
         } else if (onoff == 1 && upvote == null) {
             new Donation_Upvote(U.getID(), requestId);
         }
-        dbService.refreshListOfClass(Donation_Upvote.class);
+        dbService.refreshListOfClass(D_Donation_Request.class);
         return true;
     }
 

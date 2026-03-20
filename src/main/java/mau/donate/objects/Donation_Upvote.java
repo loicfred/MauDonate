@@ -1,12 +1,17 @@
 package mau.donate.objects;
 
-import mau.donate.service.database.DatabaseObject;
+import jakarta.persistence.*;
+import my.loic.utilities.db.spring.DatabaseObject;
 
-import java.util.List;
+import static my.loic.utilities.db.spring.DatabaseService.dbService;
 
+@Entity
+@Table
+@IdClass(Donation_Upvote.class)
 public class Donation_Upvote extends DatabaseObject<Donation_Upvote> {
-
+    @Id
     public long UserID;
+    @Id
     public long RequestID;
 
     public Donation_Upvote() {}
@@ -14,10 +19,6 @@ public class Donation_Upvote extends DatabaseObject<Donation_Upvote> {
         this.UserID = userID;
         this.RequestID = requestID;
         Write();
-    }
-
-    public static Donation_Upvote getById(long userId, long requestID) {
-        return DatabaseObject.getWhere(Donation_Upvote.class, "UserID = ? AND RequestID = ?", userId, requestID).orElse(null);
     }
 
     public long getUserID() {
@@ -34,8 +35,4 @@ public class Donation_Upvote extends DatabaseObject<Donation_Upvote> {
         RequestID = requestID;
     }
 
-    @Override
-    protected List<String> IDFields() {
-        return List.of("UserID", "RequestID");
-    }
 }

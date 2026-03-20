@@ -118,7 +118,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, RememberMeServices rememberMeServices) {
         String[] publicPaths = {
-                "/", "/home", "/accounts/**", "/api/**", "/error",
+                "/", "/home", "/accounts/**", "/api/v1/**", "/error",
                 "/service-worker.js", "/manifest.json", "/offline",
                 "/css/**", "/js/**", "/img/**"
         };

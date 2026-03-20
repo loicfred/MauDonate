@@ -14,7 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.security.Principal;
 import java.time.LocalDateTime;
 
-import static mau.donate.config.AppConfig.dbService;
+import static my.loic.utilities.db.spring.DatabaseService.dbService;
 import static mau.donate.controller.AppController.addEssential;
 
 @CrossOrigin(origins = "*")
@@ -68,11 +68,10 @@ public class RequestController {
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
 
-        Donation_Request req = Donation_Request.getById(Donation_Request.class, id).orElseThrow();
+        Donation_Request req = dbService.getById(Donation_Request.class, id).orElseThrow();
         req.UpdatedAt = LocalDateTime.now();
         req.Approved = true;
         req.UpdateOnly("Approved", "UpdatedAt");
-        dbService.refreshListOfClass(D_Donation_Request.class);
 
         User requester = req.getUser();
         emailService.acceptRequest(requester.getEmail(), requester.getFirstName() + " " + requester.getLastName(), message);
@@ -88,7 +87,7 @@ public class RequestController {
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
 
-        Donation_Request req = Donation_Request.getById(Donation_Request.class, id).orElseThrow();
+        Donation_Request req = dbService.getById(Donation_Request.class, id).orElseThrow();
         req.Delete();
 
         User requester = req.getUser();

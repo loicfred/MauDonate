@@ -1,11 +1,17 @@
 package mau.donate.objects;
 
-import mau.donate.service.database.DatabaseObject;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import my.loic.utilities.db.spring.DatabaseObject;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
+import static my.loic.utilities.db.spring.DatabaseService.dbService;
+
 public class Email_Verification extends DatabaseObject.ID_OBJ<Long, Email_Verification> {
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "ID", name = "UserID")
     private transient User U;
 
     public long UserID;
@@ -23,19 +29,16 @@ public class Email_Verification extends DatabaseObject.ID_OBJ<Long, Email_Verifi
         Write();
     }
 
-    public static Email_Verification getById(long id) {
-        return DatabaseObject.getById(Email_Verification.class, id).orElse(null);
-    }
     public static Email_Verification getByToken(String token) {
-        return DatabaseObject.getWhere(Email_Verification.class, "Token = ?", token).orElse(null);
+        return dbService.getWhere(Email_Verification.class, "Token = ?", token).orElse(null);
     }
 
     public User getUser() {
-        return U == null ? U = User.getById(UserID) : U;
+        return U == null ? U = dbService.getById(User.class, UserID).orElse(null) : U;
     }
 
     public static void ClearUnregisterUsers() {
-        for (Email_Verification vToken : DatabaseObject.getAllWhere(Email_Verification.class, "Type = ? AND ExpiryDate < ?","REGISTRATION", Instant.now().toEpochMilli())) {
+        for (Email_Verification vToken : dbService.getAllWhere(Email_Verification.class, "Type = ? AND ExpiryDate < ?","REGISTRATION", Instant.now().toEpochMilli())) {
             vToken.getUser().Delete();
         }
     }

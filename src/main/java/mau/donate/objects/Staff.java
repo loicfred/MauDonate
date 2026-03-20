@@ -1,12 +1,16 @@
 package mau.donate.objects;
 
-import mau.donate.service.database.DatabaseObject;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import my.loic.utilities.db.spring.DatabaseObject;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Entity
+@Table
 public class Staff extends DatabaseObject.ID_OBJ<Long, User> {
 
     public String FirstName;

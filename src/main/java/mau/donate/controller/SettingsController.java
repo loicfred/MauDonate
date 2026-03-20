@@ -20,7 +20,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static mau.donate.controller.AppController.addEssential;
-import static my.utilities.util.Utilities.Range;
+import static my.loic.utilities.util.Utilities.Range;
 
 @CrossOrigin(origins = "*")
 @Controller

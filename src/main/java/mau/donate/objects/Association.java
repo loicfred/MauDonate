@@ -1,10 +1,18 @@
 package mau.donate.objects;
 
-import mau.donate.service.database.DatabaseObject;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import my.loic.utilities.db.spring.DatabaseObject;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 
+import static my.loic.utilities.db.spring.DatabaseService.dbService;
+
+@Entity
+@Table
 public class Association extends DatabaseObject.ID_OBJ<Long, Association> {
 
     public String Name;
@@ -24,7 +32,4 @@ public class Association extends DatabaseObject.ID_OBJ<Long, Association> {
         Write();
     }
 
-    public static Association getById(long id) {
-        return DatabaseObject.getById(Association.class, id).orElse(null);
-    }
 }

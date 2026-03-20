@@ -12,6 +12,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.security.Principal;
 
 import static mau.donate.controller.AppController.addEssential;
+import static my.loic.utilities.db.spring.DatabaseService.dbService;
 
 @CrossOrigin(origins = "*")
 @Controller
@@ -27,7 +28,7 @@ public class WarehouseController {
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
 
-        model.addAttribute("warehouse", D_Warehouse.getById(D_Warehouse.class, id).orElse(null));
+        model.addAttribute("warehouse", dbService.getById(D_Warehouse.class, id).orElse(null));
         return "admin/warehouse";
     }
 

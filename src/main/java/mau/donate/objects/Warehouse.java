@@ -1,13 +1,20 @@
 package mau.donate.objects;
 
+import jakarta.persistence.*;
 import mau.donate.objects.enums.StorageStatus;
-import mau.donate.service.database.DatabaseObject;
+import my.loic.utilities.db.spring.DatabaseObject;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static my.loic.utilities.db.spring.DatabaseService.dbService;
+
+@Entity
+@Table
 public class Warehouse extends DatabaseObject.ID_OBJ<Long, Warehouse> {
+    @OneToMany
+    @JoinColumn(referencedColumnName = "ID", name = "WarehouseID")
     public transient List<Donation_Item> items = null;
 
     public String Name;
@@ -64,13 +71,10 @@ public class Warehouse extends DatabaseObject.ID_OBJ<Long, Warehouse> {
     }
 
     public List<Donation_Item> getItems() {
-        return items == null ? items = DatabaseObject.getAllWhere(Donation_Item.class, "WarehouseID = ? AND NOT Status = ? ORDER BY Quantity * CapacityPerQty DESC", ID, StorageStatus.DELIVERED.name()) : items;
+        return items == null ? items = dbService.getAllWhere(Donation_Item.class, "WarehouseID = ? AND NOT Status = ? ORDER BY Quantity * CapacityPerQty DESC", ID, StorageStatus.DELIVERED.name()) : items;
     }
     private void setItems(List<Donation_Item> items) {
         this.items = items;
     }
 
-    public static Warehouse getById(long id) {
-        return DatabaseObject.getById(Warehouse.class, id).orElse(null);
-    }
 }

@@ -1,7 +1,7 @@
 package mau.donate.controller.admin;
 
 import mau.donate.objects.User;
-import mau.donate.service.database.DatabaseObject;
+import my.loic.utilities.db.spring.DatabaseObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,9 +15,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import static mau.donate.config.AppConfig.dbService;
+import static my.loic.utilities.db.spring.DatabaseService.dbService;
 import static mau.donate.controller.AppController.addEssential;
 
 @CrossOrigin(origins = "*")
@@ -40,7 +39,7 @@ public class DBEditorController {
             item = item.substring(0,1).toUpperCase() + item.substring(1);
             List<FieldMeta> fields = new ArrayList<>();
             Class<?> objClass = Class.forName(DBObjectPackage + item);
-            Object entity = id != null ? DatabaseObject.getById(objClass, id).orElseThrow() : null;
+            Object entity = id != null ? dbService.getById(objClass, id).orElseThrow() : null;
             for (Field field : objClass.getDeclaredFields()) {
                 field.setAccessible(true);
                 if (Modifier.isStatic(field.getModifiers())) continue;
@@ -81,7 +80,7 @@ public class DBEditorController {
             objectName = objectName.substring(0,1).toUpperCase() + objectName.substring(1);
             @SuppressWarnings("unchecked")
             Class<? extends DatabaseObject.ID_OBJ<?, ?>> objClass = (Class<? extends DatabaseObject.ID_OBJ<?, ?>>) Class.forName(DBObjectPackage + objectName).asSubclass(DatabaseObject.class);
-            DatabaseObject.ID_OBJ<?,?> entity = id != null ? DatabaseObject.getById(objClass, id).orElseThrow() : null;
+            DatabaseObject.ID_OBJ<?,?> entity = id != null ? dbService.getById(objClass, id).orElseThrow() : null;
             if (entity == null) {
                 Constructor<DatabaseObject.ID_OBJ<?,?>> ctor = (Constructor<DatabaseObject.ID_OBJ<?,?>>) objClass.getDeclaredConstructor();
                 ctor.setAccessible(true);

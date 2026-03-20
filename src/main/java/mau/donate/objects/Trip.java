@@ -1,15 +1,23 @@
 package mau.donate.objects;
 
-import mau.donate.service.database.DatabaseObject;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import my.loic.utilities.db.spring.DatabaseObject;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static my.loic.utilities.db.spring.DatabaseService.dbService;
+
+@Entity
+@Table
 public class Trip extends DatabaseObject.ID_OBJ<Long, Trip> {
 
-    public long StaffID;
-    public long DonationID;
+    public Long StaffID;
+    public Long DonationID;
     public String Address;
     public LocalDateTime ScheduleTime;
     public String StartLocation;
@@ -27,16 +35,12 @@ public class Trip extends DatabaseObject.ID_OBJ<Long, Trip> {
         Write();
     }
 
-    public static Trip getById(long id) {
-        return DatabaseObject.getById(Trip.class, id).orElse(null);
-    }
-
     public static List<Trip> getByStaff(long staffId) {
-        return DatabaseObject.getAllWhere(Trip.class, "StaffID = ?", staffId);
+        return dbService.getAllWhere(Trip.class, "StaffID = ?", staffId);
     }
 
     public static Trip getByDonation(long donationID) {
-        return DatabaseObject.getWhere(Trip.class, "DonationID = ?", donationID).orElse(null);
+        return dbService.getWhere(Trip.class, "DonationID = ?", donationID).orElse(null);
     }
 
 }

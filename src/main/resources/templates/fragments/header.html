@@ -247,4 +247,113 @@
             }, 250);
         }
     </script>
+
+
+    <!-- Chatbox Widget -->
+    <div class="chatbox-widget" id="chatboxWidget">
+        <div class="chatbox-toggle" id="chatboxToggle">
+            <svg viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor"
+                      d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+            </svg>
+        </div>
+        <div class="chatbox-container" id="chatboxContainer">
+            <div class="chatbox-header">
+                <h6 class="mb-0">Chat Support</h6>
+                <button class="chatbox-close" id="chatboxClose">&times;</button>
+            </div>
+            <div class="chatbox-body" id="chatboxBody">
+                <div class="chatbox-message chatbox-message-received">
+                    <p style="color: black">Hello! How can we help you today?</p>
+                </div>
+            </div>
+            <div class="chatbox-footer">
+                <input type="text" placeholder="Type a message..." id="chatboxInput">
+                <button id="chatboxSend">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const chatboxToggle = document.getElementById("chatboxToggle");
+        const chatboxContainer = document.getElementById("chatboxContainer");
+        const chatboxClose = document.getElementById("chatboxClose");
+        const chatboxSend = document.getElementById("chatboxSend");
+        const chatboxInput = document.getElementById("chatboxInput");
+        const chatboxBody = document.getElementById("chatboxBody");
+
+        let messages = [
+            {role: "bot", content: "Hello! How can we help you today?"}
+        ];
+
+        chatboxToggle.addEventListener("click", (e) => {
+            e.stopPropagation();
+            chatboxContainer.classList.toggle("active");
+        });
+
+        chatboxClose.addEventListener("click", (e) => {
+            e.stopPropagation();
+            chatboxContainer.classList.remove("active");
+        });
+
+        chatboxSend.addEventListener("click", async () => {
+            const message = chatboxInput.value.trim();
+            if (message) {
+                messages.push({role: "user", content: message});
+
+                const messageDiv = document.createElement("div");
+                messageDiv.className = "chatbox-message chatbox-message-sent";
+                messageDiv.innerHTML = `<p>${message}</p>`;
+                chatboxBody.appendChild(messageDiv);
+                chatboxInput.value = "";
+                chatboxBody.scrollTop = chatboxBody.scrollHeight;
+
+                try {
+                    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+                    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+                    const response = await fetch('/api/v1/ai/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            [csrfHeader]: csrfToken
+                        },
+                        body: JSON.stringify({messages: messages})
+                    });
+
+                    const data = await response.json();
+                    if (data.content) {
+                        messages.push({role: "bot", content: data.content});
+
+                        const botMessageDiv = document.createElement("div");
+                        botMessageDiv.className = "chatbox-message chatbox-message-received";
+                        botMessageDiv.innerHTML = `<p style="color: black">${data.content}</p>`;
+                        chatboxBody.appendChild(botMessageDiv);
+                        chatboxBody.scrollTop = chatboxBody.scrollHeight;
+                    }
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                }
+            }
+        });
+
+        chatboxInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                chatboxSend.click();
+            }
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!document.getElementById("chatboxWidget").contains(e.target)) {
+                chatboxContainer.classList.remove("active");
+            }
+        });
+    </script>
+
 </div>
+
+

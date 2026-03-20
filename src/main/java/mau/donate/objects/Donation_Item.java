@@ -1,13 +1,20 @@
 package mau.donate.objects;
 
+import jakarta.persistence.*;
 import mau.donate.objects.enums.StorageStatus;
-import mau.donate.service.database.DatabaseObject;
+import my.loic.utilities.db.spring.DatabaseObject;
 
 import java.text.DecimalFormat;
+import java.util.List;
 
-import static my.utilities.util.Utilities.StopString;
+import static my.loic.utilities.util.Utilities.StopString;
 
+@Entity @Table
 public class Donation_Item extends DatabaseObject.ID_OBJ<Long, Donation_Item> {
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "ID", name = "DonationID")
+    public transient Donation D = null;
+
     public long DonationID;
     public Long WarehouseID;
     public String ItemName;

@@ -5,6 +5,8 @@ import mau.donate.objects.enums.StorageStatus;
 
 import java.util.List;
 
+import static my.loic.utilities.db.spring.DatabaseService.dbService;
+
 public class D_Donation extends Donation {
 
     public String Sender_FName;
@@ -15,14 +17,14 @@ public class D_Donation extends Donation {
     public String Receiver_Address;
 
     public static List<D_Donation> getNotBroughtDonations() {
-        return doQueryAll(D_Donation.class, """
+        return dbService.doQueryAll(D_Donation.class, """
                 SELECT DISTINCT D.* FROM maudonate.d_donation D
                 JOIN maudonate.donation_item I ON I.DonationID = D.ID
                 WHERE I.Status = ?;""", StorageStatus.NOT_YET_BROUGHT.name());
     }
 
     public static List<D_Donation> getStoredDonations() {
-        return doQueryAll(D_Donation.class, """
+        return dbService.doQueryAll(D_Donation.class, """
                 SELECT DISTINCT D.* FROM maudonate.d_donation D
                 JOIN maudonate.donation_item I ON I.DonationID = D.ID
                 WHERE I.Status = ?;""", StorageStatus.IN_STORAGE.name());

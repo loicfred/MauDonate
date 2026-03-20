@@ -1,6 +1,8 @@
 package mau.donate.objects;
 
-import mau.donate.service.database.DatabaseObject;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import my.loic.utilities.db.spring.DatabaseObject;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.security.Principal;
@@ -9,9 +11,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 
-import static mau.donate.config.AppConfig.dbService;
-import static my.utilities.util.Utilities.CutString;
+import static my.loic.utilities.db.spring.DatabaseService.dbService;
+import static my.loic.utilities.util.Utilities.CutString;
 
+@Entity @Table
 public class User extends DatabaseObject.ID_OBJ<Long, User> {
 
     public String Email;
@@ -31,7 +34,9 @@ public class User extends DatabaseObject.ID_OBJ<Long, User> {
     public boolean Anonymous = false;
     public boolean Enabled = false;
     public boolean Verified = false;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     public LocalDateTime CreatedAt = LocalDateTime.now();
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     public LocalDateTime UpdatedAt = LocalDateTime.now();
 
     public User() {
@@ -53,27 +58,24 @@ public class User extends DatabaseObject.ID_OBJ<Long, User> {
     }
 
 
-    public static User getById(long id) {
-        return DatabaseObject.getById(User.class, id).orElse(null);
-    }
-
     public static User getByEmail(String email) {
-        return DatabaseObject.getWhere(User.class, "Email = ?", email).orElse(null);
+        return dbService.getWhere(User.class, "Email = ?", email).orElse(null);
     }
     public static User getByPhone(String phone) {
-        return DatabaseObject.getWhere(User.class, "Phone = ?", phone).orElse(null);
+        return dbService.getWhere(User.class, "Phone = ?", phone).orElse(null);
     }
 
     public static User getByAuthentication(Principal principal) {
         if (principal == null) return null;
-        return DatabaseObject.getWhere(User.class, "Email = ?", principal.getName()).orElse(null);
+        return dbService.getWhere(User.class, "Email = ?", principal.getName()).orElse(null);
     }
 
 
     public static void ClearFailedLogins(String email) {
-        User U = DatabaseObject.getWhere(User.class, "Email = ? OR (Enabled = ? AND Verified = ?)", email, false, false).orElse(null);
+        User U = dbService.getWhere(User.class, "Email = ? OR (Enabled = ? AND Verified = ?)", email, false, false).orElse(null);
         if (U != null) U.Delete();
     }
+
 
     public String getEmail() {
         return Email;

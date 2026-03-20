@@ -1,13 +1,23 @@
 package mau.donate.objects;
 
-import mau.donate.service.database.DatabaseObject;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import my.loic.utilities.db.spring.DatabaseObject;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 
-import static my.utilities.util.Utilities.StopString;
+import static my.loic.utilities.db.spring.DatabaseService.dbService;
+import static my.loic.utilities.util.Utilities.StopString;
 
+@Entity
+@Table
 public class Campaign extends DatabaseObject.ID_OBJ<Long, Campaign> {
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "ID", name = "AssociationID")
+    private transient Association A = null;
 
     public long AssociationID;
     public String Title;
@@ -32,7 +42,8 @@ public class Campaign extends DatabaseObject.ID_OBJ<Long, Campaign> {
         Write();
     }
 
-    public static Campaign getById(long id) {
-        return DatabaseObject.getById(Campaign.class, id).orElse(null);
+    public Association getAssociation() {
+        return A == null ? A = dbService.getById(Association.class, AssociationID).orElse(null) : A;
     }
+
 }

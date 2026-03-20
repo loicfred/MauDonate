@@ -1,18 +1,30 @@
 package mau.donate.objects;
 
+import jakarta.persistence.*;
 import mau.donate.objects.enums.StorageStatus;
-import mau.donate.service.database.DatabaseObject;
+import my.loic.utilities.db.spring.DatabaseObject;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static my.utilities.util.Utilities.StopString;
+import static my.loic.utilities.db.spring.DatabaseService.dbService;
+import static my.loic.utilities.util.Utilities.StopString;
 
+@Entity @Table
 public class Donation extends DatabaseObject.ID_OBJ<Long, Donation> {
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "ID", name = "DonorID")
     private transient User D = null;
+
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "ID", name = "ReceiverID")
     private transient User R = null;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(referencedColumnName = "ID", name = "DonationID")
     public transient List<Donation_Item> items = null;
+
 
     public long DonorID;
     public long ReceiverID;
@@ -80,18 +92,14 @@ public class Donation extends DatabaseObject.ID_OBJ<Long, Donation> {
     }
 
     public User getDonor() {
-        return D == null ? D = User.getById(DonorID) : D;
+        return D == null ? D = dbService.getById(User.class, DonorID).orElse(null) : D;
     }
     public User getReceiver() {
-        return R == null ? R = User.getById(ReceiverID) : R;
-    }
-
-    public static Donation getById(long id) {
-        return DatabaseObject.getById(Donation.class, id).orElse(null);
+        return R == null ? R = dbService.getById(User.class, ReceiverID).orElse(null) : R;
     }
 
     public List<Donation_Item> getItems() {
-        return items == null ? items = DatabaseObject.getAllWhere(Donation_Item.class, "DonationID = ?", ID) : items;
+        return items == null ? items = dbService.getAllWhere(Donation_Item.class, "DonationID = ?", ID) : items;
     }
     public void setItems(List<Donation_Item> items) {
         this.items = items;

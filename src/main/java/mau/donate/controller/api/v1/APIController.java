@@ -4,7 +4,6 @@ import mau.donate.objects.Association;
 import mau.donate.objects.Campaign;
 import mau.donate.objects.Donation_Request;
 import mau.donate.objects.User;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -12,25 +11,21 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static my.loic.utilities.db.spring.DatabaseService.dbService;
 
 @RestController
 @RequestMapping("/api/v1")
 public class APIController {
 
-    private final CacheManager cacheManager;
-    public APIController(CacheManager cacheManager) {
-        this.cacheManager = cacheManager;
-    }
-
     @GetMapping("/img/avatar/{id}")
     @Cacheable(value = "IMG", key = "'PFP' + #id")
     public ResponseEntity<byte[]> getProfilePic(@PathVariable Long id) {
-        User user = User.getById(id);
+        User user = dbService.getById(User.class, id).orElse(null);
         HttpHeaders headers = new HttpHeaders();
-        if (user.Image == null) {
+        if (user == null || user.Image == null) {
             headers.setLocation(URI.create("/img/default-pfp.png"));
             return new ResponseEntity<>(headers, HttpStatus.FOUND);
         } else {
@@ -43,7 +38,7 @@ public class APIController {
     @GetMapping("/img/association/{id}")
     @Cacheable(value = "IMG", key = "'ASO' + #id")
     public ResponseEntity<byte[]> getAssociationPic(@PathVariable Long id) {
-        Association association = Association.getById(id);
+        Association association = dbService.getById(Association.class, id).orElse(null);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_PNG);
         headers.setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS).cachePublic());
@@ -53,7 +48,7 @@ public class APIController {
     @GetMapping("/img/campaign/{id}")
     @Cacheable(value = "IMG", key = "'CAM' + #id")
     public ResponseEntity<byte[]> getCampaignPic(@PathVariable Long id) {
-        Campaign campaign = Campaign.getById(id);
+        Campaign campaign = dbService.getById(Campaign.class, id).orElse(null);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_PNG);
         headers.setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS).cachePublic());
@@ -66,14 +61,14 @@ public class APIController {
         HttpHeaders headers = new HttpHeaders();
         headers.setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS).cachePublic());
 
-        List<SearchItem> reqs = Donation_Request.getAllWhere(Donation_Request.class, "Approved").stream().map(SearchItem::new).collect(Collectors.toList());
-        reqs.addAll(Campaign.getAll(Campaign.class).stream().map(SearchItem::new).toList());
+        List<SearchItem> reqs = dbService.getAllWhere(Donation_Request.class, "Approved").stream().map(SearchItem::new).collect(Collectors.toList());
+        reqs.addAll(dbService.getAll(Campaign.class).stream().map(SearchItem::new).toList());
         return new ResponseEntity<>(reqs, headers, HttpStatus.OK);
     }
 
     @GetMapping("/clearcache")
     public ResponseEntity<String> clearcache() {
-        cacheManager.getCacheNames().forEach(cache -> Objects.requireNonNull(cacheManager.getCache(cache)).clear());
+        dbService.clearAllCaches();
         return new ResponseEntity<>("All caches cleared !", HttpStatus.OK);
     }
 

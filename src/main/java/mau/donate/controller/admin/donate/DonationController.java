@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static mau.donate.controller.AppController.addEssential;
+import static my.loic.utilities.db.spring.DatabaseService.dbService;
 
 @CrossOrigin(origins = "*")
 @Controller
@@ -31,7 +32,7 @@ public class DonationController {
         addEssential(model, loggedUser, U);
 
         // the request to which we are donating
-        Donation_Request req = Donation_Request.getById(Donation_Request.class, reqId).orElseThrow();
+        Donation_Request req = dbService.getById(Donation_Request.class, reqId).orElseThrow();
 
         Donation D = new Donation();
         D.items = new ArrayList<>();
@@ -44,7 +45,7 @@ public class DonationController {
         if (loggedUser == null) return "redirect:/accounts/login";
         User U = User.getByEmail(loggedUser.getName());
         addEssential(model, loggedUser, U);
-        Donation_Request req = Donation_Request.getById(Donation_Request.class, reqId).orElseThrow();
+        Donation_Request req = dbService.getById(Donation_Request.class, reqId).orElseThrow();
         List<Donation_Item> items = donation.getItems();
 
         donation.CreatedAt = LocalDateTime.now();
@@ -79,7 +80,7 @@ public class DonationController {
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
 
-        Donation donation = Donation.getById(Donation.class, id).orElseThrow();
+        Donation donation = dbService.getById(Donation.class, id).orElseThrow();
         donation.UpdatedAt = LocalDateTime.now();
         donation.Approved = true;
         donation.UpdateOnly("Approved", "UpdatedAt");
@@ -98,7 +99,7 @@ public class DonationController {
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
 
-        Donation donation = Donation.getById(Donation.class, id).orElseThrow();
+        Donation donation = dbService.getById(Donation.class, id).orElseThrow();
         donation.Delete();
 
         User donor = donation.getDonor();

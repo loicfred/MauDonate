@@ -1,14 +1,21 @@
 package mau.donate.objects;
 
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import mau.donate.objects.enums.PaymentStatus;
-import mau.donate.service.database.DatabaseObject;
+import my.loic.utilities.db.spring.DatabaseObject;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 
-import static my.utilities.util.Utilities.StopString;
+import static my.loic.utilities.db.spring.DatabaseService.dbService;
+import static my.loic.utilities.util.Utilities.StopString;
 
 public class Fundraising extends DatabaseObject.ID_OBJ<String, Fundraising> {
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "ID", name = "DonorID")
+    private transient User D = null;
+
     public long DonorID;
     public double USD;
     public String Title;
@@ -27,8 +34,8 @@ public class Fundraising extends DatabaseObject.ID_OBJ<String, Fundraising> {
         Write();
     }
 
-    public static Fundraising getById(String id) {
-        return DatabaseObject.getById(Fundraising.class, id).orElse(null);
+    public User getDonor() {
+        return D == null ? D = dbService.getById(User.class, DonorID).orElse(null) : D;
     }
 
 }

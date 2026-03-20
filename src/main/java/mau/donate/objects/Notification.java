@@ -1,12 +1,13 @@
 package mau.donate.objects;
 
-import mau.donate.service.database.DatabaseObject;
+import my.loic.utilities.db.spring.DatabaseObject;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static my.utilities.util.Utilities.StopString;
+import static my.loic.utilities.db.spring.DatabaseService.dbService;
+import static my.loic.utilities.util.Utilities.StopString;
 
 public class Notification extends DatabaseObject.ID_OBJ<Long, Notification> {
 
@@ -62,11 +63,7 @@ public class Notification extends DatabaseObject.ID_OBJ<Long, Notification> {
     }
 
 
-    public static Notification getById(long id) {
-        return DatabaseObject.getById(Notification.class, id).orElse(null);
-    }
-
     public static List<Notification> ofUser(long userID, int limit) {
-        return DatabaseObject.getAllWhere(Notification.class, "UserID = ? ORDER BY ID DESC LIMIT ?;", userID, limit);
+        return dbService.getAllWhere(Notification.class, "UserID = ? ORDER BY ID DESC LIMIT ?;", userID, limit);
     }
 }

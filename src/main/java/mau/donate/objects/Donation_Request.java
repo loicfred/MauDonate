@@ -1,11 +1,21 @@
 package mau.donate.objects;
 
-import mau.donate.service.database.DatabaseObject;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import my.loic.utilities.db.spring.DatabaseObject;
 
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 
+import static my.loic.utilities.db.spring.DatabaseService.dbService;
+
+@Entity
+@Table
 public class Donation_Request extends DatabaseObject.ID_OBJ<Long, Donation_Request> {
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "ID", name = "UserID")
     public transient User U;
 
     public long UserID;
@@ -64,18 +74,14 @@ public class Donation_Request extends DatabaseObject.ID_OBJ<Long, Donation_Reque
     }
 
     public User getUser() {
-        return U == null ? U = User.getById(UserID) : U;
+        return U == null ? U = dbService.getById(User.class, UserID).orElse(null) : U;
     }
 
     public String getGoalAmountString() {
         return new DecimalFormat("#,###.##").format(GoalAmount);
     }
 
-    public static Donation_Request getById(long id) {
-        return DatabaseObject.getById(Donation_Request.class, id).orElse(null);
-    }
-
     public boolean hasUserUpvoted(long userID) {
-        return getWhere(Donation_Upvote.class, "UserID = ? AND RequestID = ?", userID, ID).orElse(null) != null;
+        return dbService.getWhere(Donation_Upvote.class, "UserID = ? AND RequestID = ?", userID, ID).orElse(null) != null;
     }
 }

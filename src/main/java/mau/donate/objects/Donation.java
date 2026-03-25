@@ -25,6 +25,7 @@ public class Donation extends DatabaseObject.ID_OBJ<Long, Donation> {
     @JoinColumn(referencedColumnName = "ID", name = "DonationID")
     public transient List<Donation_Item> items = null;
 
+    @JoinTable
 
     public long DonorID;
     public long ReceiverID;

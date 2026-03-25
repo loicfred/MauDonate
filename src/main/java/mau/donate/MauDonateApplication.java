@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @EnableCaching
 @SpringBootApplication
-@ComponentScan({"mau.donate", "my.loic.utilities"})
+@ComponentScan({"mau.donate", "my.loic.utilities.*.spring"})
 public class MauDonateApplication {
 
     static void main(String[] args) {

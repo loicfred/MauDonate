@@ -111,7 +111,7 @@ public class DBEditorController {
                 entity.Update();
             }
             if (form.getFields().stream().anyMatch(f -> f.getType().equals(byte[].class.getSimpleName()))) {
-                dbService.clearCache("IMG");
+                dbService.resetCache("IMG");
             }
             redirectAttributes.addFlashAttribute("success", "Entry updated successfully.");
             return "redirect:/admin/edit/" + objectName + (id != null ? "/" + id : "");

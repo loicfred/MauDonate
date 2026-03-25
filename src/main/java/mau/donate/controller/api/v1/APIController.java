@@ -68,7 +68,7 @@ public class APIController {
 
     @GetMapping("/clearcache")
     public ResponseEntity<String> clearcache() {
-        dbService.clearAllCaches();
+        dbService.resetAllCaches();
         return new ResponseEntity<>("All caches cleared !", HttpStatus.OK);
     }
 

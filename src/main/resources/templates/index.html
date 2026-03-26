@@ -107,7 +107,7 @@
                     <h6 class="mb-1" th:text="${req.Title}"></h6>
                     <p class="mb-2" style="border-left: 1px gray solid; padding-left: 8px;" th:text="${req.Message}"></p>
                     <div class="d-flex align-items-center position-relative">
-                        <div th:class="'upvote position-absolute ' + ${user != null && req.hasUserUpvoted(user.ID) ? 'upvote-outline' : ''}"
+                        <div th:class="'upvote position-absolute ' + ${user != null && req.hasUserUpvoted(user.getID()) ? 'upvote-outline' : ''}"
                              style="cursor: pointer; bottom: -30px; left: -5px; min-width: 48px; padding: 4px 8px; background-color: var(--secondary-color-lighter); color: var(--text-color); border-radius: 15px; font-size: 14px;"
                              th:onclick="'upvoteRequest(' + ${req.ID} + ', this)'">❤️<span style="padding-left: 2px;" th:text="${req.Upvotes}"></span>
                         </div>

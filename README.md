@@ -32,9 +32,9 @@ Allows users to edit their information.
 <img width="750" alt="image" src="https://github.com/user-attachments/assets/0a84c539-5000-4281-bcdd-4447c20052b8" />
 
 # Admin Panel
-The admin panel consist of a 4 swippable tabs similar to home each, allowing the admins to approval requests and donations.
+The admin panel consist of a 4 swippable tabs similar to home each, allowing the admins to approval requests and donations.  
 They can also manage their warehouse storage capacity and edit any database item they want.  
-The database accessor generates edit forms of each page with the use of **Reflection**.
+The database accessor generates edit forms of each page with the use of **Reflection**.  
 The admin is also able to send emails to users while approving or denying.
 
 <img width="750" alt="image" src="https://github.com/user-attachments/assets/326a0637-ec71-4c4a-8f4d-e7a4a9c1c008" />

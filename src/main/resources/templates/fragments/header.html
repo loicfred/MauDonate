@@ -41,10 +41,10 @@
                     }
                 </script>
                 <hr>
-                <button th:if="${principal != null && user.Role.equals('ADMIN')}" class="mt-auto" onclick="goToAdminDonation()">Admin - Review Donations</button>
-                <button th:if="${principal != null && user.Role.equals('ADMIN')}" onclick="goToAdminRequest()">Admin - Review Requests</button>
-                <button th:if="${principal != null && user.Role.equals('ADMIN')}" onclick="goToAdminWarehouse()">Admin - Warehouse</button>
-                <button th:if="${principal != null && user.Role.equals('ADMIN')}" onclick="goToAdminDatabase()">Admin - Database</button>
+                <button th:if="${principal != null && user.getRole().equals('ADMIN')}" class="mt-auto" onclick="goToAdminDonation()">Admin - Review Donations</button>
+                <button th:if="${principal != null && user.getRole().equals('ADMIN')}" onclick="goToAdminRequest()">Admin - Review Requests</button>
+                <button th:if="${principal != null && user.getRole().equals('ADMIN')}" onclick="goToAdminWarehouse()">Admin - Warehouse</button>
+                <button th:if="${principal != null && user.getRole().equals('ADMIN')}" onclick="goToAdminDatabase()">Admin - Database</button>
                 <script>
                     function goToAdminDonation() {
                         if (url.includes("/admin?")) goToPage(0);

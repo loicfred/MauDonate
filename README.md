@@ -7,6 +7,7 @@ I used this project to expand my **Java Springboot** development skills at the s
 - Java Springboot (MVC front-end, controller, back-end...)
 - Authentication (Login, Signin, SSO, Password Reset, Email Verification...)
 - Progressive Web Application
+- Paypal Sandbox
 - MariaDB Database
 
 ## Home

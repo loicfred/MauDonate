@@ -4,7 +4,7 @@ It was made for my **Agile Project Management** module at university with the ob
 I used this project to expand my **Java Springboot** development skills at the same time.
 
 **Applied Skills:**
-- Java Springboot (MVC front-end, controller, back-end...)
+- Java Springboot (MVC front-end, controller, back-end, OAuth2...)
 - Authentication (Login, Signin, SSO, Password Reset, Email Verification...)
 - Progressive Web Application
 - Paypal Sandbox

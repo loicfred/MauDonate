@@ -51,3 +51,6 @@ The application also supports password resets and email verification with expiry
 **Disclaimer**
 - Note that the website information is concerning receivers are fictituous and does not belongs to any real person.
 - The campaigns however have been taking from random internet websites.
+
+**See also:**
+- [MauTresor](https://github.com/loicfred/MauTresor)

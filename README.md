@@ -45,3 +45,9 @@ Allows users to log in or sign up on the platform. There is also single sign-on 
 The application also supports password resets and email verification with expiry time.
 
 <img width="750" alt="image" src="https://github.com/user-attachments/assets/8397b4b3-f526-40ea-b274-71a119507550" />
+
+
+
+**Disclaimer**
+- Note that the website information is concerning receivers are fictituous and does not belongs to any real person.
+- The campaigns however have been taking from random internet websites.

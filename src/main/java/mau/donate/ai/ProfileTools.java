@@ -4,7 +4,7 @@ import mau.donate.objects.User;
 import org.springframework.ai.tool.annotation.Tool;
 
 import static my.loic.utilities.db.spring.DatabaseService.dbService;
-import static my.loic.utilities.util.Utilities.copyObject;
+import static my.loic.utilities.util.ClassUtils.copyObject;
 
 public class ProfileTools {
     private Long UserID;

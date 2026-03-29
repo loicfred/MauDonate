@@ -1,12 +1,8 @@
 package mau.donate.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
-import mau.donate.objects.Email_Verification;
 import mau.donate.objects.User;
 import mau.donate.service.EmailService;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,10 +13,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.UUID;
 
 import static mau.donate.controller.AppController.addEssential;
-import static my.loic.utilities.util.Utilities.Range;
+import static my.loic.utilities.util.NumberUtils.Range;
 
 @CrossOrigin(origins = "*")
 @Controller

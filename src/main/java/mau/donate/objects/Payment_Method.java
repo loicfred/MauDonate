@@ -5,8 +5,6 @@ import my.loic.utilities.db.spring.DatabaseObject;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
-import static my.loic.utilities.db.spring.DatabaseService.dbService;
-
 public class Payment_Method extends DatabaseObject.ID_OBJ<Long, Payment_Method> {
     public long UserID;
     public String Provider;

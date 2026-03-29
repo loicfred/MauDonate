@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static my.loic.utilities.db.spring.DatabaseService.dbService;
-import static my.loic.utilities.util.Utilities.StopString;
+import static my.loic.utilities.util.StringUtils.StopString;
 
 public class Notification extends DatabaseObject.ID_OBJ<Long, Notification> {
 

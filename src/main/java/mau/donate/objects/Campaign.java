@@ -10,7 +10,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 
 import static my.loic.utilities.db.spring.DatabaseService.dbService;
-import static my.loic.utilities.util.Utilities.StopString;
+import static my.loic.utilities.util.StringUtils.StopString;
 
 @Entity
 @Table

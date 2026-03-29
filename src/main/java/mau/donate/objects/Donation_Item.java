@@ -1,13 +1,15 @@
 package mau.donate.objects;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import mau.donate.objects.enums.StorageStatus;
 import my.loic.utilities.db.spring.DatabaseObject;
 
 import java.text.DecimalFormat;
-import java.util.List;
 
-import static my.loic.utilities.util.Utilities.StopString;
+import static my.loic.utilities.util.StringUtils.StopString;
 
 @Entity @Table
 public class Donation_Item extends DatabaseObject.ID_OBJ<Long, Donation_Item> {

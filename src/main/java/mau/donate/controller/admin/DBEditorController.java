@@ -8,7 +8,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,8 +19,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static my.loic.utilities.db.spring.DatabaseService.dbService;
 import static mau.donate.controller.AppController.addEssential;
+import static my.loic.utilities.db.spring.DatabaseService.dbService;
 
 @CrossOrigin(origins = "*")
 @Controller
@@ -110,7 +113,9 @@ public class DBEditorController {
             } else {
                 entity.Update();
             }
-            if (form.getFields().stream().anyMatch(f -> f.getType().equals(byte[].class.getSimpleName()))) {
+            List<String> img = form.getFields().stream().filter(f -> f.getType().equals(byte[].class.getSimpleName())).map(FieldMeta::getName).toList();
+            if (!img.isEmpty()) {
+                entity.UpdateOnly(img.toArray(String[]::new));
                 dbService.resetCache("IMG");
             }
             redirectAttributes.addFlashAttribute("success", "Entry updated successfully.");

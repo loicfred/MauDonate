@@ -5,11 +5,10 @@ import jakarta.persistence.ManyToOne;
 import mau.donate.objects.enums.PaymentStatus;
 import my.loic.utilities.db.spring.DatabaseObject;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 import static my.loic.utilities.db.spring.DatabaseService.dbService;
-import static my.loic.utilities.util.Utilities.StopString;
+import static my.loic.utilities.util.StringUtils.StopString;
 
 public class Fundraising extends DatabaseObject.ID_OBJ<String, Fundraising> {
     @ManyToOne

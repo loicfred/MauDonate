@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static my.loic.utilities.db.spring.DatabaseService.dbService;
-import static my.loic.utilities.util.Utilities.StopString;
+import static my.loic.utilities.util.StringUtils.StopString;
 
 @Entity @Table
 public class Donation extends DatabaseObject.ID_OBJ<Long, Donation> {

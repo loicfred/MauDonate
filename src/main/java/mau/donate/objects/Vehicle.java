@@ -7,8 +7,6 @@ import my.loic.utilities.db.spring.DatabaseObject;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
-import static my.loic.utilities.db.spring.DatabaseService.dbService;
-
 @Entity @Table
 public class Vehicle extends DatabaseObject.ID_OBJ<Long, Vehicle> {
 

@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.time.Period;
 
 import static my.loic.utilities.db.spring.DatabaseService.dbService;
-import static my.loic.utilities.util.Utilities.CutString;
+import static my.loic.utilities.util.StringUtils.CutString;
 
 @Entity @Table
 public class User extends DatabaseObject.ID_OBJ<Long, User> {
@@ -120,7 +120,7 @@ public class User extends DatabaseObject.ID_OBJ<Long, User> {
         return Verified;
     }
     public byte[] getImage() {
-        return Image;
+        return Image == null ? Image = refetchAttribute("Image", byte[].class) : Image;
     }
 
     public void setPassword(String password) {
@@ -167,6 +167,7 @@ public class User extends DatabaseObject.ID_OBJ<Long, User> {
     }
     public void setImage(byte[] image) {
         Image = image;
+        UpdateOnly("Image");
     }
 
     public boolean isPasswordValid() {

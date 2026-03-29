@@ -1,15 +1,11 @@
 package mau.donate.objects;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import my.loic.utilities.db.spring.DatabaseObject;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-
-import static my.loic.utilities.db.spring.DatabaseService.dbService;
 
 @Entity
 @Table

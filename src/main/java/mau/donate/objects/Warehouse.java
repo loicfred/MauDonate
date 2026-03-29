@@ -1,6 +1,9 @@
 package mau.donate.objects;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import mau.donate.objects.enums.StorageStatus;
 import my.loic.utilities.db.spring.DatabaseObject;
 

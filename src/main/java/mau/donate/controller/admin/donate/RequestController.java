@@ -3,7 +3,6 @@ package mau.donate.controller.admin.donate;
 import mau.donate.objects.Donation_Request;
 import mau.donate.objects.Notification;
 import mau.donate.objects.User;
-import mau.donate.objects.derived.D_Donation_Request;
 import mau.donate.objects.enums.DonationStatus;
 import mau.donate.service.EmailService;
 import org.springframework.stereotype.Controller;
@@ -14,8 +13,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.security.Principal;
 import java.time.LocalDateTime;
 
-import static my.loic.utilities.db.spring.DatabaseService.dbService;
 import static mau.donate.controller.AppController.addEssential;
+import static my.loic.utilities.db.spring.DatabaseService.dbService;
 
 @CrossOrigin(origins = "*")
 @Controller

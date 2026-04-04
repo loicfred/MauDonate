@@ -28,4 +28,12 @@ public class Association extends DatabaseObject.ID_OBJ<Long, Association> {
         Write();
     }
 
+    public byte[] getImage() {
+        return Image == null ? Image = refetchAttribute("Image", byte[].class) : Image;
+    }
+    public void setImage(byte[] image) {
+        Image = image;
+        UpdateOnly("Image");
+    }
+
 }

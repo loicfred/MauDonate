@@ -5,6 +5,7 @@ import mau.donate.service.OAuth2Service;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -31,17 +32,13 @@ public class SecurityConfig {
         this.oAuth2UserService = oAuth2UserService;
     }
 
-    // ----------------------
     // Password Encoder
-    // ----------------------
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // ----------------------
     // UserDetailsService
-    // ----------------------
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> {
@@ -56,9 +53,7 @@ public class SecurityConfig {
         };
     }
 
-    // ----------------------
     // Authentication Handlers
-    // ----------------------
     @Bean
     public AuthenticationSuccessHandler formLoginSuccessHandler() {
         return (request, response, authentication) -> {
@@ -71,7 +66,6 @@ public class SecurityConfig {
     public AuthenticationSuccessHandler oauth2LoginSuccessHandler(RememberMeServices rememberMeServices) {
         return (request, response, authentication) -> {
             System.out.println(authentication.getName() + " logged in (OAuth2)!");
-            // Trigger remember-me if present
             rememberMeServices.loginSuccess(request, response, authentication);
             response.sendRedirect("/home");
         };
@@ -80,29 +74,21 @@ public class SecurityConfig {
     @Bean
     public LogoutSuccessHandler logoutSuccessHandler() {
         return (request, response, authentication) -> {
-            if (authentication != null) {
-                System.out.println(authentication.getName() + " logged out!");
-            }
+            if (authentication != null) System.out.println(authentication.getName() + " logged out!");
             response.sendRedirect("/accounts/login?logout");
         };
     }
 
-    // ----------------------
     // Persistent Token Repository (Remember-Me)
-    // ----------------------
     @Bean
     public RememberMeServices rememberMeServices(UserDetailsService userDetailsService) {
-        PersistentTokenBasedRememberMeServices services =
-                new PersistentTokenBasedRememberMeServices(
-                        "my-remember-me-key",  // key used to identify cookies
-                        userDetailsService,
-                        persistentTokenRepository()
-                );
-        services.setAlwaysRemember(false); // optional, can respect checkbox
+        PersistentTokenBasedRememberMeServices services = new PersistentTokenBasedRememberMeServices("my-remember-me-key", userDetailsService, persistentTokenRepository());
+        services.setAlwaysRemember(false);
         services.setCookieName("remember-me");
-        services.setTokenValiditySeconds(1209600); // 14 days
+        services.setTokenValiditySeconds(1209600);
         return services;
     }
+
     @Bean
     public PersistentTokenRepository persistentTokenRepository() {
         JdbcTokenRepositoryImpl repo = new JdbcTokenRepositoryImpl();
@@ -111,9 +97,7 @@ public class SecurityConfig {
         return repo;
     }
 
-    // ----------------------
     // Security Filter Chain
-    // ----------------------
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, RememberMeServices rememberMeServices) {
         String[] publicPaths = {
@@ -121,26 +105,17 @@ public class SecurityConfig {
                 "/service-worker.js", "/manifest.json", "/offline",
                 "/css/**", "/js/**", "/img/**"
         };
-
         return http
-                // ----------------------
                 // Authorization
-                // ----------------------
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(publicPaths).permitAll()
                         .anyRequest().authenticated()
                 )
-
-                // ----------------------
                 // CSRF
-                // ----------------------
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/paypal/**")
                 )
-
-                // ----------------------
                 // Form Login
-                // ----------------------
                 .formLogin(form -> form
                         .loginPage("/accounts/login")
                         .loginProcessingUrl("/accounts/login")
@@ -148,34 +123,24 @@ public class SecurityConfig {
                         .failureUrl("/accounts/login?error")
                         .permitAll()
                 )
-
-                // ----------------------
                 // Remember-Me
-                // ----------------------
                 .rememberMe(rememberMe -> rememberMe
                         .tokenRepository(persistentTokenRepository())
                         .tokenValiditySeconds(1209600) // 14 days
                         .userDetailsService(userDetailsService())
                 )
-
-                // ----------------------
                 // Logout
-                // ----------------------
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessHandler(logoutSuccessHandler())
                         .permitAll()
                 )
-
-                // ----------------------
                 // OAuth2 Login
-                // ----------------------
                 .oauth2Login(oauth -> oauth
                         .loginPage("/accounts/login")
                         .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
                         .successHandler(oauth2LoginSuccessHandler(rememberMeServices))
                 )
-
                 .build();
     }
 }

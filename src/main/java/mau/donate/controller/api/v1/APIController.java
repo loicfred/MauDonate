@@ -27,13 +27,13 @@ public class APIController {
     public ResponseEntity<byte[]> getProfilePic(@PathVariable Long id) {
         User user = dbService.getById(User.class, id).orElse(null);
         HttpHeaders headers = new HttpHeaders();
-        if (user == null || user.Image == null) {
+        if (user == null || user.getImage() == null) {
             headers.setLocation(URI.create("/img/default-pfp.png"));
             return new ResponseEntity<>(headers, HttpStatus.FOUND);
         } else {
             headers.setContentType(MediaType.IMAGE_PNG);
             headers.setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS).cachePublic());
-            return new ResponseEntity<>(user.Image, headers, HttpStatus.FOUND);
+            return new ResponseEntity<>(user.getImage(), headers, HttpStatus.FOUND);
         }
     }
 
@@ -44,7 +44,7 @@ public class APIController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_PNG);
         headers.setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS).cachePublic());
-        return new ResponseEntity<>(association.Image, headers, HttpStatus.FOUND);
+        return new ResponseEntity<>(association.getImage(), headers, HttpStatus.FOUND);
     }
 
     @GetMapping("/img/campaign/{id}")
@@ -54,7 +54,7 @@ public class APIController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_PNG);
         headers.setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS).cachePublic());
-        return new ResponseEntity<>(campaign.Image, headers, HttpStatus.FOUND);
+        return new ResponseEntity<>(campaign.getImage(), headers, HttpStatus.FOUND);
     }
 
     @GetMapping("/searchbar")

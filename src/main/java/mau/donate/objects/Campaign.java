@@ -42,6 +42,14 @@ public class Campaign extends DatabaseObject.ID_OBJ<Long, Campaign> {
         Write();
     }
 
+    public byte[] getImage() {
+        return Image == null ? Image = refetchAttribute("Image", byte[].class) : Image;
+    }
+    public void setImage(byte[] image) {
+        Image = image;
+        UpdateOnly("Image");
+    }
+
     public Association getAssociation() {
         return A == null ? A = dbService.getById(Association.class, AssociationID).orElse(null) : A;
     }

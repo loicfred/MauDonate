@@ -3,8 +3,8 @@ package mau.donate.ai;
 import mau.donate.objects.User;
 import org.springframework.ai.tool.annotation.Tool;
 
-import static my.loic.utilities.db.spring.DatabaseService.dbService;
-import static my.loic.utilities.util.ClassUtils.copyObject;
+import static org.solarframework.db.spring.DatabaseService.dbService;
+import static org.solarframework.core.util.ClassUtils.copyObject;
 
 public class ProfileTools {
     private Long UserID;

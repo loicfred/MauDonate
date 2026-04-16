@@ -4,7 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
-import my.loic.utilities.db.spring.DatabaseObject;
+import org.solarframework.db.spring.DatabaseObject;
 
 @Entity
 @Table

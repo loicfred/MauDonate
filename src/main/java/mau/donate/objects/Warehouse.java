@@ -5,13 +5,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import mau.donate.objects.enums.StorageStatus;
-import my.loic.utilities.db.spring.DatabaseObject;
+import org.solarframework.db.spring.DatabaseObject;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static my.loic.utilities.db.spring.DatabaseService.dbService;
+import static org.solarframework.db.spring.DatabaseService.dbService;
 
 @Entity
 @Table

@@ -4,7 +4,7 @@ import mau.donate.ai.AboutUsTools;
 import mau.donate.ai.CampaignTools;
 import mau.donate.ai.ProfileTools;
 import mau.donate.objects.User;
-import my.loic.utilities.ai.spring.Conversation;
+import org.solarframework.ai.spring.Conversation;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static my.loic.utilities.ai.spring.AIService.aiService;
+import static org.solarframework.ai.spring.AIService.aiService;
 
 @RestController
 @RequestMapping("/api/v1/ai")
@@ -41,13 +41,13 @@ public class AIController {
             """.formatted(infoType.stream().map(String::toString).collect(Collectors.joining(", ")),
                 p != null ? "The current user's ID is " + userId + ". YOU SHOULD NOT SHARE THIS ID, nor use the ID of someone else." : "No user logged in.")).build();
 
-        Conversation C = aiService.startConversation(SYSMSG);
-
-
         List<Object> toolClasses = new ArrayList<>();
         if (infoType.contains("Campaign")) toolClasses.add(new CampaignTools());
         if (infoType.contains("Personal Information")) toolClasses.add(new ProfileTools(userId));
         if (infoType.contains("About Us")) toolClasses.add(new AboutUsTools());
+
+        Conversation C = aiService.startConversation(SYSMSG, toolClasses.toArray());
+
 
 
         for (Msg m : messages.messages) {
@@ -58,7 +58,7 @@ public class AIController {
             }
         }
 
-        String answer = C.talk(messages.messages.getLast().content, toolClasses.toArray());
+        String answer = C.talk(messages.messages.getLast().content);
         System.err.println(answer);
         return new Msg("bot", answer);
     }

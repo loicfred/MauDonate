@@ -5,7 +5,7 @@ import mau.donate.objects.enums.StorageStatus;
 
 import java.util.List;
 
-import static my.loic.utilities.db.spring.DatabaseService.dbService;
+import static org.solarframework.db.spring.DatabaseService.dbService;
 
 public class D_Donation extends Donation {
 

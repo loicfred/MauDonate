@@ -1,6 +1,6 @@
 package mau.donate.objects;
 
-import my.loic.utilities.db.spring.DatabaseObject;
+import org.solarframework.db.spring.DatabaseObject;
 
 import java.time.Instant;
 import java.time.LocalDateTime;

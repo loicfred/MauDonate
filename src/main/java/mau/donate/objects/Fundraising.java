@@ -3,12 +3,12 @@ package mau.donate.objects;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import mau.donate.objects.enums.PaymentStatus;
-import my.loic.utilities.db.spring.DatabaseObject;
+import org.solarframework.db.spring.DatabaseObject;
 
 import java.time.LocalDateTime;
 
-import static my.loic.utilities.db.spring.DatabaseService.dbService;
-import static my.loic.utilities.util.StringUtils.StopString;
+import static org.solarframework.db.spring.DatabaseService.dbService;
+import static org.solarframework.core.util.StringUtils.StopString;
 
 public class Fundraising extends DatabaseObject.ID_OBJ<String, Fundraising> {
     @ManyToOne

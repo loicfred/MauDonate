@@ -5,11 +5,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import mau.donate.objects.enums.StorageStatus;
-import my.loic.utilities.db.spring.DatabaseObject;
+import org.solarframework.db.spring.DatabaseObject;
 
 import java.text.DecimalFormat;
 
-import static my.loic.utilities.util.StringUtils.StopString;
+import static org.solarframework.core.util.StringUtils.StopString;
 
 @Entity @Table
 public class Donation_Item extends DatabaseObject.ID_OBJ<Long, Donation_Item> {

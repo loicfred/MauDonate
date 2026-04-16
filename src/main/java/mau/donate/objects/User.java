@@ -2,7 +2,7 @@ package mau.donate.objects;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import my.loic.utilities.db.spring.DatabaseObject;
+import org.solarframework.db.spring.DatabaseObject;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.security.Principal;
@@ -11,8 +11,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 
-import static my.loic.utilities.db.spring.DatabaseService.dbService;
-import static my.loic.utilities.util.StringUtils.CutString;
+import static org.solarframework.db.spring.DatabaseService.dbService;
+import static org.solarframework.core.util.StringUtils.CutString;
 
 @Entity @Table
 public class User extends DatabaseObject.ID_OBJ<Long, User> {

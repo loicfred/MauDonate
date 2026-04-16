@@ -7,7 +7,7 @@ import org.springframework.ai.tool.annotation.Tool;
 import java.util.ArrayList;
 import java.util.List;
 
-import static my.loic.utilities.db.spring.DatabaseService.dbService;
+import static org.solarframework.db.spring.DatabaseService.dbService;
 
 public class CampaignTools {
 

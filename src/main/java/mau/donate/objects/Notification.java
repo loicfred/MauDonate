@@ -1,13 +1,13 @@
 package mau.donate.objects;
 
-import my.loic.utilities.db.spring.DatabaseObject;
+import org.solarframework.db.spring.DatabaseObject;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static my.loic.utilities.db.spring.DatabaseService.dbService;
-import static my.loic.utilities.util.StringUtils.StopString;
+import static org.solarframework.db.spring.DatabaseService.dbService;
+import static org.solarframework.core.util.StringUtils.StopString;
 
 public class Notification extends DatabaseObject.ID_OBJ<Long, Notification> {
 

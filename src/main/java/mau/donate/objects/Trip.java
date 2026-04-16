@@ -2,13 +2,13 @@ package mau.donate.objects;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import my.loic.utilities.db.spring.DatabaseObject;
+import org.solarframework.db.spring.DatabaseObject;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static my.loic.utilities.db.spring.DatabaseService.dbService;
+import static org.solarframework.db.spring.DatabaseService.dbService;
 
 @Entity
 @Table

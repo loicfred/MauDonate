@@ -14,7 +14,7 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 
 import static mau.donate.controller.AppController.addEssential;
-import static my.loic.utilities.db.spring.DatabaseService.dbService;
+import static org.solarframework.db.spring.DatabaseService.dbService;
 
 @CrossOrigin(origins = "*")
 @Controller

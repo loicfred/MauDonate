@@ -6,7 +6,7 @@ import mau.donate.objects.User;
 import mau.donate.objects.derived.D_Donation;
 import mau.donate.objects.derived.D_Warehouse;
 import mau.donate.service.EmailService;
-import my.loic.utilities.db.spring.Row;
+import org.solarframework.db.spring.Row;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +18,7 @@ import java.util.Map;
 
 import static mau.donate.controller.AppController.addEssential;
 import static mau.donate.controller.admin.DBEditorController.DBObjectPackage;
-import static my.loic.utilities.db.spring.DatabaseService.dbService;
+import static org.solarframework.db.spring.DatabaseService.dbService;
 
 @CrossOrigin(origins = "*")
 @Controller

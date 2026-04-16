@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 import static mau.donate.controller.AppController.addEssential;
-import static my.loic.utilities.util.NumberUtils.Range;
+import static org.solarframework.core.util.NumberUtils.Range;
 
 @CrossOrigin(origins = "*")
 @Controller

@@ -38,7 +38,7 @@ self.addEventListener('fetch', event => {
                 return response;
             }).catch(err => {
                 console.error('[SW] Asset fetch failed:', url.pathname, err);
-                return new Response('', { status: 504 });
+                return new Response({ status: 504 });
             })
         );
     }

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static org.solarframework.db.spring.DatabaseService.dbService;
+import static org.solarframework.db.spring.DatabaseRegistry.SolarDBManager;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -25,7 +25,7 @@ public class APIController {
     @GetMapping("/img/avatar/{id}")
     @Cacheable(value = "IMG", key = "'PFP' + #id")
     public ResponseEntity<byte[]> getProfilePic(@PathVariable Long id) {
-        User user = dbService.getById(User.class, id).orElse(null);
+        User user = SolarDBManager.getById(User.class, id).orElse(null);
         HttpHeaders headers = new HttpHeaders();
         if (user == null || user.getImage() == null) {
             headers.setLocation(URI.create("/img/default-pfp.png"));
@@ -40,7 +40,7 @@ public class APIController {
     @GetMapping("/img/association/{id}")
     @Cacheable(value = "IMG", key = "'ASO' + #id")
     public ResponseEntity<byte[]> getAssociationPic(@PathVariable Long id) {
-        Association association = dbService.getById(Association.class, id).orElse(null);
+        Association association = SolarDBManager.getById(Association.class, id).orElse(null);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_PNG);
         headers.setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS).cachePublic());
@@ -50,7 +50,7 @@ public class APIController {
     @GetMapping("/img/campaign/{id}")
     @Cacheable(value = "IMG", key = "'CAM' + #id")
     public ResponseEntity<byte[]> getCampaignPic(@PathVariable Long id) {
-        Campaign campaign = dbService.getById(Campaign.class, id).orElse(null);
+        Campaign campaign = SolarDBManager.getById(Campaign.class, id).orElse(null);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_PNG);
         headers.setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS).cachePublic());
@@ -63,14 +63,14 @@ public class APIController {
         HttpHeaders headers = new HttpHeaders();
         headers.setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS).cachePublic());
 
-        List<SearchItem> reqs = dbService.getAllWhere(Donation_Request.class, "Approved").stream().map(SearchItem::new).collect(Collectors.toList());
-        reqs.addAll(dbService.getAll(Campaign.class).stream().map(SearchItem::new).toList());
+        List<SearchItem> reqs = SolarDBManager.getAllWhere(Donation_Request.class, "Approved").stream().map(SearchItem::new).collect(Collectors.toList());
+        reqs.addAll(SolarDBManager.getAll(Campaign.class).stream().map(SearchItem::new).toList());
         return new ResponseEntity<>(reqs, headers, HttpStatus.OK);
     }
 
     @GetMapping("/clearcache")
     public ResponseEntity<String> clearcache() {
-        dbService.resetAllCaches();
+        SolarDBManager.resetAllCaches();
         return new ResponseEntity<>("All caches cleared !", HttpStatus.OK);
     }
 

@@ -1,14 +1,18 @@
 package mau.donate.objects;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import org.solarframework.db.spring.DatabaseObject;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-import static org.solarframework.db.spring.DatabaseService.dbService;
+import static org.solarframework.db.spring.DatabaseRegistry.SolarDBManager;
 
+@Entity
+@Table
 public class Email_Verification extends DatabaseObject.ID_OBJ<Long, Email_Verification> {
     @ManyToOne
     @JoinColumn(referencedColumnName = "ID", name = "UserID")
@@ -30,15 +34,15 @@ public class Email_Verification extends DatabaseObject.ID_OBJ<Long, Email_Verifi
     }
 
     public static Email_Verification getByToken(String token) {
-        return dbService.getWhere(Email_Verification.class, "Token = ?", token).orElse(null);
+        return SolarDBManager.getWhere(Email_Verification.class, "Token = ?", token).orElse(null);
     }
 
     public User getUser() {
-        return U == null ? U = dbService.getById(User.class, UserID).orElse(null) : U;
+        return U == null ? U = SolarDBManager.getById(User.class, UserID).orElse(null) : U;
     }
 
     public static void ClearUnregisterUsers() {
-        for (Email_Verification vToken : dbService.getAllWhere(Email_Verification.class, "Type = ? AND ExpiryDate < ?","REGISTRATION", Instant.now().toEpochMilli())) {
+        for (Email_Verification vToken : SolarDBManager.getAllWhere(Email_Verification.class, "Type = ? AND ExpiryDate < ?","REGISTRATION", Instant.now().toEpochMilli())) {
             vToken.getUser().Delete();
         }
     }

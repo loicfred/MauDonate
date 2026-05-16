@@ -1,10 +1,14 @@
 package mau.donate.objects;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import org.solarframework.db.spring.DatabaseObject;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 
+@Entity
+@Table
 public class Payment_Method extends DatabaseObject.ID_OBJ<Long, Payment_Method> {
     public long UserID;
     public String Provider;

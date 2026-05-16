@@ -3,12 +3,13 @@ package mau.donate.objects;
 import jakarta.persistence.*;
 import mau.donate.objects.enums.StorageStatus;
 import org.solarframework.db.spring.DatabaseObject;
+import org.solarframework.db.v1.DBUpdate;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.solarframework.db.spring.DatabaseService.dbService;
+import static org.solarframework.db.spring.DatabaseRegistry.SolarDBManager;
 import static org.solarframework.core.util.StringUtils.StopString;
 
 @Entity @Table
@@ -25,8 +26,7 @@ public class Donation extends DatabaseObject.ID_OBJ<Long, Donation> {
     @JoinColumn(referencedColumnName = "ID", name = "DonationID")
     public transient List<Donation_Item> items = null;
 
-    @JoinTable
-
+    @Id
     public long DonorID;
     public long ReceiverID;
     public double Rupees;
@@ -93,14 +93,14 @@ public class Donation extends DatabaseObject.ID_OBJ<Long, Donation> {
     }
 
     public User getDonor() {
-        return D == null ? D = dbService.getById(User.class, DonorID).orElse(null) : D;
+        return D == null ? D = SolarDBManager.getById(User.class, DonorID).orElse(null) : D;
     }
     public User getReceiver() {
-        return R == null ? R = dbService.getById(User.class, ReceiverID).orElse(null) : R;
+        return R == null ? R = SolarDBManager.getById(User.class, ReceiverID).orElse(null) : R;
     }
 
     public List<Donation_Item> getItems() {
-        return items == null ? items = dbService.getAllWhere(Donation_Item.class, "DonationID = ?", ID) : items;
+        return items == null ? items = SolarDBManager.getAllWhere(Donation_Item.class, "DonationID = ?", ID) : items;
     }
     public void setItems(List<Donation_Item> items) {
         this.items = items;
@@ -112,7 +112,7 @@ public class Donation extends DatabaseObject.ID_OBJ<Long, Donation> {
 
     public String getItemsStatus() {
         for (StorageStatus status : StorageStatus.values()) {
-            if (getItems().stream().allMatch(i -> i.Status.equalsIgnoreCase(status.name()))) {
+            if (getItems().stream().allMatch(i -> i.Status.toString().equalsIgnoreCase(status.name()))) {
                 return status.name();
             }
         }

@@ -3,7 +3,7 @@ package mau.donate.ai;
 import mau.donate.objects.User;
 import org.springframework.ai.tool.annotation.Tool;
 
-import static org.solarframework.db.spring.DatabaseService.dbService;
+import static org.solarframework.db.spring.DatabaseRegistry.SolarDBManager;
 import static org.solarframework.core.util.ClassUtils.copyObject;
 
 public class ProfileTools {
@@ -16,7 +16,7 @@ public class ProfileTools {
     @Tool(description = "Get the currently logged in user information")
     public Object getProfileInformation() {
         if (UserID == null) return "You are not logged in.";
-        User inCache = dbService.getByIdWithJoins(User.class, UserID).orElse(null);
+        User inCache = SolarDBManager.getByIdWithJoins(User.class, UserID).orElse(null);
         User u = new User();
         if (inCache == null) return "No information found about you.";
         copyObject(u, inCache);

@@ -11,7 +11,7 @@ import java.text.DecimalFormat;
 
 import static org.solarframework.core.util.StringUtils.StopString;
 
-@Entity @Table
+@Table @Entity
 public class Donation_Item extends DatabaseObject.ID_OBJ<Long, Donation_Item> {
     @ManyToOne
     @JoinColumn(referencedColumnName = "ID", name = "DonationID")
@@ -22,7 +22,7 @@ public class Donation_Item extends DatabaseObject.ID_OBJ<Long, Donation_Item> {
     public String ItemName;
     public int Quantity;
     public long CapacityPerQty = 0;
-    public String Status = StorageStatus.NOT_YET_BROUGHT.toString(); // NOT_YET_BROUGHT, IN_STORAGE, DELIVERED;
+    public StorageStatus Status = StorageStatus.NOT_YET_BROUGHT; // NOT_YET_BROUGHT, IN_STORAGE, DELIVERED;
 
     public Donation_Item() {}
 
@@ -44,10 +44,10 @@ public class Donation_Item extends DatabaseObject.ID_OBJ<Long, Donation_Item> {
         Quantity = quantity;
     }
 
-    public String getStatus() {
+    public StorageStatus getStatus() {
         return Status;
     }
-    public void setStatus(String status) {
+    public void setStatus(StorageStatus status) {
         Status = status;
     }
 

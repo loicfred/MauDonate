@@ -9,7 +9,7 @@ import org.solarframework.db.spring.DatabaseObject;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 
-import static org.solarframework.db.spring.DatabaseService.dbService;
+import static org.solarframework.db.spring.DatabaseRegistry.SolarDBManager;
 
 @Entity
 @Table
@@ -74,7 +74,7 @@ public class Donation_Request extends DatabaseObject.ID_OBJ<Long, Donation_Reque
     }
 
     public User getUser() {
-        return U == null ? U = dbService.getById(User.class, UserID).orElse(null) : U;
+        return U == null ? U = SolarDBManager.getById(User.class, UserID).orElse(null) : U;
     }
 
     public String getGoalAmountString() {
@@ -82,6 +82,6 @@ public class Donation_Request extends DatabaseObject.ID_OBJ<Long, Donation_Reque
     }
 
     public boolean hasUserUpvoted(long userID) {
-        return dbService.getWhere(Donation_Upvote.class, "UserID = ? AND RequestID = ?", userID, ID).orElse(null) != null;
+        return SolarDBManager.getWhere(Donation_Upvote.class, "UserID = ? AND RequestID = ?", userID, ID).orElse(null) != null;
     }
 }

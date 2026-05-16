@@ -11,7 +11,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.solarframework.db.spring.DatabaseService.dbService;
+import static org.solarframework.db.spring.DatabaseRegistry.SolarDBManager;
 
 @Entity
 @Table
@@ -74,7 +74,7 @@ public class Warehouse extends DatabaseObject.ID_OBJ<Long, Warehouse> {
     }
 
     public List<Donation_Item> getItems() {
-        return items == null ? items = dbService.getAllWhere(Donation_Item.class, "WarehouseID = ? AND NOT Status = ? ORDER BY Quantity * CapacityPerQty DESC", ID, StorageStatus.DELIVERED.name()) : items;
+        return items == null ? items = SolarDBManager.getAllWhere(Donation_Item.class, "WarehouseID = ? AND NOT Status = ? ORDER BY Quantity * CapacityPerQty DESC", ID, StorageStatus.DELIVERED.name()) : items;
     }
     private void setItems(List<Donation_Item> items) {
         this.items = items;

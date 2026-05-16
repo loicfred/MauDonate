@@ -14,7 +14,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.solarframework.db.spring.DatabaseService.dbService;
+import static org.solarframework.db.spring.DatabaseRegistry.SolarDBManager;
 
 @CrossOrigin(origins = "*")
 @Controller
@@ -25,8 +25,8 @@ public class AppController {
         User U = User.getByAuthentication(loggedUser);
         if (loggedUser != null && U == null) return "redirect:/logout";
         addEssential(model, loggedUser, U);
-        model.addAttribute("requests", dbService.getAllWhere(D_Donation_Request.class, "Approved AND NOT Completed ORDER BY Upvotes DESC"));
-        model.addAttribute("campaigns", dbService.getAll(Campaign.class));
+        model.addAttribute("requests", SolarDBManager.getAllWhere(D_Donation_Request.class, "Approved AND NOT Completed ORDER BY Upvotes DESC"));
+        model.addAttribute("campaigns", SolarDBManager.getAll(Campaign.class));
         return "index";
     }
 
@@ -48,8 +48,8 @@ public class AppController {
         if (loggedUser == null) return "redirect:/accounts/login";
         User U = User.getByAuthentication(loggedUser);
         addEssential(model, loggedUser, U);
-        model.addAttribute("fundraisings", dbService.getAllWhere(Fundraising.class, "DonorID = ? ", U.getID()));
-        model.addAttribute("donations", dbService.getAllWhere(Donation.class, "DonorID = ? ", U.getID()));
+        model.addAttribute("fundraisings", SolarDBManager.getAllWhere(Fundraising.class, "DonorID = ? ", U.getID()));
+        model.addAttribute("donations", SolarDBManager.getAllWhere(Donation.class, "DonorID = ? ", U.getID()));
         return "billing";
     }
 
@@ -102,13 +102,13 @@ public class AppController {
     public boolean upvote_request(Principal loggedUser, @PathVariable long requestId, @PathVariable long onoff) {
         if (loggedUser == null) return false;
         User U = User.getByAuthentication(loggedUser);
-        Donation_Upvote upvote = dbService.getWhere(Donation_Upvote.class, "UserID = ? AND RequestID = ?", U.getID(), requestId).orElse(null);
+        Donation_Upvote upvote = SolarDBManager.getWhere(Donation_Upvote.class, "UserID = ? AND RequestID = ?", U.getID(), requestId).orElse(null);
         if (onoff == 0 && upvote != null) {
             upvote.Delete();
         } else if (onoff == 1 && upvote == null) {
             new Donation_Upvote(U.getID(), requestId);
         }
-        dbService.resetCacheForClass(D_Donation_Request.class, true, true);
+        SolarDBManager.resetCacheForClass(D_Donation_Request.class, true, true);
         return true;
     }
 

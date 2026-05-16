@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.solarframework.db.spring.DatabaseService.dbService;
+import static org.solarframework.db.spring.DatabaseRegistry.SolarDBManager;
 
 @Entity
 @Table
@@ -34,11 +34,11 @@ public class Trip extends DatabaseObject.ID_OBJ<Long, Trip> {
     }
 
     public static List<Trip> getByStaff(long staffId) {
-        return dbService.getAllWhere(Trip.class, "StaffID = ?", staffId);
+        return SolarDBManager.getAllWhere(Trip.class, "StaffID = ?", staffId);
     }
 
     public static Trip getByDonation(long donationID) {
-        return dbService.getWhere(Trip.class, "DonationID = ?", donationID).orElse(null);
+        return SolarDBManager.getWhere(Trip.class, "DonationID = ?", donationID).orElse(null);
     }
 
 }

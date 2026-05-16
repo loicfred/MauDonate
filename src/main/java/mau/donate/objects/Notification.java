@@ -1,14 +1,18 @@
 package mau.donate.objects;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import org.solarframework.db.spring.DatabaseObject;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.solarframework.db.spring.DatabaseService.dbService;
+import static org.solarframework.db.spring.DatabaseRegistry.SolarDBManager;
 import static org.solarframework.core.util.StringUtils.StopString;
 
+@Entity
+@Table
 public class Notification extends DatabaseObject.ID_OBJ<Long, Notification> {
 
     public long UserID;
@@ -64,6 +68,6 @@ public class Notification extends DatabaseObject.ID_OBJ<Long, Notification> {
 
 
     public static List<Notification> ofUser(long userID, int limit) {
-        return dbService.getAllWhere(Notification.class, "UserID = ? ORDER BY ID DESC LIMIT ?;", userID, limit);
+        return SolarDBManager.getAllWhere(Notification.class, "UserID = ? ORDER BY ID DESC LIMIT ?;", userID, limit);
     }
 }

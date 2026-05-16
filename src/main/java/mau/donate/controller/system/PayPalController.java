@@ -23,11 +23,9 @@ import java.util.Map;
 public class PayPalController {
 
     private final PayPalHttpClient payPalClient;
-    private final ExchangeRateService exchangeRateService;
 
-    public PayPalController(PayPalHttpClient payPalClient, ExchangeRateService exchangeRateService) {
+    public PayPalController(PayPalHttpClient payPalClient) {
         this.payPalClient = payPalClient;
-        this.exchangeRateService = exchangeRateService;
     }
 
     @PreAuthorize("isAuthenticated()")

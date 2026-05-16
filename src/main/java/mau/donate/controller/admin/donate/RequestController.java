@@ -14,7 +14,7 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 
 import static mau.donate.controller.AppController.addEssential;
-import static org.solarframework.db.spring.DatabaseService.dbService;
+import static org.solarframework.db.spring.DatabaseRegistry.SolarDBManager;
 
 @CrossOrigin(origins = "*")
 @Controller
@@ -67,7 +67,7 @@ public class RequestController {
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
 
-        Donation_Request req = dbService.getById(Donation_Request.class, id).orElseThrow();
+        Donation_Request req = SolarDBManager.getById(Donation_Request.class, id).orElseThrow();
         req.UpdatedAt = LocalDateTime.now();
         req.Approved = true;
         req.UpdateOnly("Approved", "UpdatedAt");
@@ -86,7 +86,7 @@ public class RequestController {
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
 
-        Donation_Request req = dbService.getById(Donation_Request.class, id).orElseThrow();
+        Donation_Request req = SolarDBManager.getById(Donation_Request.class, id).orElseThrow();
         req.Delete();
 
         User requester = req.getUser();

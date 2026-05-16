@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static mau.donate.controller.AppController.addEssential;
-import static org.solarframework.db.spring.DatabaseService.dbService;
+import static org.solarframework.db.spring.DatabaseRegistry.SolarDBManager;
 
 @CrossOrigin(origins = "*")
 @Controller
@@ -42,7 +42,7 @@ public class DBEditorController {
             item = item.substring(0,1).toUpperCase() + item.substring(1);
             List<FieldMeta> fields = new ArrayList<>();
             Class<?> objClass = Class.forName(DBObjectPackage + item);
-            Object entity = id != null ? dbService.getById(objClass, id).orElseThrow() : null;
+            Object entity = id != null ? SolarDBManager.getById(objClass, id).orElseThrow() : null;
             for (Field field : objClass.getDeclaredFields()) {
                 field.setAccessible(true);
                 if (Modifier.isStatic(field.getModifiers())) continue;
@@ -83,7 +83,7 @@ public class DBEditorController {
             objectName = objectName.substring(0,1).toUpperCase() + objectName.substring(1);
             @SuppressWarnings("unchecked")
             Class<? extends DatabaseObject.ID_OBJ<?, ?>> objClass = (Class<? extends DatabaseObject.ID_OBJ<?, ?>>) Class.forName(DBObjectPackage + objectName).asSubclass(DatabaseObject.class);
-            DatabaseObject.ID_OBJ<?,?> entity = id != null ? dbService.getById(objClass, id).orElseThrow() : null;
+            DatabaseObject.ID_OBJ<?,?> entity = id != null ? SolarDBManager.getById(objClass, id).orElseThrow() : null;
             if (entity == null) {
                 Constructor<DatabaseObject.ID_OBJ<?,?>> ctor = (Constructor<DatabaseObject.ID_OBJ<?,?>>) objClass.getDeclaredConstructor();
                 ctor.setAccessible(true);
@@ -116,7 +116,7 @@ public class DBEditorController {
             List<String> img = form.getFields().stream().filter(f -> f.getType().equals(byte[].class.getSimpleName())).map(FieldMeta::getName).toList();
             if (!img.isEmpty()) {
                 entity.UpdateOnly(img.toArray(String[]::new));
-                dbService.resetCache("IMG");
+                SolarDBManager.resetCache("IMG");
             }
             redirectAttributes.addFlashAttribute("success", "Entry updated successfully.");
             return "redirect:/admin/edit/" + objectName + (id != null ? "/" + id : "");

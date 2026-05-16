@@ -3,14 +3,9 @@ package mau.donate.service;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-@Service
 public class ExchangeRateService {
 
-    private final RestClient restClient;
 
-    public ExchangeRateService(RestClient restClient) {
-        this.restClient = restClient;
-    }
 
 //    public BigDecimal convertMurToUsd(BigDecimal murAmount) {
 //        Map response = restClient.get()

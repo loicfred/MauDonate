@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 
-import static org.solarframework.db.spring.DatabaseService.dbService;
+import static org.solarframework.db.spring.DatabaseRegistry.SolarDBManager;
 import static org.solarframework.core.util.StringUtils.CutString;
 
 @Entity @Table
@@ -59,20 +59,20 @@ public class User extends DatabaseObject.ID_OBJ<Long, User> {
 
 
     public static User getByEmail(String email) {
-        return dbService.getWhere(User.class, "Email = ?", email).orElse(null);
+        return SolarDBManager.getWhere(User.class, "Email = ?", email).orElse(null);
     }
     public static User getByPhone(String phone) {
-        return dbService.getWhere(User.class, "Phone = ?", phone).orElse(null);
+        return SolarDBManager.getWhere(User.class, "Phone = ?", phone).orElse(null);
     }
 
     public static User getByAuthentication(Principal principal) {
         if (principal == null) return null;
-        return dbService.getWhere(User.class, "Email = ?", principal.getName()).orElse(null);
+        return SolarDBManager.getWhere(User.class, "Email = ?", principal.getName()).orElse(null);
     }
 
 
     public static void ClearFailedLogins(String email) {
-        User U = dbService.getWhere(User.class, "Email = ? OR (Enabled = ? AND Verified = ?)", email, false, false).orElse(null);
+        User U = SolarDBManager.getWhere(User.class, "Email = ? OR (Enabled = ? AND Verified = ?)", email, false, false).orElse(null);
         if (U != null) U.Delete();
     }
 

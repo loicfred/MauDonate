@@ -9,7 +9,7 @@ import org.solarframework.db.spring.DatabaseObject;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
-import static org.solarframework.db.spring.DatabaseService.dbService;
+import static org.solarframework.db.spring.DatabaseRegistry.SolarDBManager;
 import static org.solarframework.core.util.StringUtils.StopString;
 
 @Entity
@@ -51,7 +51,7 @@ public class Campaign extends DatabaseObject.ID_OBJ<Long, Campaign> {
     }
 
     public Association getAssociation() {
-        return A == null ? A = dbService.getById(Association.class, AssociationID).orElse(null) : A;
+        return A == null ? A = SolarDBManager.getById(Association.class, AssociationID).orElse(null) : A;
     }
 
 }

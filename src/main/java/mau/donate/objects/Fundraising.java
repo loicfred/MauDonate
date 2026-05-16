@@ -1,15 +1,19 @@
 package mau.donate.objects;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import mau.donate.objects.enums.PaymentStatus;
 import org.solarframework.db.spring.DatabaseObject;
 
 import java.time.LocalDateTime;
 
-import static org.solarframework.db.spring.DatabaseService.dbService;
+import static org.solarframework.db.spring.DatabaseRegistry.SolarDBManager;
 import static org.solarframework.core.util.StringUtils.StopString;
 
+@Entity
+@Table
 public class Fundraising extends DatabaseObject.ID_OBJ<String, Fundraising> {
     @ManyToOne
     @JoinColumn(referencedColumnName = "ID", name = "DonorID")
@@ -34,7 +38,7 @@ public class Fundraising extends DatabaseObject.ID_OBJ<String, Fundraising> {
     }
 
     public User getDonor() {
-        return D == null ? D = dbService.getById(User.class, DonorID).orElse(null) : D;
+        return D == null ? D = SolarDBManager.getById(User.class, DonorID).orElse(null) : D;
     }
 
 }

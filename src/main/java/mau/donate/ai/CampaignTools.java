@@ -7,20 +7,20 @@ import org.springframework.ai.tool.annotation.Tool;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.solarframework.db.spring.DatabaseService.dbService;
+import static org.solarframework.db.spring.DatabaseRegistry.SolarDBManager;
 
 public class CampaignTools {
 
     @Tool(description = "Get a campaign information by name or keyword (both use same attribute)")
     public Object getCampaignInformation(String keyword) {
-        List<Campaign> InCache = dbService.getAllWhere(Campaign.class, "Title LIKE ? OR Message LIKE ?", "%" + keyword + "%", "%" + keyword + "%");
+        List<Campaign> InCache = SolarDBManager.getAllWhere(Campaign.class, "Title LIKE ? OR Message LIKE ?", "%" + keyword + "%", "%" + keyword + "%");
         if (InCache.isEmpty()) return "There is no campaign with the name " + keyword + ".";
         return new Campaign();
     }
 
     @Tool(description = "Get a campaign's creator or association information by name or keyword (both use same attribute)")
     public Object getCampaignAssociation(String keyword) {
-        List<Campaign> InCache = dbService.getAllWhere(Campaign.class, "Title LIKE ? OR Message LIKE ?", "%" + keyword + "%", "%" + keyword + "%");
+        List<Campaign> InCache = SolarDBManager.getAllWhere(Campaign.class, "Title LIKE ? OR Message LIKE ?", "%" + keyword + "%", "%" + keyword + "%");
         if (InCache.isEmpty()) return "There are no campaign information found " + keyword + ".";
         List<Association> c = new ArrayList<>();
         for (Campaign campaign : InCache) {

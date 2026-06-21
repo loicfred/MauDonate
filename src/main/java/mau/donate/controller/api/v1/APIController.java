@@ -3,7 +3,7 @@ package mau.donate.controller.api.v1;
 import mau.donate.objects.Association;
 import mau.donate.objects.Campaign;
 import mau.donate.objects.Donation_Request;
-import mau.donate.objects.User;
+import org.solarframework.web.auth.obj.Account_User;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,15 +25,15 @@ public class APIController {
     @GetMapping("/img/avatar/{id}")
     @Cacheable(value = "IMG", key = "'PFP' + #id")
     public ResponseEntity<byte[]> getProfilePic(@PathVariable Long id) {
-        User user = SolarDBManager.getById(User.class, id).orElse(null);
+        Account_User user = SolarDBManager.getById(Account_User.class, id).orElse(null);
         HttpHeaders headers = new HttpHeaders();
-        if (user == null || user.getImage() == null) {
+        if (user == null || user.getAvatar() == null) {
             headers.setLocation(URI.create("/img/default-pfp.png"));
             return new ResponseEntity<>(headers, HttpStatus.FOUND);
         } else {
             headers.setContentType(MediaType.IMAGE_PNG);
             headers.setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS).cachePublic());
-            return new ResponseEntity<>(user.getImage(), headers, HttpStatus.FOUND);
+            return new ResponseEntity<>(user.getAvatar(), headers, HttpStatus.FOUND);
         }
     }
 

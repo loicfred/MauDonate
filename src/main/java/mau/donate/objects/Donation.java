@@ -2,6 +2,7 @@ package mau.donate.objects;
 
 import jakarta.persistence.*;
 import mau.donate.objects.enums.StorageStatus;
+import org.solarframework.web.auth.obj.Account_User;
 import org.solarframework.db.spring.DatabaseObject;
 import org.solarframework.db.v1.DBUpdate;
 
@@ -16,17 +17,16 @@ import static org.solarframework.core.util.StringUtils.StopString;
 public class Donation extends DatabaseObject.ID_OBJ<Long, Donation> {
     @ManyToOne
     @JoinColumn(referencedColumnName = "ID", name = "DonorID")
-    private transient User D = null;
+    private transient Account_User D = null;
 
     @ManyToOne
     @JoinColumn(referencedColumnName = "ID", name = "ReceiverID")
-    private transient User R = null;
+    private transient Account_User R = null;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(referencedColumnName = "ID", name = "DonationID")
     public transient List<Donation_Item> items = null;
 
-    @Id
     public long DonorID;
     public long ReceiverID;
     public double Rupees;
@@ -92,11 +92,11 @@ public class Donation extends DatabaseObject.ID_OBJ<Long, Donation> {
         UpdatedAt = updatedAt;
     }
 
-    public User getDonor() {
-        return D == null ? D = SolarDBManager.getById(User.class, DonorID).orElse(null) : D;
+    public Account_User getDonor() {
+        return D == null ? D = SolarDBManager.getById(Account_User.class, DonorID).orElse(null) : D;
     }
-    public User getReceiver() {
-        return R == null ? R = SolarDBManager.getById(User.class, ReceiverID).orElse(null) : R;
+    public Account_User getReceiver() {
+        return R == null ? R = SolarDBManager.getById(Account_User.class, ReceiverID).orElse(null) : R;
     }
 
     public List<Donation_Item> getItems() {

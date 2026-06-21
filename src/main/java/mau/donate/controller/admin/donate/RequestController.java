@@ -1,20 +1,19 @@
 package mau.donate.controller.admin.donate;
 
 import mau.donate.objects.Donation_Request;
-import mau.donate.objects.Notification;
-import mau.donate.objects.User;
 import mau.donate.objects.enums.DonationStatus;
 import mau.donate.service.EmailService;
+import org.solarframework.web.auth.obj.Account_Notification;
+import org.solarframework.web.auth.obj.Account_User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
-import java.time.LocalDateTime;
 
-import static mau.donate.controller.AppController.addEssential;
 import static org.solarframework.db.spring.DatabaseRegistry.SolarDBManager;
+import static org.solarframework.web.auth.spring.Constants.addEssential;
 
 @CrossOrigin(origins = "*")
 @Controller
@@ -28,11 +27,11 @@ public class RequestController {
 
     @GetMapping("/donation/request")
     public String requestPage(Model model, Principal loggedUser) {
-        if (loggedUser == null) return "redirect:/accounts/login";
-        User U = User.getByAuthentication(loggedUser);
+        if (loggedUser == null) return "redirect:/auth/v1/login";
+        Account_User U = Account_User.getByAuthentication(loggedUser);
         addEssential(model, loggedUser, U);
 
-        if (U.getPhone() == null) return "redirect:/settings?phoneNumber";
+        if (U.getPhoneNumber() == null) return "redirect:/settings?phoneNumber";
         else if (U.getAddress() == null) return "redirect:/settings?address";
         model.addAttribute("request", new Donation_Request());
         return "request";
@@ -40,13 +39,11 @@ public class RequestController {
 
     @PostMapping("/donation/request")
     public String makeRequest(Model model, Principal loggedUser, @ModelAttribute Donation_Request req, RedirectAttributes redirectAttributes) {
-        if (loggedUser == null) return "redirect:/accounts/login";
-        User U = User.getByAuthentication(loggedUser);
+        if (loggedUser == null) return "redirect:/auth/v1/login";
+        Account_User U = Account_User.getByAuthentication(loggedUser);
         addEssential(model, loggedUser, U);
 
-        req.CreatedAt = LocalDateTime.now();
-        req.UpdatedAt = LocalDateTime.now();
-        req.Status = DonationStatus.PENDING.toString();
+        req.Status = DonationStatus.PENDING;
         req.UserID = U.getID();
         req.Approved = false;
         req.Completed = false;
@@ -62,36 +59,35 @@ public class RequestController {
 
     @PostMapping("/admin/request/validate/{id}/accept")
     public String acceptDonationRequest(Model model, Principal loggedUser, @PathVariable Long id, @RequestParam String message, RedirectAttributes redirectAttributes) {
-        if (loggedUser == null) return "redirect:/accounts/login";
-        User U = User.getByAuthentication(loggedUser);
+        if (loggedUser == null) return "redirect:/auth/v1/login";
+        Account_User U = Account_User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
 
         Donation_Request req = SolarDBManager.getById(Donation_Request.class, id).orElseThrow();
-        req.UpdatedAt = LocalDateTime.now();
         req.Approved = true;
         req.UpdateOnly("Approved", "UpdatedAt");
 
-        User requester = req.getUser();
+        Account_User requester = req.getUser();
         emailService.acceptRequest(requester.getEmail(), requester.getFirstName() + " " + requester.getLastName(), message);
-        new Notification(requester.getID(), "Request Approved", "Congratulations, your donation request has been approved !");
+        new Account_Notification(requester.getID(), "Request Approved", "Congratulations, your donation request has been approved !");
 
         redirectAttributes.addFlashAttribute("successReq", "Successfully accepted the request from " + requester.getFirstName() + ".");
         return "redirect:/admin?page=1";
     }
     @PostMapping("/admin/request/validate/{id}/deny")
     public String denyDonationRequest(Model model, Principal loggedUser, @PathVariable Long id, @RequestParam String message, RedirectAttributes redirectAttributes) {
-        if (loggedUser == null) return "redirect:/accounts/login";
-        User U = User.getByAuthentication(loggedUser);
+        if (loggedUser == null) return "redirect:/auth/v1/login";
+        Account_User U = Account_User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
 
         Donation_Request req = SolarDBManager.getById(Donation_Request.class, id).orElseThrow();
         req.Delete();
 
-        User requester = req.getUser();
+        Account_User requester = req.getUser();
         emailService.denyRequest(requester.getEmail(), requester.getFirstName() + " " + requester.getLastName(), message);
-        new Notification(requester.getID(), "Denied Request", "Unfortunately your donation request has been denied. More details sent by email.");
+        new Account_Notification(requester.getID(), "Denied Request", "Unfortunately your donation request has been denied. More details sent by email.");
 
         redirectAttributes.addFlashAttribute("successReq", "Successfully denied the request from " + requester.getFirstName() + ".");
         return "redirect:/admin?page=1";

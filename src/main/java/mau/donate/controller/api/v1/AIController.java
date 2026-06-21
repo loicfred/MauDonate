@@ -3,8 +3,8 @@ package mau.donate.controller.api.v1;
 import mau.donate.ai.AboutUsTools;
 import mau.donate.ai.CampaignTools;
 import mau.donate.ai.ProfileTools;
-import mau.donate.objects.User;
 import org.solarframework.ai.spring.Conversation;
+import org.solarframework.web.auth.obj.Account_User;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -30,7 +30,7 @@ public class AIController {
         List<String> infoType = aiService.chooseBetween("What kind of information is the user currently asking for?",
                 List.of("Campaign", "Personal Information", "About Us", "Other"));
         System.err.println(infoType);
-        Long userId = p != null ? User.getByAuthentication(p).getID() : null;
+        Long userId = p != null ? Account_User.getByAuthentication(p).getID() : null;
 
         SystemMessage SYSMSG = SystemMessage.builder().text("""
             You are an AI assistant that helps users to answer questions about the MauDonate donation app.

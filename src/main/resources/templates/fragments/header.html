@@ -13,7 +13,7 @@
                 <button onclick="goToCampaign()">Campaigns</button>
                 <button onclick="goToAbout()">About</button>
                 <hr>
-                <a th:if="${principal == null}" href="/accounts/login">Log in</a>
+                <a th:if="${principal == null}" href="/auth/v1/login">Log in</a>
                 <a th:if="${principal != null}" href="/donation/request">Make a donation request</a>
                 <a th:if="${principal != null}" href="/fundraise">Fundraise</a>
                 <a th:if="${principal != null}" href="/settings">Settings</a>
@@ -154,7 +154,7 @@
                     const loginBtn = document.getElementById("loginBtn");
                     loginBtn.addEventListener("click", (e) => {
                         e.stopPropagation();
-                        document.location.href = "/accounts/login";
+                        document.location.href = "/auth/v1/login";
                     });
                 </script>
             </div>

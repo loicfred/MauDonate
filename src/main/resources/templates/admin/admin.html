@@ -213,7 +213,7 @@
                     const ids = document.getElementById('IDs');
 
                     function addSelect(select) {
-                        fetch('/admin/list/' + select.value)
+                        fetch('/admin/db/v1/list/' + select.value)
                             .then(res => res.json())
                             .then(data => {
                                 insertDb.disabled = false;
@@ -243,11 +243,11 @@
 
                     document.getElementById('databaseForm').addEventListener('submit', function (e) {
                         e.preventDefault();
-                        window.location.href = '/admin/edit/' + tableSelect.value + '/' + (id.value ? id.value : ids.value);
+                        window.location.href = '/admin/db/v1/edit/' + tableSelect.value + '/' + (id.value ? id.value : ids.value);
                     });
                     insertDb.addEventListener("click", (e) => {
                         e.preventDefault();
-                        window.location.href = '/admin/edit/' + tableSelect.value;
+                        window.location.href = '/admin/db/v1/edit/' + tableSelect.value;
                     })
                     clearcache.addEventListener("click", (e) => {
                         e.preventDefault();

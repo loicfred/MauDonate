@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table
-public class Staff extends DatabaseObject.ID_OBJ<Long, User> {
+public class Staff extends DatabaseObject.ID_OBJ<Long, Staff> {
 
     public String FirstName;
     public String LastName;

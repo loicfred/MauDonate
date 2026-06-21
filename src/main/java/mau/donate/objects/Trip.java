@@ -16,17 +16,15 @@ public class Trip extends DatabaseObject.ID_OBJ<Long, Trip> {
 
     public Long StaffID;
     public Long DonationID;
-    public String Address;
     public LocalDateTime ScheduleTime;
     public String StartLocation;
     public String EndDestination;
 
     public Trip() {}
-    public Trip(long staffID, long donationID, String address, LocalDateTime scheduleTime, String startLocation, String endDestination) {
+    public Trip(long staffID, long donationID, LocalDateTime scheduleTime, String startLocation, String endDestination) {
         ID = Instant.now().toEpochMilli();
         StaffID = staffID;
         DonationID = donationID;
-        Address = address;
         ScheduleTime = scheduleTime;
         StartLocation = startLocation;
         EndDestination = endDestination;

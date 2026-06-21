@@ -1,6 +1,6 @@
 package mau.donate.ai;
 
-import mau.donate.objects.User;
+import org.solarframework.web.auth.obj.Account_User;
 import org.springframework.ai.tool.annotation.Tool;
 
 import static org.solarframework.db.spring.DatabaseRegistry.SolarDBManager;
@@ -16,11 +16,11 @@ public class ProfileTools {
     @Tool(description = "Get the currently logged in user information")
     public Object getProfileInformation() {
         if (UserID == null) return "You are not logged in.";
-        User inCache = SolarDBManager.getByIdWithJoins(User.class, UserID).orElse(null);
-        User u = new User();
+        Account_User inCache = SolarDBManager.getByIdWithJoins(Account_User.class, UserID).orElse(null);
+        Account_User u = new Account_User();
         if (inCache == null) return "No information found about you.";
         copyObject(u, inCache);
-        u.Image = null;
+        u.setAvatar(null);
         return u;
     }
 

@@ -1,9 +1,6 @@
 package mau.donate.objects;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import mau.donate.objects.enums.StorageStatus;
 import org.solarframework.db.spring.DatabaseObject;
 
@@ -22,6 +19,7 @@ public class Donation_Item extends DatabaseObject.ID_OBJ<Long, Donation_Item> {
     public String ItemName;
     public int Quantity;
     public long CapacityPerQty = 0;
+    @Enumerated(EnumType.STRING)
     public StorageStatus Status = StorageStatus.NOT_YET_BROUGHT; // NOT_YET_BROUGHT, IN_STORAGE, DELIVERED;
 
     public Donation_Item() {}

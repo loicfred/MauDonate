@@ -2,6 +2,8 @@ package mau.donate.controller.admin.donate;
 
 import mau.donate.objects.*;
 import mau.donate.service.EmailService;
+import org.solarframework.web.auth.obj.Account_Notification;
+import org.solarframework.web.auth.obj.Account_User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,8 +14,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static mau.donate.controller.AppController.addEssential;
 import static org.solarframework.db.spring.DatabaseRegistry.SolarDBManager;
+import static org.solarframework.web.auth.spring.Constants.addEssential;
 
 @CrossOrigin(origins = "*")
 @Controller
@@ -27,8 +29,8 @@ public class DonationController {
 
     @GetMapping("/donate/{reqId}")
     public String donatePage(Model model, Principal loggedUser, @PathVariable Long reqId) {
-        if (loggedUser == null) return "redirect:/accounts/login";
-        User U = User.getByEmail(loggedUser.getName());
+        if (loggedUser == null) return "redirect:/auth/v1/login";
+        Account_User U = Account_User.getByEmail(loggedUser.getName());
         addEssential(model, loggedUser, U);
 
         // the request to which we are donating
@@ -42,8 +44,8 @@ public class DonationController {
     }
     @PostMapping("/donate/{reqId}")
     public String doDonation(Model model, Principal loggedUser, @PathVariable Long reqId, @ModelAttribute Donation donation, RedirectAttributes redirectAttributes) {
-        if (loggedUser == null) return "redirect:/accounts/login";
-        User U = User.getByEmail(loggedUser.getName());
+        if (loggedUser == null) return "redirect:/auth/v1/login";
+        Account_User U = Account_User.getByEmail(loggedUser.getName());
         addEssential(model, loggedUser, U);
         Donation_Request req = SolarDBManager.getById(Donation_Request.class, reqId).orElseThrow();
         List<Donation_Item> items = donation.getItems();
@@ -75,8 +77,8 @@ public class DonationController {
 
     @PostMapping("/admin/donation/validate/{id}/accept")
     public String acceptDonation(Model model, Principal loggedUser, @PathVariable Long id, @RequestParam String message, RedirectAttributes redirectAttributes) {
-        if (loggedUser == null) return "redirect:/accounts/login";
-        User U = User.getByAuthentication(loggedUser);
+        if (loggedUser == null) return "redirect:/auth/v1/login";
+        Account_User U = Account_User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
 
@@ -85,26 +87,26 @@ public class DonationController {
         donation.Approved = true;
         donation.UpdateOnly("Approved", "UpdatedAt");
 
-        User donor = donation.getDonor();
+        Account_User donor = donation.getDonor();
         emailService.acceptDonation(donor.getEmail(), donor.getFirstName() + " " + donor.getLastName(), message);
-        new Notification(donor.getID(), "Donation Approved", "Congratulations, your donation has been approved !");
+        new Account_Notification(donor.getID(), "Donation Approved", "Congratulations, your donation has been approved !");
 
         redirectAttributes.addFlashAttribute("successDon", "Successfully accepted the donation from " + donor.getFirstName() + ".");
         return "redirect:/admin?page=0";
     }
     @PostMapping("/admin/donation/validate/{id}/deny")
     public String denyDonation(Model model, Principal loggedUser, @PathVariable Long id, @RequestParam String message, RedirectAttributes redirectAttributes) {
-        if (loggedUser == null) return "redirect:/accounts/login";
-        User U = User.getByAuthentication(loggedUser);
+        if (loggedUser == null) return "redirect:/auth/v1/login";
+        Account_User U = Account_User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
 
         Donation donation = SolarDBManager.getById(Donation.class, id).orElseThrow();
         donation.Delete();
 
-        User donor = donation.getDonor();
+        Account_User donor = donation.getDonor();
         emailService.denyDonation(donor.getEmail(), donor.getFirstName() + " " + donor.getLastName(), message);
-        new Notification(donor.getID(), "Donation Denied", "Unfortunately your donation has been denied. More details sent by email.");
+        new Account_Notification(donor.getID(), "Donation Denied", "Unfortunately your donation has been denied. More details sent by email.");
 
         redirectAttributes.addFlashAttribute("successDon", "Successfully denied the donation from " + donor.getFirstName() + ".");
         return "redirect:/admin?page=0";

@@ -1,11 +1,11 @@
 package mau.donate.controller.admin;
 
 import mau.donate.objects.Donation_Request;
-import mau.donate.objects.Notification;
-import mau.donate.objects.User;
 import mau.donate.objects.derived.D_Donation;
 import mau.donate.objects.derived.D_Warehouse;
-import mau.donate.service.EmailService;
+import org.solarframework.web.auth.obj.Account_Notification;
+import org.solarframework.web.auth.obj.Account_User;
+import org.solarframework.web.auth.spring.AuthEmailService;
 import org.solarframework.db.api.dto.Row;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,24 +16,23 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.util.Map;
 
-import static mau.donate.controller.AppController.addEssential;
-import static mau.donate.controller.admin.DBEditorController.DBObjectPackage;
 import static org.solarframework.db.spring.DatabaseRegistry.SolarDBManager;
+import static org.solarframework.web.auth.spring.Constants.addEssential;
 
 @CrossOrigin(origins = "*")
 @Controller
 public class AdminController {
 
-    private final EmailService emailService;
+    private final AuthEmailService emailService;
 
-    public AdminController(EmailService emailService) {
+    public AdminController(AuthEmailService emailService) {
         this.emailService = emailService;
     }
 
     @GetMapping("/admin")
     public String admin(Model model, Principal loggedUser) {
-        if (loggedUser == null) return "redirect:/accounts/login";
-        User U = User.getByAuthentication(loggedUser);
+        if (loggedUser == null) return "redirect:/auth/v1/login";
+        Account_User U = Account_User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
 
@@ -51,40 +50,24 @@ public class AdminController {
 
     @PostMapping("/admin/email/send")
     public String sendEmail(Model model, Principal loggedUser, @RequestParam String email, @RequestParam String subject, @RequestParam String message, RedirectAttributes redirectAttributes) {
-        if (loggedUser == null) return "redirect:/accounts/login";
-        User U = User.getByAuthentication(loggedUser);
+        if (loggedUser == null) return "redirect:/auth/v1/login";
+        Account_User U = Account_User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
 
-        User receiver = User.getByEmail(email);
+        Account_User receiver = Account_User.getByEmail(email);
         emailService.sendEmail(receiver.getEmail(), subject, message);
-        new Notification(receiver.getID(), subject, message);
+        new Account_Notification(receiver.getID(), subject, message);
 
         redirectAttributes.addFlashAttribute("successDb", "Successfully sent an email to " + receiver.getFirstName() + ".");
         return "redirect:/admin?page=3";
     }
 
     @ResponseBody
-    @GetMapping("/admin/list/{item}")
-    public Map<String, ?> fetchItemList(Model model, Principal loggedUser, @PathVariable String item) {
-        if (loggedUser == null) return null;
-        User U = User.getByAuthentication(loggedUser);
-        if (!U.getRole().equals("ADMIN")) return null;
-        addEssential(model, loggedUser, U);
-        try {
-            item = item.substring(0, 1).toUpperCase() + item.substring(1);
-            Class<?> objClass = Class.forName(DBObjectPackage + item);
-            return Map.of("tblstats", SolarDBManager.getService(objClass).getTableStats(item), "items", SolarDBManager.getAll(objClass));
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    @ResponseBody
     @GetMapping("/admin/stats/{year}/{month}")
     public Map<String, Object> fetchItemList(Model model, Principal loggedUser, @PathVariable Long year, @PathVariable Long month) {
         if (loggedUser == null) return null;
-        User U = User.getByAuthentication(loggedUser);
+        Account_User U = Account_User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return null;
         addEssential(model, loggedUser, U);
         try {

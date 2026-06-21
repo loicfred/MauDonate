@@ -3,10 +3,9 @@ package mau.donate.controller.system;
 import com.paypal.core.PayPalHttpClient;
 import com.paypal.orders.*;
 import mau.donate.objects.Fundraising;
-import mau.donate.objects.Notification;
-import mau.donate.objects.User;
 import mau.donate.objects.enums.PaymentStatus;
-import mau.donate.service.ExchangeRateService;
+import org.solarframework.web.auth.obj.Account_Notification;
+import org.solarframework.web.auth.obj.Account_User;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -58,7 +57,7 @@ public class PayPalController {
     @PostMapping("/capture-order/{orderId}")
     public Map<String, Object> captureOrder(Principal loggedUser, @PathVariable String orderId, @RequestBody Map<String, Object> payload) throws IOException {
         if (loggedUser == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User must be authenticated");
-        User U = User.getByEmail(loggedUser.getName());
+        Account_User U = Account_User.getByEmail(loggedUser.getName());
         Fundraising fundraising = new Fundraising(orderId, U.getID(), 0, payload.get("title").toString(), payload.get("comment").toString());
         try {
             Order order = payPalClient.execute(new OrdersCaptureRequest(orderId).requestBody(new OrderRequest())).result();
@@ -66,7 +65,7 @@ public class PayPalController {
             String typeUsd = order.purchaseUnits().getFirst().payments().captures().getFirst().amount().currencyCode();
 
             fundraising.USD = Double.parseDouble(amountUsd);
-            Notification notif = new Notification(U.getID(), "Successfully donated to fundraising!", "Transaction " + amountUsd + " " + typeUsd + " successfully done to fundraising.");
+            Account_Notification notif = new Account_Notification(U.getID(), "Successfully donated to fundraising!", "Transaction " + amountUsd + " " + typeUsd + " successfully done to fundraising.");
             fundraising.Status = PaymentStatus.COMPLETED.name();
             return Map.of("status", order.status(), "id", order.id(), "amountUsd", amountUsd, "currencyUsd", typeUsd, "notification", notif);
         } catch (Exception e) {

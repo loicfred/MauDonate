@@ -1,9 +1,9 @@
 package mau.donate.controller.admin;
 
 import mau.donate.objects.Donation_Item;
-import mau.donate.objects.User;
 import mau.donate.objects.Warehouse;
 import mau.donate.objects.derived.D_Warehouse;
+import org.solarframework.web.auth.obj.Account_User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,8 +11,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 
-import static mau.donate.controller.AppController.addEssential;
 import static org.solarframework.db.spring.DatabaseRegistry.SolarDBManager;
+import static org.solarframework.web.auth.spring.Constants.addEssential;
 
 @CrossOrigin(origins = "*")
 @Controller
@@ -23,8 +23,8 @@ public class WarehouseController {
 
     @GetMapping("/admin/warehouse/{id}")
     public String ViewWarehouse(Model model, Principal loggedUser, @PathVariable Long id) {
-        if (loggedUser == null) return "redirect:/accounts/login";
-        User U = User.getByAuthentication(loggedUser);
+        if (loggedUser == null) return "redirect:/auth/v1/login";
+        Account_User U = Account_User.getByAuthentication(loggedUser);
         if (!U.getRole().equals("ADMIN")) return "redirect:/home";
         addEssential(model, loggedUser, U);
 
@@ -34,8 +34,8 @@ public class WarehouseController {
 
     @PostMapping("/admin/warehouse/{warehouseId}/items/update")
     public String updateItemStatus(Principal loggedUser, @PathVariable Long warehouseId, @ModelAttribute Warehouse warehouse, RedirectAttributes redirectAttributes) {
-        if (loggedUser == null) return "redirect:/accounts/login";
-        User U = User.getByAuthentication(loggedUser);
+        if (loggedUser == null) return "redirect:/auth/v1/login";
+        Account_User U = Account_User.getByAuthentication(loggedUser);
         try {
             if (!U.getRole().equals("ADMIN")) throw new Exception("Unauthorized");
             for (Donation_Item I : warehouse.getItems()) {

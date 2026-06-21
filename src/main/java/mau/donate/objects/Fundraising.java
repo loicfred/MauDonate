@@ -5,6 +5,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import mau.donate.objects.enums.PaymentStatus;
+import org.solarframework.web.auth.obj.Account_User;
 import org.solarframework.db.spring.DatabaseObject;
 
 import java.time.LocalDateTime;
@@ -17,7 +18,7 @@ import static org.solarframework.core.util.StringUtils.StopString;
 public class Fundraising extends DatabaseObject.ID_OBJ<String, Fundraising> {
     @ManyToOne
     @JoinColumn(referencedColumnName = "ID", name = "DonorID")
-    private transient User D = null;
+    private transient Account_User D = null;
 
     public long DonorID;
     public double USD;
@@ -37,8 +38,8 @@ public class Fundraising extends DatabaseObject.ID_OBJ<String, Fundraising> {
         Write();
     }
 
-    public User getDonor() {
-        return D == null ? D = SolarDBManager.getById(User.class, DonorID).orElse(null) : D;
+    public Account_User getDonor() {
+        return D == null ? D = SolarDBManager.getById(Account_User.class, DonorID).orElse(null) : D;
     }
 
 }

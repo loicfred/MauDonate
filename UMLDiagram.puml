@@ -34,7 +34,7 @@ enum DonationStatus {
 ' =========================
 ' CORE ENTITIES
 ' =========================
-class User {
+class Account_User {
   Long ID
   String Email
   String Password
